@@ -27,112 +27,16 @@
 <x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen dashboard-page">
     <div class="dashboard-layout">
         <aside class="dashboard-sidebar">
-            <div class="sidebar-brand">
-                <div class="brand-icon">
-                    <span></span>
-                </div>
-                <div>
-                    <h1>Terapi Rohani</h1>
-                    <p>Pasien Paliatif</p>
-                </div>
-            </div>
-
-            <nav class="sidebar-nav">
-                <a class="nav-item" href="{{ route('dashboard') }}">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Beranda') }}
-                </a>
-                <a class="nav-item" href="#">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12zm0 2.5c-4 0-7.5 2-7.5 4.5V22h15v-3c0-2.5-3.5-4.5-7.5-4.5z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Pasien') }}
-                </a>
-                <a class="nav-item" href="{{ route('menu.assessment') }}">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm8 1v4h4" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Pengkajian') }}
-                </a>
-                <a class="nav-item" href="{{ route('menu.spiritual-needs') }}">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.2 5.4 5.8.5-4.4 3.8 1.4 5.7L12 15.8 7 18.4l1.4-5.7L4 8.9l5.8-.5z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Intervensi') }}
-                </a>
-
-                <div class="nav-group">
-                    <div class="nav-item is-active">
-                        <span class="nav-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v12l-4-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="currentColor"/></svg>
-                        </span>
-                        {{ __('Evaluasi') }}
-                    </div>
-                    <div class="nav-sub">
-                        <a class="nav-sub-item is-active" href="{{ route('menu.emotional-evaluation') }}">{{ __('Evaluasi Perasaan') }}</a>
-                        <a class="nav-sub-item" href="#">{{ __('Riwayat Evaluasi') }}</a>
-                    </div>
-                </div>
-
-                <a class="nav-item" href="#">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v3M17 2v3M4 7h16v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7zm2 4h4v4H6z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Jadwal & Aktivitas') }}
-                </a>
-                <a class="nav-item" href="{{ route('education.index') }}">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l9-4 9 4-9 4-9-4zm0 5l9 4 9-4v7l-9 4-9-4v-7z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Referensi') }}
-                </a>
-                <a class="nav-item" href="#">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16v2H4zM5 4h4v12H5zM10 10h4v6h-4zM15 7h4v9h-4z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Laporan') }}
-                </a>
-                <a class="nav-item" href="{{ route('profile.edit') }}">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm8 8.5V22H4v-5.5A6.5 6.5 0 0 1 10.5 10h3A6.5 6.5 0 0 1 20 16.5z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Pengaturan') }}
-                </a>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="footer-card">
-                    <p class="footer-title">RS PKU Muhammadiyah</p>
-                    <p class="footer-subtitle">Gombong</p>
-                    <p class="footer-text">Melayani dengan iman, profesional dan humanis.</p>
-                </div>
-            </div>
+            <x-app-sidebar />
         </aside>
 
         <main class="dashboard-main">
-            <header class="dashboard-topbar">
-                <div>
-                    <h2>Evaluasi Perasaan</h2>
-                    <p>Terapi Rohani Pasien Paliatif</p>
-                </div>
-                <div class="topbar-actions">
-                    <button class="icon-button" type="button" aria-label="Notifikasi">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2zm7-6V11a7 7 0 1 0-14 0v5l-2 2v1h18v-1z" fill="currentColor"/></svg>
-                        <span class="badge">3</span>
-                    </button>
-                    <button class="icon-button" type="button" aria-label="Bantuan">?</button>
-                    <div class="user-chip">
-                        <div class="avatar">{{ strtoupper(substr($nurseName, 0, 1)) }}</div>
-                        <div>
-                            <div class="user-name">{{ $nurseName }}</div>
-                            <div class="user-role">{{ $nurseRole }}</div>
-                        </div>
-                        <span class="chevron">v</span>
-                    </div>
-                </div>
-            </header>
+            <x-app-topbar
+                class="dashboard-topbar"
+                title="Evaluasi Perasaan"
+                subtitle="Terapi Rohani Pasien Paliatif"
+                :badgeCount="3"
+            />
 
             <section class="card evaluation-hero">
                 <div class="patient-profile">
@@ -323,7 +227,7 @@
         }
 
         .dashboard-sidebar {
-            background: var(--surface-muted);
+            background: var(--surface);
             padding: 28px 20px;
             border-right: 1px solid #edf2f7;
             display: flex;
@@ -449,13 +353,23 @@
             padding: 28px 32px 48px;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 8px;
         }
 
         .dashboard-topbar {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
             align-items: center;
-            justify-content: space-between;
+        }
+
+        .dashboard-topbar > div:first-child {
+            grid-column: 2;
+            text-align: center;
+        }
+
+        .dashboard-topbar .topbar-actions {
+            grid-column: 3;
+            justify-self: end;
         }
 
         .dashboard-topbar h2 {
@@ -632,6 +546,12 @@
             display: grid;
             grid-template-columns: 2.1fr 1fr;
             gap: 20px;
+        }
+
+        .evaluation-main,
+        .evaluation-side {
+            display: grid;
+            gap: 8px;
         }
 
         .card-header h4 {
@@ -875,10 +795,21 @@
         }
 
         @media (max-width: 1200px) {
-            .evaluation-hero {
-                grid-template-columns: 1fr;
+            .dashboard-topbar {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
             }
 
+            .dashboard-topbar > div:first-child {
+                text-align: left;
+            }
+
+            .dashboard-topbar .topbar-actions {
+                justify-self: auto;
+                align-self: flex-start;
+            }
             .hero-metrics {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }

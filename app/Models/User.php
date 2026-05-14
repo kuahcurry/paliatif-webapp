@@ -51,4 +51,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(CaregiverAssessment::class);
     }
+
+    public function ecogAssessments(): HasMany
+    {
+        return $this->hasMany(EcogAssessment::class);
+    }
+
+    public function esasAssessments(): HasMany
+    {
+        return $this->hasMany(EsasAssessment::class);
+    }
+
+    public function swbsAssessments(): HasMany
+    {
+        return $this->hasMany(SwbsAssessment::class);
+    }
 }

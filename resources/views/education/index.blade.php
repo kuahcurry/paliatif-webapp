@@ -29,74 +29,17 @@
 <x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen education-page">
     <div class="education-layout">
         <aside class="education-sidebar">
-            <div class="sidebar-brand">
-                <div class="brand-icon">
-                    <span></span>
-                </div>
-                <div>
-                    <h1>Terapi Rohani</h1>
-                    <p>Pasien Paliatif</p>
-                    <small>RS PKU Muhammadiyah Gombong</small>
-                </div>
-            </div>
-
-            <nav class="sidebar-nav">
-                <a class="nav-item" href="{{ route('dashboard') }}">Beranda</a>
-                <a class="nav-item" href="#">Pasien</a>
-                <a class="nav-item" href="{{ route('menu.assessment') }}">Pengkajian</a>
-                <a class="nav-item" href="{{ route('menu.spiritual-needs') }}">Intervensi</a>
-                <a class="nav-item" href="{{ route('menu.emotional-evaluation') }}">Evaluasi</a>
-                <a class="nav-item" href="{{ route('journals.index') }}">Jurnal & Catatan</a>
-
-                <div class="nav-group">
-                    <div class="nav-item is-active">Modul Edukasi</div>
-                    <div class="nav-sub">
-                        <a class="nav-sub-item is-active" href="{{ route('education.index') }}">Untuk Caregiver</a>
-                        <a class="nav-sub-item" href="#">Untuk Pasien</a>
-                        <a class="nav-sub-item" href="#">Untuk Keluarga</a>
-                    </div>
-                </div>
-
-                <a class="nav-item" href="#">Jadwal & Aktivitas</a>
-                <a class="nav-item" href="#">Referensi</a>
-                <a class="nav-item" href="#">Laporan</a>
-                <a class="nav-item" href="{{ route('profile.edit') }}">Pengaturan</a>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="footer-card">
-                    <p class="footer-title">RS PKU Muhammadiyah</p>
-                    <p class="footer-subtitle">Gombong</p>
-                    <p class="footer-text">Melayani dengan iman, profesional dan humanis.</p>
-                </div>
-            </div>
+            <x-app-sidebar />
         </aside>
 
         <main class="education-main">
-            <header class="education-topbar">
-                <button class="ghost-button" type="button" aria-label="Menu">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
-                </button>
-                <div>
-                    <h2>Modul Edukasi untuk Caregiver</h2>
-                    <p>Edukasi spiritual-psikososial</p>
-                </div>
-                <div class="topbar-actions">
-                    <button class="icon-button" type="button" aria-label="Notifikasi">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2zm7-6V11a7 7 0 1 0-14 0v5l-2 2v1h18v-1z" fill="currentColor"/></svg>
-                        <span class="badge">3</span>
-                    </button>
-                    <button class="icon-button" type="button" aria-label="Bantuan">?</button>
-                    <div class="user-chip">
-                        <div class="avatar">{{ strtoupper(substr($nurseName, 0, 1)) }}</div>
-                        <div>
-                            <div class="user-name">{{ $nurseName }}</div>
-                            <div class="user-role">{{ $nurseRole }}</div>
-                        </div>
-                        <span class="chevron">v</span>
-                    </div>
-                </div>
-            </header>
+            <x-app-topbar
+                class="education-topbar"
+                title="Modul Edukasi untuk Caregiver"
+                subtitle="Edukasi spiritual-psikososial"
+                :showMenuButton="true"
+                :badgeCount="3"
+            />
 
             <section class="card patient-card">
                 <div class="patient-profile">
@@ -363,11 +306,25 @@
         .nav-item {
             display: flex;
             align-items: center;
+            gap: 10px;
             padding: 10px 12px;
             border-radius: 12px;
             color: var(--muted);
             text-decoration: none;
             font-size: 0.9rem;
+        }
+
+        .nav-icon {
+            width: 20px;
+            height: 20px;
+            display: grid;
+            place-items: center;
+            color: currentColor;
+        }
+
+        .nav-icon svg {
+            width: 18px;
+            height: 18px;
         }
 
         .nav-item.is-active,
@@ -423,14 +380,34 @@
             padding: 26px 32px 48px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 8px;
+        }
+
+        .education-left,
+        .education-right {
+            display: grid;
+            gap: 8px;
         }
 
         .education-topbar {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
             align-items: center;
-            justify-content: space-between;
-            gap: 16px;
+        }
+
+        .education-topbar > div:not(.topbar-actions) {
+            grid-column: 2;
+            text-align: center;
+        }
+
+        .education-topbar .ghost-button {
+            grid-column: 1;
+            justify-self: start;
+        }
+
+        .education-topbar .topbar-actions {
+            grid-column: 3;
+            justify-self: end;
         }
 
         .education-topbar h2 {
@@ -927,8 +904,19 @@
             }
 
             .education-topbar {
+                display: flex;
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 12px;
+            }
+
+            .education-topbar > div:not(.topbar-actions) {
+                text-align: left;
+            }
+
+            .education-topbar .topbar-actions {
+                justify-self: auto;
+                align-self: flex-start;
             }
         }
     </style>

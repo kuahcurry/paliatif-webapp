@@ -14,8 +14,62 @@ class CaregiverAssessmentController extends Controller
             ->orderByDesc('created_at')
             ->first();
 
+        $ecogHistory = $request->user()?->ecogAssessments()
+            ->orderByDesc('created_at')
+            ->take(5)
+            ->get() ?? collect();
+
+        $latestEcog = $ecogHistory->first();
+
+        $esasHistory = $request->user()?->esasAssessments()
+            ->orderByDesc('created_at')
+            ->take(5)
+            ->get() ?? collect();
+
+        $latestEsas = $esasHistory->first();
+
+        $swbsHistory = $request->user()?->swbsAssessments()
+            ->orderByDesc('created_at')
+            ->take(5)
+            ->get() ?? collect();
+
+        $latestSwbs = $swbsHistory->first();
+
+        $assessmentHistory = collect()
+            ->merge($swbsHistory->map(function ($entry) {
+                return [
+                    'date' => $entry->created_at,
+                    'instrument' => 'SWBS',
+                    'result' => 'Total ' . $entry->total_score,
+                ];
+            }))
+            ->merge($ecogHistory->map(function ($entry) {
+                return [
+                    'date' => $entry->created_at,
+                    'instrument' => 'ECOG',
+                    'result' => $entry->score_label,
+                ];
+            }))
+            ->merge($esasHistory->map(function ($entry) {
+                return [
+                    'date' => $entry->created_at,
+                    'instrument' => 'ESAS',
+                    'result' => 'Total ' . $entry->total_score,
+                ];
+            }))
+            ->sortByDesc('date')
+            ->take(8)
+            ->values();
+
         return view('menu.assessment', [
             'latestAssessment' => $latestAssessment,
+            'ecogHistory' => $ecogHistory,
+            'latestEcog' => $latestEcog,
+            'esasHistory' => $esasHistory,
+            'latestEsas' => $latestEsas,
+            'swbsHistory' => $swbsHistory,
+            'latestSwbs' => $latestSwbs,
+            'assessmentHistory' => $assessmentHistory,
         ]);
     }
 

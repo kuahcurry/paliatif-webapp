@@ -16,113 +16,134 @@
     $statusLabel = $latestAssessment ? 'Dalam Proses' : 'Belum Dimulai';
     $statusTone = $latestAssessment ? 'status-pill success' : 'status-pill warning';
     $lastSaved = $latestAssessment?->updated_at?->format('H:i') ?? now()->format('H:i');
+    $ecogOptions = [
+        [
+            'score' => 0,
+            'label' => 'Asimtomatik, aktif sepenuhnya, mampu melakukan semua aktivitas tanpa hambatan.',
+        ],
+        [
+            'score' => 1,
+            'label' => 'Simptomatik namun bisa sepenuhnya berjalan, kegiatan fisik terbatas dan bisa melakukan kerja ringan atau tidak bergerak misalnya pekerjaan rumah tangga yang ringan dan pekerjaan kantor.',
+        ],
+        [
+            'score' => 2,
+            'label' => 'Simptomatik, kurang dari 50 persen berada ditempat tidur sepanjang hari, dapat berjalan dan merawat diri tapi tidak bisa melakukan aktivitas kerja.',
+        ],
+        [
+            'score' => 3,
+            'label' => 'Mampu merawat diri sendiri tetapi tidak mampu melakukan pekerjaan dan lebih dari 50 persen waktu harus berbaring.',
+        ],
+        [
+            'score' => 4,
+            'label' => 'Tidak bisa melakukan rawat diri apapun, sepenuhnya harus ditempat tidur atau kursi.',
+        ],
+        [
+            'score' => 5,
+            'label' => 'Meninggal.',
+        ],
+    ];
+    $scoreLegend = [
+        ['label' => 'Sangat Baik', 'tone' => 'good'],
+        ['label' => 'Cukup Baik', 'tone' => 'calm'],
+        ['label' => 'Kurang Baik', 'tone' => 'warn'],
+    ];
+    $swbsScale = [
+        ['value' => 6, 'short' => 'SS', 'label' => 'Sangat Setuju'],
+        ['value' => 5, 'short' => 'CS', 'label' => 'Cukup Setuju'],
+        ['value' => 4, 'short' => 'S', 'label' => 'Setuju'],
+        ['value' => 3, 'short' => 'TS', 'label' => 'Tidak Setuju'],
+        ['value' => 2, 'short' => 'CTS', 'label' => 'Cukup Tidak Setuju'],
+        ['value' => 1, 'short' => 'STS', 'label' => 'Sangat Tidak Setuju'],
+    ];
+    $swbsStatements = [
+        'Saya merasa damai dan tenteram di dalam diri saya.',
+        'Saya merasa memiliki hubungan yang dekat dengan Tuhan.',
+        'Saya menemukan makna dan tujuan hidup saya.',
+        'Saya merasa takut menghadapi kematian.',
+        'Saya merasa hidup saya penuh harapan.',
+        'Saya merasa jauh dari Tuhan.',
+        'Saya merasa hidup saya tidak memiliki arti.',
+        'Saya merasa diberkati dalam hidup saya.',
+        'Saya merasa hidup saya penuh dengan kedamaian.',
+        'Saya merasa putus asa dengan masa depan saya.',
+        'Saya merasa hidup saya bernilai.',
+        'Saya merasa tidak ada hal yang bisa membuat saya bahagia.',
+        'Saya merasa Tuhan peduli dengan saya.',
+        'Saya merasa hidup saya penuh dengan rasa syukur.',
+        'Saya merasa sulit mempercayai Tuhan.',
+        'Saya merasa hidup saya membawa kebaikan bagi orang lain.',
+        'Saya merasa tidak memiliki kekuatan dalam diri saya.',
+        'Saya merasa yakin akan pertolongan Tuhan.',
+        'Saya merasa sulit menerima keadaan saya sekarang.',
+        'Saya merasa hidup saya masih memiliki tujuan yang jelas.',
+    ];
+    $esasQuestions = [
+        [
+            'name' => 'pain',
+            'left' => 'Tidak nyeri',
+            'right' => 'Nyeri hebat',
+        ],
+        [
+            'name' => 'fatigue',
+            'left' => 'Tidak lelah',
+            'right' => 'Perasaan lelah yang hebat',
+        ],
+        [
+            'name' => 'nausea',
+            'left' => 'Tidak mual',
+            'right' => 'Mual hebat dan parah',
+        ],
+        [
+            'name' => 'stress',
+            'left' => 'Tidak stress',
+            'right' => 'Stress hebat dan parah',
+        ],
+        [
+            'name' => 'anxiety',
+            'left' => 'Tidak cemas',
+            'right' => 'Cemas parah',
+        ],
+        [
+            'name' => 'drowsiness',
+            'left' => 'Tidak merasa mengantuk',
+            'right' => 'Mengantuk hebat',
+        ],
+        [
+            'name' => 'appetite',
+            'left' => 'Selera makan baik',
+            'right' => 'Selera makan buruk',
+        ],
+        [
+            'name' => 'wellbeing',
+            'left' => 'Merasa sehat dan segar bugar',
+            'right' => 'Perasaan tidak berdaya',
+        ],
+        [
+            'name' => 'shortness_of_breath',
+            'left' => 'Tidak sesak nafas',
+            'right' => 'Sesak nafas berat',
+        ],
+        [
+            'name' => 'other_problem',
+            'left' => 'Tidak ada masalah',
+            'right' => 'Masalah berat (klg, keuangan, kesehatan)',
+        ],
+    ];
 @endphp
 
 <x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen dashboard-page">
     <div class="dashboard-layout">
         <aside class="dashboard-sidebar">
-            <div class="sidebar-brand">
-                <div class="brand-icon">
-                    <span></span>
-                </div>
-                <div>
-                    <h1>Terapi Rohani</h1>
-                    <p>Pasien Paliatif</p>
-                </div>
-            </div>
-
-            <nav class="sidebar-nav">
-                <a class="nav-item" href="{{ route('dashboard') }}">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Beranda') }}
-                </a>
-
-                <div class="nav-group">
-                    <div class="nav-item is-active">
-                        <span class="nav-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm8 1v4h4" fill="currentColor"/></svg>
-                        </span>
-                        {{ __('Pengkajian') }}
-                    </div>
-                    <div class="nav-sub">
-                        <a class="nav-sub-item is-active" href="{{ route('menu.assessment') }}">{{ __('Pengkajian Awal') }}</a>
-                        <a class="nav-sub-item" href="#">SWBS</a>
-                        <a class="nav-sub-item" href="#">ECOG</a>
-                        <a class="nav-sub-item" href="#">ESAS</a>
-                    </div>
-                </div>
-
-                <a class="nav-item" href="{{ route('menu.spiritual-needs') }}">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.2 5.4 5.8.5-4.4 3.8 1.4 5.7L12 15.8 7 18.4l1.4-5.7L4 8.9l5.8-.5z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Intervensi') }}
-                </a>
-                <a class="nav-item" href="{{ route('menu.emotional-evaluation') }}">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v12l-4-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Evaluasi') }}
-                </a>
-                <a class="nav-item" href="#">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v3M17 2v3M4 7h16v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7zm2 4h4v4H6z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Jadwal & Aktivitas') }}
-                </a>
-                <a class="nav-item" href="{{ route('education.index') }}">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l9-4 9 4-9 4-9-4zm0 5l9 4 9-4v7l-9 4-9-4v-7z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Referensi') }}
-                </a>
-                <a class="nav-item" href="#">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16v2H4zM5 4h4v12H5zM10 10h4v6h-4zM15 7h4v9h-4z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Laporan') }}
-                </a>
-                <a class="nav-item" href="{{ route('profile.edit') }}">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm8 8.5V22H4v-5.5A6.5 6.5 0 0 1 10.5 10h3A6.5 6.5 0 0 1 20 16.5z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Pengaturan') }}
-                </a>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="footer-card">
-                    <p class="footer-title">RS PKU Muhammadiyah</p>
-                    <p class="footer-subtitle">Gombong</p>
-                    <p class="footer-text">Melayani dengan iman, profesional dan humanis.</p>
-                </div>
-            </div>
+            <x-app-sidebar />
         </aside>
 
         <main class="dashboard-main">
-            <header class="dashboard-topbar">
-                <div>
-                    <h2>Pengkajian Awal</h2>
-                    <p>Terapi Rohani Pasien Paliatif</p>
-                </div>
-                <div class="topbar-actions">
-                    <button class="icon-button" type="button" aria-label="Notifikasi">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2zm7-6V11a7 7 0 1 0-14 0v5l-2 2v1h18v-1z" fill="currentColor"/></svg>
-                        <span class="badge">3</span>
-                    </button>
-                    <button class="icon-button" type="button" aria-label="Bantuan">?</button>
-                    <div class="user-chip">
-                        <div class="avatar">{{ strtoupper(substr($assessmentBy, 0, 1)) }}</div>
-                        <div>
-                            <div class="user-name">{{ $assessmentBy }}</div>
-                            <div class="user-role">{{ $assessmentRole }}</div>
-                        </div>
-                        <span class="chevron">v</span>
-                    </div>
-                </div>
-            </header>
+            <x-app-topbar
+                class="dashboard-topbar"
+                title="Pengkajian Awal"
+                subtitle="Terapi Rohani Pasien Paliatif"
+                :badgeCount="3"
+            />
 
             @if (session('status') === 'assessment-saved')
                 <div class="alert success">{{ __('Pengkajian caregiver tersimpan.') }}</div>
@@ -174,41 +195,211 @@
 
             <section class="assessment-content">
                 <div class="assessment-main">
-                    <div class="card">
+                    <div class="card is-collapsed" data-collapsible>
                         <div class="card-header">
                             <div>
-                                <h4>Pilih Instrumen Pengkajian</h4>
-                                <p>Silakan pilih instrumen untuk melakukan pengkajian awal pasien.</p>
+                                <h4>Spiritual Well-Being Scale (SWBS)</h4>
+                                <p>Pilih satu jawaban pada setiap pernyataan.</p>
+                            </div>
+                            <div class="card-actions">
+                                @if (!$latestSwbs)
+                                    <span class="status-chip warning" title="Belum diisi" aria-label="Belum diisi">!</span>
+                                    <span class="status-text warning">Perlu diisi!</span>
+                                @else
+                                    <span class="status-chip success" title="Sudah diisi" aria-label="Sudah diisi">✓</span>
+                                @endif
+                                <div class="swbs-legend">
+                                    @foreach ($swbsScale as $option)
+                                        <span class="swbs-pill">{{ $option['short'] }} - {{ $option['label'] }}</span>
+                                    @endforeach
+                                </div>
+                                <button type="button" class="collapse-toggle" aria-expanded="false" aria-label="Perluas atau minimalkan">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </button>
                             </div>
                         </div>
 
-                        <div class="instrument-grid">
-                            <div class="instrument-card green">
-                                <div class="instrument-icon">
-                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-3.5-8-7.5C2 8.5 5 6 8 6c1.7 0 3.2 1 4 2.3C12.8 7 14.3 6 16 6c3 0 6 2.5 4 7.5-2 4-8 7.5-8 7.5z" fill="currentColor"/></svg>
-                                </div>
-                                <h5>Spiritual Well Being Scale (SWBS)</h5>
-                                <p>Mengukur kesejahteraan spiritual pasien dalam hubungan dengan diri sendiri, orang lain, dan Tuhan.</p>
-                                <button type="button">Mulai Pengkajian</button>
-                            </div>
+                        <div class="card-body">
+                            @if (session('status') === 'swbs-saved')
+                                <div class="alert success">Pengkajian SWBS tersimpan.</div>
+                            @endif
 
-                            <div class="instrument-card blue">
-                                <div class="instrument-icon">
-                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v4H7zM5 10h14v10H5z" fill="currentColor"/></svg>
-                                </div>
-                                <h5>Eastern Cooperative Oncology Group (ECOG)</h5>
-                                <p>Menilai tingkat kemampuan pasien dalam beraktivitas sehari-hari dan kondisi fungsional.</p>
-                                <button type="button">Mulai Pengkajian</button>
-                            </div>
+                            <form method="POST" action="{{ route('menu.assessment.swbs.store') }}" class="swbs-form">
+                                @csrf
 
-                            <div class="instrument-card purple">
-                                <div class="instrument-icon">
-                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18H6z" fill="currentColor"/></svg>
+                                @foreach ($swbsStatements as $index => $statement)
+                                    @php
+                                        $questionNumber = $index + 1;
+                                    @endphp
+                                    <div class="swbs-row">
+                                        <div class="swbs-statement">
+                                            <span class="swbs-index">{{ $questionNumber }}</span>
+                                            <span>{{ $statement }}</span>
+                                        </div>
+                                        <div class="swbs-scale">
+                                            @foreach ($swbsScale as $option)
+                                                <label>
+                                                    <input type="radio" name="q{{ $questionNumber }}" value="{{ $option['value'] }}" @checked(old('q' . $questionNumber, $latestSwbs?->{'q' . $questionNumber}) == $option['value']) required>
+                                                    <span>{{ $option['short'] }}</span>
+                                                </label>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endforeach
+
+                                <div class="score-summary">
+                                    <div class="score-info">
+                                        <span class="score-pill" id="swbs-total-score">-</span>
+                                        <span class="score-label">Total skor SWBS</span>
+                                    </div>
+                                    <button type="submit" class="primary-button">Simpan SWBS</button>
                                 </div>
-                                <h5>Edmonton Symptom Assessment System (ESAS)</h5>
-                                <p>Menilai intensitas gejala fisik dan emosional yang dialami pasien.</p>
-                                <button type="button">Mulai Pengkajian</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card is-collapsed" data-collapsible>
+                        <div class="card-header">
+                            <div>
+                                <h4>ECOG Performance Status Scale</h4>
+                                <p>Gunakan skala ini untuk menilai kemampuan pasien menjalankan aktivitas sehari-hari.</p>
                             </div>
+                            <div class="card-actions">
+                                @if (!$latestEcog)
+                                    <span class="status-chip warning" title="Belum diisi" aria-label="Belum diisi">!</span>
+                                    <span class="status-text warning">Perlu diisi!</span>
+                                @else
+                                    <span class="status-chip success" title="Sudah diisi" aria-label="Sudah diisi">✓</span>
+                                @endif
+                                <div class="score-legend">
+                                    @foreach ($scoreLegend as $legend)
+                                        <span class="legend-item {{ $legend['tone'] }}">{{ $legend['label'] }}</span>
+                                    @endforeach
+                                </div>
+                                <button type="button" class="collapse-toggle" aria-expanded="false" aria-label="Perluas atau minimalkan">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            @if (session('status') === 'ecog-saved')
+                                <div class="alert success">Pengkajian ECOG tersimpan.</div>
+                            @endif
+
+                            <form method="POST" action="{{ route('menu.assessment.ecog.store') }}" class="ecog-form">
+                                @csrf
+
+                                <div class="ecog-meta">
+                                    <div class="field">
+                                        <label for="respondent_initials">Inisial responden</label>
+                                        <input id="respondent_initials" name="respondent_initials" type="text" value="{{ old('respondent_initials', $latestEcog?->respondent_initials) }}" placeholder="Mis. AH" />
+                                    </div>
+                                    <div class="field">
+                                        <label for="age">Umur</label>
+                                        <input id="age" name="age" type="number" min="0" max="130" value="{{ old('age', $latestEcog?->age) }}" placeholder="Tahun" />
+                                    </div>
+                                    <div class="field">
+                                        <label for="gender">Jenis kelamin</label>
+                                        <input id="gender" name="gender" type="text" value="{{ old('gender', $latestEcog?->gender) }}" placeholder="Laki-laki / Perempuan" />
+                                    </div>
+                                    <div class="field">
+                                        <label for="marital_status">Status pernikahan</label>
+                                        <input id="marital_status" name="marital_status" type="text" value="{{ old('marital_status', $latestEcog?->marital_status) }}" placeholder="Menikah / Belum" />
+                                    </div>
+                                    <div class="field">
+                                        <label for="cancer_stage">Stadium kanker</label>
+                                        <input id="cancer_stage" name="cancer_stage" type="text" value="{{ old('cancer_stage', $latestEcog?->cancer_stage) }}" placeholder="Stadium" />
+                                    </div>
+                                </div>
+
+                                <div class="ecog-table">
+                                    <div class="ecog-row head">
+                                        <span>Keterangan</span>
+                                        <span>Skor</span>
+                                    </div>
+                                    @foreach ($ecogOptions as $option)
+                                        <label class="ecog-row">
+                                            <span>{{ $option['label'] }}</span>
+                                            <span class="score-cell">
+                                                <input type="radio" name="score" value="{{ $option['score'] }}" @checked(old('score', $latestEcog?->score) == $option['score']) required>
+                                                <span class="score-pill">{{ $option['score'] }}</span>
+                                            </span>
+                                        </label>
+                                    @endforeach
+                                </div>
+
+                                @if ($errors->has('score'))
+                                    <div class="field-error">{{ $errors->first('score') }}</div>
+                                @endif
+
+                                <div class="score-summary">
+                                    <div class="score-info">
+                                        <span class="score-pill" id="ecog-score-value">-</span>
+                                        <span class="score-label" id="ecog-score-label">Belum dipilih</span>
+                                    </div>
+                                    <button type="submit" class="primary-button">Simpan pengkajian</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card is-collapsed" data-collapsible>
+                        <div class="card-header">
+                            <div>
+                                <h4>Edmonton Symptom Assessment System (ESAS)</h4>
+                                <p>Lingkari salah satu nomor sesuai yang dirasakan pasien.</p>
+                            </div>
+                            <div class="card-actions">
+                                @if (!$latestEsas)
+                                    <span class="status-chip warning" title="Belum diisi" aria-label="Belum diisi">!</span>
+                                    <span class="status-text warning">Perlu diisi!</span>
+                                @else
+                                    <span class="status-chip success" title="Sudah diisi" aria-label="Sudah diisi">✓</span>
+                                @endif
+                                <button type="button" class="collapse-toggle" aria-expanded="false" aria-label="Perluas atau minimalkan">
+                                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                                        <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            @if (session('status') === 'esas-saved')
+                                <div class="alert success">Pengkajian ESAS tersimpan.</div>
+                            @endif
+
+                            <form method="POST" action="{{ route('menu.assessment.esas.store') }}" class="esas-form">
+                                @csrf
+
+                                @foreach ($esasQuestions as $question)
+                                    <div class="esas-row">
+                                        <span class="esas-label">{{ $question['left'] }}</span>
+                                        <div class="esas-scale">
+                                            @for ($i = 0; $i <= 10; $i++)
+                                                <label>
+                                                    <input type="radio" name="{{ $question['name'] }}" value="{{ $i }}" @checked(old($question['name'], $latestEsas?->{$question['name']}) == $i) required>
+                                                    <span>{{ $i }}</span>
+                                                </label>
+                                            @endfor
+                                        </div>
+                                        <span class="esas-label right">{{ $question['right'] }}</span>
+                                    </div>
+                                @endforeach
+
+                                <div class="score-summary">
+                                    <div class="score-info">
+                                        <span class="score-pill" id="esas-total-score">-</span>
+                                        <span class="score-label">Total skor ESAS</span>
+                                    </div>
+                                    <button type="submit" class="primary-button">Simpan ESAS</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
 
@@ -232,27 +423,23 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>10 Mei 2024, 14:20</td>
-                                        <td><span class="pill green">SWBS</span></td>
-                                        <td>{{ $assessmentBy }}</td>
-                                        <td><span class="pill success">Selesai</span></td>
-                                        <td><button class="ghost-button" type="button">Lihat</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>10 Mei 2024, 14:45</td>
-                                        <td><span class="pill blue">ECOG</span></td>
-                                        <td>{{ $assessmentBy }}</td>
-                                        <td><span class="pill success">Selesai</span></td>
-                                        <td><button class="ghost-button" type="button">Lihat</button></td>
-                                    </tr>
-                                    <tr>
-                                        <td>10 Mei 2024, 15:10</td>
-                                        <td><span class="pill purple">ESAS</span></td>
-                                        <td>{{ $assessmentBy }}</td>
-                                        <td><span class="pill success">Selesai</span></td>
-                                        <td><button class="ghost-button" type="button">Lihat</button></td>
-                                    </tr>
+                                    @forelse ($assessmentHistory ?? [] as $entry)
+                                        <tr>
+                                            <td>{{ $entry['date']->format('d M Y, H:i') }}</td>
+                                            <td>
+                                                <span class="pill {{ $entry['instrument'] === 'ECOG' ? 'blue' : ($entry['instrument'] === 'SWBS' ? 'green' : 'purple') }}">
+                                                    {{ $entry['instrument'] }}
+                                                </span>
+                                            </td>
+                                            <td>{{ $assessmentBy }}</td>
+                                            <td><span class="pill success">{{ $entry['result'] }}</span></td>
+                                            <td><button class="ghost-button" type="button">Lihat</button></td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="empty-row">Belum ada riwayat pengkajian.</td>
+                                        </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
@@ -342,7 +529,7 @@
         }
 
         .dashboard-sidebar {
-            background: var(--surface-muted);
+            background: var(--surface);
             padding: 28px 20px;
             border-right: 1px solid #edf2f7;
             display: flex;
@@ -358,17 +545,17 @@
         }
 
         .brand-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 14px;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
             background: #dff3df;
             display: grid;
             place-items: center;
         }
 
         .brand-icon span {
-            width: 20px;
-            height: 20px;
+            width: 14px;
+            height: 14px;
             border-radius: 999px;
             background: #63b96b;
             display: block;
@@ -468,13 +655,23 @@
             padding: 28px 32px 48px;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 8px;
         }
 
         .dashboard-topbar {
-            display: flex;
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
             align-items: center;
-            justify-content: space-between;
+        }
+
+        .dashboard-topbar > div:first-child {
+            grid-column: 2;
+            text-align: center;
+        }
+
+        .dashboard-topbar .topbar-actions {
+            grid-column: 3;
+            justify-self: end;
         }
 
         .dashboard-topbar h2 {
@@ -575,6 +772,75 @@
             gap: 16px;
         }
 
+        .card-body {
+            display: grid;
+            gap: 16px;
+        }
+
+        .card-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .status-chip {
+            width: 24px;
+            height: 24px;
+            border-radius: 999px;
+            display: grid;
+            place-items: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .status-chip.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-chip.success {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .status-text {
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-text.warning {
+            color: #92400e;
+        }
+
+        .collapse-toggle {
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            width: 30px;
+            height: 30px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            color: var(--muted);
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+        }
+
+        .collapse-toggle svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.2s ease;
+        }
+
+        .card:not(.is-collapsed) .collapse-toggle svg {
+            transform: rotate(180deg);
+        }
+
+        .card.is-collapsed .card-body {
+            display: none;
+        }
+
         .assessment-hero {
             display: grid;
             grid-template-columns: 1.1fr 2fr;
@@ -672,6 +938,19 @@
             gap: 20px;
         }
 
+        .assessment-main,
+        .assessment-side {
+            display: grid;
+            gap: 8px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
         .card-header h4 {
             font-weight: 700;
             font-size: 1rem;
@@ -680,6 +959,264 @@
         .card-header p {
             font-size: 0.75rem;
             color: var(--muted);
+        }
+
+        .score-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .legend-item {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .legend-item.good { background: #dcfce7; color: #15803d; }
+        .legend-item.calm { background: #e0f2fe; color: #0369a1; }
+        .legend-item.warn { background: #fee2e2; color: #b91c1c; }
+
+        .swbs-form {
+            display: grid;
+            gap: 14px;
+        }
+
+        .swbs-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .swbs-pill {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .swbs-row {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 16px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.78rem;
+            color: #1f2937;
+            align-items: center;
+        }
+
+        .swbs-row:last-child {
+            border-bottom: none;
+        }
+
+        .swbs-statement {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            color: #1f2937;
+        }
+
+        .swbs-index {
+            width: 24px;
+            height: 24px;
+            border-radius: 999px;
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 0.7rem;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            font-weight: 600;
+        }
+
+        .swbs-scale {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 8px;
+            align-items: center;
+        }
+
+        .swbs-scale label {
+            display: grid;
+            justify-items: center;
+            gap: 4px;
+            font-size: 0.7rem;
+            color: var(--muted);
+        }
+
+        .swbs-scale input {
+            width: 14px;
+            height: 14px;
+        }
+
+        .ecog-form {
+            display: grid;
+            gap: 16px;
+        }
+
+        .ecog-meta {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .ecog-meta .field {
+            display: grid;
+            gap: 6px;
+        }
+
+        .ecog-meta label {
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        .ecog-meta input {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 8px 10px;
+            font-size: 0.8rem;
+            background: #ffffff;
+        }
+
+        .ecog-table {
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .ecog-row {
+            display: grid;
+            grid-template-columns: 1fr 120px;
+            gap: 12px;
+            padding: 12px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #1f2937;
+            cursor: pointer;
+        }
+
+        .ecog-row:last-child {
+            border-bottom: none;
+        }
+
+        .ecog-row.head {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+            cursor: default;
+        }
+
+        .score-cell {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .score-cell input {
+            width: 16px;
+            height: 16px;
+        }
+
+        .score-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            background: #e2e8f0;
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .field-error {
+            font-size: 0.75rem;
+            color: #dc2626;
+        }
+
+        .score-summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .esas-form {
+            display: grid;
+            gap: 14px;
+        }
+
+        .esas-row {
+            display: grid;
+            grid-template-columns: 180px 1fr 180px;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.78rem;
+            color: #1f2937;
+        }
+
+        .esas-row:last-child {
+            border-bottom: none;
+        }
+
+        .esas-label {
+            color: var(--muted);
+        }
+
+        .esas-label.right {
+            text-align: right;
+        }
+
+        .esas-scale {
+            display: grid;
+            grid-template-columns: repeat(11, minmax(0, 1fr));
+            gap: 6px;
+            align-items: center;
+        }
+
+        .esas-scale label {
+            display: grid;
+            justify-items: center;
+            gap: 4px;
+            font-size: 0.7rem;
+            color: var(--muted);
+        }
+
+        .esas-scale input {
+            width: 14px;
+            height: 14px;
+        }
+
+        .score-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .score-label {
+            font-size: 0.8rem;
+            color: var(--muted);
+            font-weight: 600;
+        }
+
+        .empty-row {
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.85rem;
+            padding: 12px;
         }
 
         .instrument-grid {
@@ -884,6 +1421,10 @@
                 grid-template-columns: 1fr;
             }
 
+            .ecog-meta {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
             .hero-metrics {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
@@ -895,9 +1436,42 @@
             .instrument-grid {
                 grid-template-columns: 1fr;
             }
+
+            .swbs-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .esas-row {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            .esas-label.right {
+                text-align: left;
+            }
         }
 
         @media (max-width: 900px) {
+            .ecog-meta {
+                grid-template-columns: 1fr;
+            }
+            .dashboard-topbar {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .dashboard-topbar > div:first-child {
+                text-align: left;
+            }
+
+            .dashboard-topbar .topbar-actions {
+                justify-self: auto;
+                align-self: flex-start;
+            }
+
             .dashboard-layout {
                 grid-template-columns: 1fr;
             }
@@ -926,4 +1500,105 @@
             }
         }
     </style>
+
+    <script>
+        const ecogScoreInputs = document.querySelectorAll('input[name="score"]');
+        const scoreValue = document.getElementById('ecog-score-value');
+        const scoreLabel = document.getElementById('ecog-score-label');
+
+        const labelForScore = (value) => {
+            if (value <= 1) {
+                return 'Sangat Baik';
+            }
+            if (value <= 3) {
+                return 'Cukup Baik';
+            }
+            return 'Kurang Baik';
+        };
+
+        const updateScorePreview = () => {
+            const selected = Array.from(ecogScoreInputs).find((input) => input.checked);
+            if (!selected) {
+                if (scoreValue) scoreValue.textContent = '-';
+                if (scoreLabel) scoreLabel.textContent = 'Belum dipilih';
+                return;
+            }
+
+            const score = Number(selected.value);
+            if (scoreValue) scoreValue.textContent = String(score);
+            if (scoreLabel) scoreLabel.textContent = labelForScore(score);
+        };
+
+        ecogScoreInputs.forEach((input) => {
+            input.addEventListener('change', updateScorePreview);
+        });
+
+        updateScorePreview();
+
+        const esasTotal = document.getElementById('esas-total-score');
+        const esasInputs = document.querySelectorAll('.esas-scale input');
+
+        const updateEsasTotal = () => {
+            let total = 0;
+            let hasSelection = false;
+
+            esasInputs.forEach((input) => {
+                if (input.checked) {
+                    total += Number(input.value);
+                    hasSelection = true;
+                }
+            });
+
+            if (esasTotal) {
+                esasTotal.textContent = hasSelection ? String(total) : '-';
+            }
+        };
+
+        esasInputs.forEach((input) => {
+            input.addEventListener('change', updateEsasTotal);
+        });
+
+        updateEsasTotal();
+
+        const swbsTotal = document.getElementById('swbs-total-score');
+        const swbsInputs = document.querySelectorAll('.swbs-scale input');
+
+        const updateSwbsTotal = () => {
+            let total = 0;
+            let hasSelection = false;
+
+            swbsInputs.forEach((input) => {
+                if (input.checked) {
+                    total += Number(input.value);
+                    hasSelection = true;
+                }
+            });
+
+            if (swbsTotal) {
+                swbsTotal.textContent = hasSelection ? String(total) : '-';
+            }
+        };
+
+        swbsInputs.forEach((input) => {
+            input.addEventListener('change', updateSwbsTotal);
+        });
+
+        updateSwbsTotal();
+
+        const collapseButtons = document.querySelectorAll('.collapse-toggle');
+
+        collapseButtons.forEach((button) => {
+            const card = button.closest('.card');
+            if (card) {
+                const collapsed = card.classList.contains('is-collapsed');
+                button.setAttribute('aria-expanded', String(!collapsed));
+            }
+
+            button.addEventListener('click', () => {
+                if (!card) return;
+                const isCollapsed = card.classList.toggle('is-collapsed');
+                button.setAttribute('aria-expanded', String(!isCollapsed));
+            });
+        });
+    </script>
 </x-app-layout>

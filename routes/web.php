@@ -3,6 +3,9 @@
 use App\Http\Controllers\Admin\JournalController as AdminJournalController;
 use App\Http\Controllers\Admin\PrayerController as AdminPrayerController;
 use App\Http\Controllers\CaregiverAssessmentController;
+use App\Http\Controllers\EcogAssessmentController;
+use App\Http\Controllers\EsasAssessmentController;
+use App\Http\Controllers\SwbsAssessmentController;
 use App\Http\Controllers\EducationModuleController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\PrayerController;
@@ -28,6 +31,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/pengkajian-awal', [CaregiverAssessmentController::class, 'index'])->name('menu.assessment');
     Route::post('/pengkajian-awal', [CaregiverAssessmentController::class, 'store'])->name('menu.assessment.store');
+    Route::post('/pengkajian-awal/swbs', [SwbsAssessmentController::class, 'store'])->name('menu.assessment.swbs.store');
+    Route::post('/pengkajian-awal/ecog', [EcogAssessmentController::class, 'store'])->name('menu.assessment.ecog.store');
+    Route::post('/pengkajian-awal/esas', [EsasAssessmentController::class, 'store'])->name('menu.assessment.esas.store');
 
     Route::get('/kebutuhan-spiritual', function () {
         return view('menu.spiritual-needs');

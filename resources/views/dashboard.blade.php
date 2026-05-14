@@ -50,106 +50,16 @@
 <x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen dashboard-page">
     <div class="dashboard-layout">
         <aside class="dashboard-sidebar">
-            <div class="sidebar-brand">
-                <div class="brand-icon">
-                    <span></span>
-                </div>
-                <div>
-                    <h1>Terapi Rohani</h1>
-                    <p>Pasien Paliatif</p>
-                </div>
-            </div>
-
-            <nav class="sidebar-nav">
-                <a class="nav-item {{ request()->routeIs('dashboard') ? 'is-active' : '' }}" href="{{ route('dashboard') }}">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Beranda') }}
-                </a>
-                <a class="nav-item" href="#">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12zm0 2.5c-4 0-7.5 2-7.5 4.5V22h15v-3c0-2.5-3.5-4.5-7.5-4.5z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Pasien') }}
-                </a>
-                <a class="nav-item" href="{{ route('menu.assessment') }}">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm8 1v4h4" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Pengkajian') }}
-                </a>
-                <a class="nav-item" href="{{ route('menu.spiritual-needs') }}">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.2 5.4 5.8.5-4.4 3.8 1.4 5.7L12 15.8 7 18.4l1.4-5.7L4 8.9l5.8-.5z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Intervensi') }}
-                </a>
-                <a class="nav-item" href="{{ route('menu.emotional-evaluation') }}">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16a1 1 0 0 1 1 1v12l-4-3H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Evaluasi') }}
-                </a>
-                <a class="nav-item" href="#daily-check">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v3M17 2v3M4 7h16v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7zm2 4h4v4H6z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Jadwal & Aktivitas') }}
-                </a>
-                <a class="nav-item" href="{{ route('education.index') }}">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l9-4 9 4-9 4-9-4zm0 5l9 4 9-4v7l-9 4-9-4v-7z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Referensi') }}
-                </a>
-                <a class="nav-item" href="#">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16v2H4zM5 4h4v12H5zM10 10h4v6h-4zM15 7h4v9h-4z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Laporan') }}
-                </a>
-                <a class="nav-item" href="{{ route('profile.edit') }}">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0-4-4 4 4 0 0 0 4 4zm8 8.5V22H4v-5.5A6.5 6.5 0 0 1 10.5 10h3A6.5 6.5 0 0 1 20 16.5z" fill="currentColor"/></svg>
-                    </span>
-                    {{ __('Pengaturan') }}
-                </a>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="footer-card">
-                    <p class="footer-title">RS PKU Muhammadiyah</p>
-                    <p class="footer-subtitle">Gombong</p>
-                    <p class="footer-text">Melayani dengan iman, profesional dan humanis.</p>
-                </div>
-            </div>
+            <x-app-sidebar />
         </aside>
 
         <main class="dashboard-main">
-            <header class="dashboard-topbar">
-                <div>
-                    <h2>Dashboard Spiritual Harian</h2>
-                    <p>Terapi Rohani Pasien Paliatif</p>
-                </div>
-                <div class="topbar-actions">
-                    <button class="icon-button" type="button" aria-label="Notifikasi">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2zm7-6V11a7 7 0 1 0-14 0v5l-2 2v1h18v-1z" fill="currentColor"/></svg>
-                        @if (! $hasToday)
-                            <span class="badge">1</span>
-                        @endif
-                    </button>
-                    <button class="icon-button" type="button" aria-label="Bantuan">?</button>
-                    <div class="user-chip">
-                        <div class="avatar">{{ strtoupper(substr($patientName, 0, 1)) }}</div>
-                        <div>
-                            <div class="user-name">{{ $patientName }}</div>
-                            <div class="user-role">Perawat</div>
-                        </div>
-                        <span class="chevron">v</span>
-                    </div>
-                </div>
-            </header>
+            <x-app-topbar
+                class="dashboard-topbar"
+                title="Dashboard Spiritual Harian"
+                subtitle="Terapi Rohani Pasien Paliatif"
+                :badgeCount="! $hasToday ? 1 : 0"
+            />
 
             <div class="dashboard-alerts">
                 @if (session('status') === 'radar-saved')
@@ -491,7 +401,7 @@
         }
 
         .dashboard-sidebar {
-            background: var(--surface-muted);
+            background: var(--surface);
             padding: 28px 20px;
             border-right: 1px solid #edf2f7;
             display: flex;
@@ -507,17 +417,17 @@
         }
 
         .brand-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 14px;
+                width: 32px;
+                height: 32px;
+                border-radius: 10px;
             background: #dff3df;
             display: grid;
             place-items: center;
         }
 
         .brand-icon span {
-            width: 20px;
-            height: 20px;
+                width: 14px;
+                height: 14px;
             border-radius: 999px;
             background: #63b96b;
             display: block;
@@ -596,13 +506,23 @@
             padding: 28px 32px 48px;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 8px;
         }
 
         .dashboard-topbar {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
+            position: relative;
+        }
+
+        .dashboard-topbar > div:first-child {
+            text-align: center;
+        }
+
+        .dashboard-topbar .topbar-actions {
+            position: absolute;
+            right: 0;
         }
 
         .dashboard-topbar h2 {
@@ -1139,10 +1059,19 @@
         }
 
         @media (max-width: 1200px) {
-            .hero-card {
-                grid-template-columns: 1fr;
+            .dashboard-topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: space-between;
             }
 
+            .dashboard-topbar > div:first-child {
+                text-align: left;
+            }
+
+            .dashboard-topbar .topbar-actions {
+                position: static;
+            }
             .hero-stats {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
             }
