@@ -6,30 +6,39 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class JournalEntry extends Model
+class UserNotification extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'user_id',
-        'entry_date',
-        'entry_type',
-        'category',
-        'content',
-        'is_shareable',
-        'provider_response',
+        'title',
+        'body',
+        'type',
+        'url',
+        'is_read',
     ];
 
     protected function casts(): array
     {
         return [
-            'entry_date' => 'date',
-            'is_shareable' => 'boolean',
+            'is_read' => 'boolean',
         ];
     }
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function scopeUnread($query)
+    {
+        return $query->where('is_read', false);
+    }
+
+    public function markAsRead(): void
+    {
+        $this->is_read = true;
+        $this->save();
     }
 }

@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\EducationModuleController as AdminEducationModuleController;
+use App\Http\Controllers\Admin\EmotionalEvaluationController as AdminEmotionalEvaluationController;
 use App\Http\Controllers\Admin\JournalController as AdminJournalController;
 use App\Http\Controllers\Admin\PrayerController as AdminPrayerController;
 use App\Http\Controllers\CaregiverAssessmentController;
@@ -7,7 +10,10 @@ use App\Http\Controllers\EcogAssessmentController;
 use App\Http\Controllers\EsasAssessmentController;
 use App\Http\Controllers\SwbsAssessmentController;
 use App\Http\Controllers\EducationModuleController;
+use App\Http\Controllers\EmotionalEvaluationController;
 use App\Http\Controllers\JournalController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SpiritualNeedController;
 use App\Http\Controllers\PrayerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SpiritualDashboardController;
@@ -35,18 +41,24 @@ Route::middleware('auth')->group(function () {
     Route::post('/pengkajian-awal/ecog', [EcogAssessmentController::class, 'store'])->name('menu.assessment.ecog.store');
     Route::post('/pengkajian-awal/esas', [EsasAssessmentController::class, 'store'])->name('menu.assessment.esas.store');
 
-    Route::get('/kebutuhan-spiritual', function () {
-        return view('menu.spiritual-needs');
-    })->name('menu.spiritual-needs');
+    Route::get('/kebutuhan-spiritual', [SpiritualNeedController::class, 'index'])->name('menu.spiritual-needs');
 
-    Route::get('/evaluasi-perasaan', function () {
-        return view('menu.emotional-evaluation');
-    })->name('menu.emotional-evaluation');
+    Route::get('/evaluasi-perasaan', [EmotionalEvaluationController::class, 'index'])->name('menu.emotional-evaluation');
+    Route::post('/evaluasi-perasaan', [EmotionalEvaluationController::class, 'store'])->name('menu.emotional-evaluation.store');
 
     Route::get('/edukasi-caregiver', [EducationModuleController::class, 'index'])->name('education.index');
+    Route::get('/edukasi-caregiver/{educationModule}', [EducationModuleController::class, 'show'])->name('education.show');
 
     Route::get('/jurnal', [JournalController::class, 'index'])->name('journals.index');
     Route::post('/jurnal', [JournalController::class, 'store'])->name('journals.store');
+
+    Route::get('/notifikasi', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifikasi/{userNotification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifikasi/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.markAllRead');
+
+    Route::get('/faq', function () {
+        return view('faq');
+    })->name('faq');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -54,10 +66,22 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+
     Route::get('/prayers', [AdminPrayerController::class, 'index'])->name('prayers.index');
     Route::delete('/prayers/{prayer}', [AdminPrayerController::class, 'destroy'])->name('prayers.destroy');
     Route::get('/journals', [AdminJournalController::class, 'index'])->name('journals.index');
     Route::patch('/journals/{journalEntry}', [AdminJournalController::class, 'update'])->name('journals.update');
+
+    Route::get('/education', [AdminEducationModuleController::class, 'index'])->name('education.index');
+    Route::get('/education/create', [AdminEducationModuleController::class, 'create'])->name('education.create');
+    Route::post('/education', [AdminEducationModuleController::class, 'store'])->name('education.store');
+    Route::get('/education/{educationModule}/edit', [AdminEducationModuleController::class, 'edit'])->name('education.edit');
+    Route::put('/education/{educationModule}', [AdminEducationModuleController::class, 'update'])->name('education.update');
+    Route::delete('/education/{educationModule}', [AdminEducationModuleController::class, 'destroy'])->name('education.destroy');
+
+    Route::get('/evaluations', [AdminEmotionalEvaluationController::class, 'index'])->name('evaluations.index');
+
 });
 
 require __DIR__.'/auth.php';

@@ -4,24 +4,8 @@
 @endpush
 
 @php
-    $patientName = Auth::user()->name ?? 'Bapak Supriyono';
-    $patientAge = '62 Tahun';
-    $patientGender = 'Laki-laki';
-    $patientRm = 'No. RM: 23051567';
-    $patientRoom = 'Ruang: Mawar 3';
-    $nurseName = Auth::user()->name ?? 'Siti Rahmawati';
-    $nurseRole = 'Perawat';
-    $interventionSteps = [
-        ['title' => 'Penguatan Harapan', 'desc' => 'Latihan refleksi harapan dan rasa syukur.', 'status' => 'done'],
-        ['title' => 'Makna Hidup', 'desc' => 'Membantu pasien menemukan makna harian.', 'status' => 'current'],
-        ['title' => 'Doa & Dzikir', 'desc' => 'Penguatan spiritual sesuai keyakinan.', 'status' => 'upcoming'],
-        ['title' => 'Dukungan Keluarga', 'desc' => 'Kolaborasi dengan caregiver.', 'status' => 'upcoming'],
-    ];
-    $todayPrograms = [
-        ['label' => 'Doa Pagi', 'detail' => '5-7 menit doa dan afirmasi.'],
-        ['label' => 'Dzikir Singkat', 'detail' => '3 menit untuk menenangkan pikiran.'],
-        ['label' => 'Refleksi Syukur', 'detail' => 'Menulis 3 hal yang disyukuri.'],
-    ];
+    $stepStatusLabels = ['done' => 'Selesai', 'current' => 'Sedang Berjalan', 'pending' => 'Akan Datang'];
+    $stepStatusColors = ['done' => '#22c55e', 'current' => '#4f9b4f', 'pending' => '#cbd5e1'];
 @endphp
 
 <x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen intervention-page">
@@ -51,7 +35,7 @@
                 <div class="patient-metrics">
                     <div class="metric">
                         <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12zm0 2.5c-4 0-7.5 2-7.5 4.5V22h15v-3c0-2.5-3.5-4.5-7.5-4.5z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </div>
                         <div>
                             <p class="metric-label">Perawat Penanggung Jawab</p>
@@ -61,17 +45,17 @@
                     </div>
                     <div class="metric">
                         <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C7 6 5 10 5 14a7 7 0 0 0 14 0c0-4-2-8-7-12zm0 18a5 5 0 0 1-5-5c0-2.9 1.7-5.7 5-9 3.3 3.3 5 6.1 5 9a5 5 0 0 1-5 5z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </div>
                         <div>
                             <p class="metric-label">Fokus Intervensi</p>
-                            <p class="metric-value">Harapan & Makna Hidup</p>
+                            <p class="metric-value">{{ $interventionFocus }}</p>
                             <p class="metric-sub">Diperbarui: {{ now()->format('H:i') }} WIB</p>
                         </div>
                     </div>
                     <div class="metric">
                         <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v3M17 2v3M4 7h16v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7zm2 4h4v4H6z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v3M16 2v3M3 7h18M5 5h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </div>
                         <div>
                             <p class="metric-label">Program Hari Ini</p>
@@ -90,7 +74,7 @@
                                 <h4>Pohon Spiritual</h4>
                                 <p>Pohon spiritual akan terus bertumbuh seiring perjalanan pengguna.</p>
                             </div>
-                            <span class="status-pill">Tahap 2 dari 4</span>
+                            <span class="status-pill">Tahap {{ $currentStep }} dari {{ $totalSteps }}</span>
                         </div>
 
                         <div class="highlight-card">
@@ -104,8 +88,8 @@
                                 <div class="tree-item {{ $step['status'] }}">
                                     <div class="tree-dot"></div>
                                     <div>
-                                        <h6>{{ $step['title'] }}</h6>
-                                        <p>{{ $step['desc'] }}</p>
+                                        <h6>{{ $step['name'] }}</h6>
+                                        <p>{{ $stepStatusLabels[$step['status']] ?? $step['status'] }}</p>
                                     </div>
                                 </div>
                             @endforeach
@@ -122,8 +106,8 @@
                         <div class="program-grid">
                             @foreach ($todayPrograms as $program)
                                 <div class="program-card">
-                                    <h5>{{ $program['label'] }}</h5>
-                                    <p>{{ $program['detail'] }}</p>
+                                    <h5>{{ $program['title'] }}</h5>
+                                    <p>{{ $program['description'] }}</p>
                                 </div>
                             @endforeach
                         </div>
@@ -574,8 +558,20 @@
             margin-top: 4px;
         }
 
-        .tree-item.done .tree-dot {
+        .tree-item.completed .tree-dot {
             background: #22c55e;
+        }
+
+        .tree-item.active .tree-dot {
+            background: #4f9b4f;
+        }
+
+        .tree-item .tree-line::after {
+            background: #22c55e;
+        }
+
+        .tree-item.pending .tree-dot {
+            background: #cbd5e1;
         }
 
         .tree-item.current .tree-dot {

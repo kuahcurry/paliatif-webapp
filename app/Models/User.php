@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'religion', 'email', 'password', 'is_admin'])]
+#[Fillable(['name', 'religion', 'email', 'password', 'is_admin', 'patient_gender', 'patient_age', 'patient_rm', 'patient_room'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -29,6 +29,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'patient_age' => 'integer',
         ];
     }
 
@@ -65,5 +66,25 @@ class User extends Authenticatable
     public function swbsAssessments(): HasMany
     {
         return $this->hasMany(SwbsAssessment::class);
+    }
+
+    public function emotionalEvaluations(): HasMany
+    {
+        return $this->hasMany(EmotionalEvaluation::class);
+    }
+
+    public function spiritualIntervention(): HasMany
+    {
+        return $this->hasMany(SpiritualIntervention::class);
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(UserNotification::class);
+    }
+
+    public function unreadNotifications(): HasMany
+    {
+        return $this->hasMany(UserNotification::class)->where('is_read', false);
     }
 }

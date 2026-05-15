@@ -6,25 +6,22 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class JournalEntry extends Model
+class SpiritualIntervention extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'user_id',
-        'entry_date',
-        'entry_type',
-        'category',
-        'content',
-        'is_shareable',
-        'provider_response',
+        'focus',
+        'current_step',
+        'total_steps',
     ];
 
     protected function casts(): array
     {
         return [
-            'entry_date' => 'date',
-            'is_shareable' => 'boolean',
+            'current_step' => 'integer',
+            'total_steps' => 'integer',
         ];
     }
 

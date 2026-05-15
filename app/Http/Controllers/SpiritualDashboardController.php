@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\EducationModule;
 use App\Models\SpiritualRadarLog;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -31,14 +32,16 @@ class SpiritualDashboardController extends Controller
         $latestLog = $allLogs->first();
         $hasToday = $latestLog?->date?->isSameDay($today) ?? false;
 
-        $journalEntries = $user->journalEntries()
-            ->orderByDesc('entry_date')
-            ->limit(3)
-            ->get();
+        $dailyTip = EducationModule::where('is_active', true)
+            ->inRandomOrder()
+            ->first();
 
-        $hasJournalToday = $user->journalEntries()
-            ->whereDate('entry_date', $today)
-            ->exists();
+        $recommendedActivities = [
+            'doa' => EducationModule::where('is_active', true)->whereJsonContains('tags', 'spiritual_support')->inRandomOrder()->first(),
+            'dzikir' => EducationModule::where('is_active', true)->whereJsonContains('tags', 'coping')->inRandomOrder()->first(),
+            'refleksi' => EducationModule::where('is_active', true)->whereJsonContains('tags', 'grief')->inRandomOrder()->first(),
+            'istirahat' => EducationModule::where('is_active', true)->inRandomOrder()->first(),
+        ];
 
         $overallStatus = $this->buildOverallStatus($latestLog);
         $spiritualScoreToday = $latestLog ? $this->calculateSpiritualScore($latestLog) : null;
@@ -60,8 +63,8 @@ class SpiritualDashboardController extends Controller
             'summaryText' => $this->buildSummaryText($latestLog),
             'trendText' => $this->buildTrendText($logs, $range),
             'recommendations' => $this->buildRecommendations($latestLog),
-            'journalEntries' => $journalEntries,
-            'hasJournalToday' => $hasJournalToday,
+            'dailyTip' => $dailyTip,
+            'recommendedActivities' => $recommendedActivities,
             'overallStatus' => $overallStatus,
             'spiritualScoreToday' => $spiritualScoreToday,
             'emotionScoreToday' => $emotionScoreToday,
@@ -151,15 +154,8 @@ class SpiritualDashboardController extends Controller
         ];
 
         $labels = $this->scoreLabels();
-        $lowestKey = array_key_first($scores);
-        $lowestValue = $scores[$lowestKey];
-
-        foreach ($scores as $key => $value) {
-            if ($value < $lowestValue) {
-                $lowestKey = $key;
-                $lowestValue = $value;
-            }
-        }
+        $lowestValue = min($scores);
+        $lowestKey = array_search($lowestValue, $scores, true);
 
         return "Skor terendah hari ini: {$labels[$lowestKey]} ({$lowestValue}/5).";
     }
@@ -173,6 +169,8 @@ class SpiritualDashboardController extends Controller
         $first = $logs->first();
         $last = $logs->last();
 
+        $logs = $logs->values();
+
         $diffs = [
             'Makna hidup' => $last->score_meaning - $first->score_meaning,
             'Kedekatan dengan Tuhan/yang Ilahi' => $last->score_closeness - $first->score_closeness,
@@ -181,21 +179,10 @@ class SpiritualDashboardController extends Controller
             'Rasa kesepian' => $last->score_loneliness - $first->score_loneliness,
         ];
 
-        $minLabel = array_key_first($diffs);
-        $maxLabel = array_key_first($diffs);
-        $minDiff = $diffs[$minLabel];
-        $maxDiff = $diffs[$maxLabel];
-
-        foreach ($diffs as $label => $diff) {
-            if ($diff < $minDiff) {
-                $minDiff = $diff;
-                $minLabel = $label;
-            }
-            if ($diff > $maxDiff) {
-                $maxDiff = $diff;
-                $maxLabel = $label;
-            }
-        }
+        $minDiff = min($diffs);
+        $maxDiff = max($diffs);
+        $minLabel = array_search($minDiff, $diffs, true);
+        $maxLabel = array_search($maxDiff, $diffs, true);
 
         if ($minDiff <= -1) {
             return "Dalam {$range} hari terakhir, {$minLabel} cenderung menurun.";

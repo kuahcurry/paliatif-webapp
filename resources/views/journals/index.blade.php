@@ -4,25 +4,26 @@
 @endpush
 
 @php
-    $patientName = 'Bapak Supriyono';
-    $patientAge = '62 Tahun';
-    $patientGender = 'Laki-laki';
-    $patientRm = 'No. RM: 23051567';
-    $patientRoom = 'Ruang: Mawar 3';
-    $patientAdmit = '10 Mei 2024';
-    $patientStatus = 'Stabil';
-    $patientStatusTime = 'Diperbarui: 08:45 WIB';
-    $nurseName = Auth::user()->name ?? 'Siti Rahmawati';
-    $nurseRole = 'Perawat';
-    $writeCategories = ['Perasaan', 'Harapan', 'Doa', 'Syukur', 'Lainnya'];
-    $historyCategories = ['Perasaan', 'Doa', 'Harapan', 'Syukur', 'Kekhawatiran'];
-    $summaryItems = [
-        ['label' => 'Syukur', 'count' => 4, 'tone' => 'good'],
-        ['label' => 'Harapan', 'count' => 3, 'tone' => 'calm'],
-        ['label' => 'Doa', 'count' => 3, 'tone' => 'focus'],
-        ['label' => 'Perasaan', 'count' => 2, 'tone' => 'neutral'],
-        ['label' => 'Kekhawatiran', 'count' => 1, 'tone' => 'warn'],
+    $_user = Auth::user();
+    $patientName = $_user->name ?? 'Pasien';
+    $patientAge = $_user->patient_age ? $_user->patient_age . ' Tahun' : '--';
+    $patientGender = $_user->patient_gender ?? '--';
+    $patientRm = $_user->patient_rm ? 'No. RM: ' . $_user->patient_rm : '--';
+    $patientRoom = $_user->patient_room ? 'Ruang: ' . $_user->patient_room : '--';
+    $patientAdmit = $_user->created_at ? $_user->created_at->format('d M Y') : '--';
+    $patientStatus = $patientStatus ?? 'Dalam Pemantauan';
+    $patientStatusTime = 'Diperbarui: ' . now()->format('H:i') . ' WIB';
+    $nurseName = $_user->name;
+    $nurseRole = $_user->is_admin ? 'Admin' : 'Pasien';
+    $writeCategories = $writeCategories ?? ['Perasaan', 'Harapan', 'Doa', 'Syukur', 'Kekhawatiran', 'Lainnya'];
+    $historyCategories = $historyCategories ?? $writeCategories;
+    $summaryItems = $summaryItems ?? [];
+    $entryTypes = $entryTypes ?? [
+        'patient' => 'Jurnal Pasien',
+        'family' => 'Jurnal Keluarga',
     ];
+    $activeEntryType = $activeEntryType ?? 'patient';
+    $activeCategory = $activeCategory ?? 'all';
 @endphp
 
 <x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen journal-page">
@@ -52,7 +53,7 @@
                 <div class="patient-metrics">
                     <div class="metric">
                         <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v3M17 2v3M4 7h16v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v3M16 2v3M3 7h18M5 5h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </div>
                         <div>
                             <p class="metric-label">Tanggal Masuk</p>
@@ -61,7 +62,7 @@
                     </div>
                     <div class="metric">
                         <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C7 6 5 10 5 14a7 7 0 0 0 14 0c0-4-2-8-7-12zm0 18a5 5 0 0 1-5-5c0-2.9 1.7-5.7 5-9 3.3 3.3 5 6.1 5 9a5 5 0 0 1-5 5z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </div>
                         <div>
                             <p class="metric-label">Kondisi Umum</p>
@@ -71,7 +72,7 @@
                     </div>
                     <div class="metric">
                         <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12zm0 2.5c-4 0-7.5 2-7.5 4.5V22h15v-3c0-2.5-3.5-4.5-7.5-4.5z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </div>
                         <div>
                             <p class="metric-label">Perawat Penanggung Jawab</p>
@@ -85,9 +86,12 @@
             <section class="journal-body">
                 <div class="journal-left">
                     <div class="card">
-                        <div class="tabs">
-                            <button class="tab is-active" type="button">Jurnal Pasien</button>
-                            <button class="tab" type="button">Jurnal Keluarga</button>
+                        <div class="tabs" data-tabs>
+                            @foreach ($entryTypes as $typeValue => $typeLabel)
+                                <button class="tab {{ $activeEntryType === $typeValue ? 'is-active' : '' }}" type="button" data-entry-type="{{ $typeValue }}">
+                                    {{ $typeLabel }}
+                                </button>
+                            @endforeach
                         </div>
 
                         <div class="compose">
@@ -97,7 +101,7 @@
                                     <p>Tuliskan perasaan, harapan, doa, atau hal lain yang ingin disampaikan hari ini.</p>
                                 </div>
                                 <span class="privacy-pill">
-                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 9.7-8 10-4.5-.3-8-5-8-10V6l8-4z" fill="currentColor"/></svg>
+                                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                                     Privasi Terlindungi
                                 </span>
                             </div>
@@ -113,8 +117,10 @@
                             @if ($hasToday)
                                 <div class="notice info">Catatan reflektif hari ini sudah dibuat.</div>
                             @else
-                                <form method="POST" action="{{ route('journals.store') }}" class="compose-form">
+                                <form method="POST" action="{{ route('journals.store') }}" class="compose-form" data-compose-form>
                                     @csrf
+                                    <input type="hidden" name="entry_type" id="entry-type" value="{{ $activeEntryType }}">
+                                    <input type="hidden" name="category" id="entry-category" value="">
                                     <textarea id="journal-content" name="content" rows="4" maxlength="1000" placeholder="Mulai tulis catatan Anda di sini...">{{ old('content') }}</textarea>
                                     @if ($errors->has('content'))
                                         <div class="field-error">{{ $errors->first('content') }}</div>
@@ -123,7 +129,7 @@
                                     <div class="compose-footer">
                                         <div class="tag-row">
                                             @foreach ($writeCategories as $category)
-                                                <span class="tag-chip">{{ $category }}</span>
+                                                <button class="tag-chip" type="button" data-category="{{ $category }}">{{ $category }}</button>
                                             @endforeach
                                         </div>
 
@@ -149,12 +155,15 @@
                                 <h4>Riwayat Jurnal</h4>
                                 <p>Catatan reflektif pasien dalam 7 hari terakhir.</p>
                             </div>
-                            <select class="filter-select" aria-label="Filter kategori">
-                                <option>Semua Kategori</option>
-                                @foreach ($historyCategories as $category)
-                                    <option>{{ $category }}</option>
-                                @endforeach
-                            </select>
+                            <form method="GET" action="{{ route('journals.index') }}" class="filter-form">
+                                <input type="hidden" name="entry_type" value="{{ $activeEntryType }}">
+                                <select class="filter-select" name="category" aria-label="Filter kategori" data-filter-select>
+                                    <option value="all" @selected($activeCategory === 'all')>Semua Kategori</option>
+                                    @foreach ($historyCategories as $category)
+                                        <option value="{{ $category }}" @selected($activeCategory === $category)>{{ $category }}</option>
+                                    @endforeach
+                                </select>
+                            </form>
                         </div>
 
                         @if ($entries->isEmpty())
@@ -163,7 +172,7 @@
                             <div class="history-list">
                                 @foreach ($entries as $entry)
                                     @php
-                                        $category = $historyCategories[$loop->index % count($historyCategories)];
+                                        $category = $entry->category ?: 'Lainnya';
                                         $statusLabel = $entry->provider_response ? 'Dibaca' : ($entry->is_shareable ? 'Belum Dibaca' : 'Privat');
                                         $statusTone = $entry->provider_response ? 'good' : ($entry->is_shareable ? 'neutral' : 'muted');
                                     @endphp
@@ -191,9 +200,7 @@
                                         </div>
                                         <div class="history-actions">
                                             <span class="status-pill {{ $statusTone }}">{{ $statusLabel }}</span>
-                                            <button type="button" class="icon-button ghost" aria-label="Opsi">
-                                                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="19" cy="12" r="2" fill="currentColor"/></svg>
-                                            </button>
+
                                         </div>
                                     </div>
                                 @endforeach
@@ -256,7 +263,7 @@
                     <div class="card help-card">
                         <h4>Butuh Bantuan?</h4>
                         <p>Jika Anda merasa perlu dukungan lebih lanjut, jangan ragu untuk berbicara dengan perawat atau konselor spiritual kami.</p>
-                        <button class="ghost-button" type="button">Hubungi Kami</button>
+                            <a href="{{ route('faq') }}" class="ghost-button">Hubungi Kami</a>
                     </div>
                 </aside>
             </section>
@@ -766,6 +773,19 @@
             padding: 6px 10px;
             border-radius: 999px;
             font-size: 0.75rem;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tag-chip:hover {
+            background: #e2e8f0;
+        }
+
+        .tag-chip.is-active {
+            background: #4f9b4f;
+            color: #ffffff;
+            border-color: #4f9b4f;
         }
 
         .toggle {
@@ -1109,12 +1129,54 @@
     <script>
         const journalInput = document.getElementById('journal-content');
         const journalCounter = document.getElementById('journal-counter');
+        const entryTypeInput = document.getElementById('entry-type');
+        const entryCategoryInput = document.getElementById('entry-category');
+        const tabs = document.querySelectorAll('[data-tabs] .tab');
+        const categoryButtons = document.querySelectorAll('[data-category]');
+        const filterSelect = document.querySelector('[data-filter-select]');
+
+        const setActiveCategory = (value) => {
+            if (entryCategoryInput) {
+                entryCategoryInput.value = value;
+            }
+            categoryButtons.forEach((button) => {
+                button.classList.toggle('is-active', button.dataset.category === value);
+            });
+        };
+
+        tabs.forEach((tab) => {
+            tab.addEventListener('click', () => {
+                const entryType = tab.dataset.entryType || 'patient';
+                if (entryTypeInput) {
+                    entryTypeInput.value = entryType;
+                }
+                tabs.forEach((item) => item.classList.toggle('is-active', item === tab));
+                setActiveCategory('');
+            });
+        });
+
+        categoryButtons.forEach((button) => {
+            button.addEventListener('click', (e) => {
+                e.preventDefault();
+                setActiveCategory(button.dataset.category || '');
+            });
+        });
+
         if (journalInput && journalCounter) {
             const updateCounter = () => {
                 journalCounter.textContent = journalInput.value.length + '/1000';
             };
             updateCounter();
             journalInput.addEventListener('input', updateCounter);
+        }
+
+        if (filterSelect) {
+            filterSelect.addEventListener('change', () => {
+                const form = filterSelect.closest('form');
+                if (form) {
+                    form.submit();
+                }
+            });
         }
     </script>
 </x-app-layout>

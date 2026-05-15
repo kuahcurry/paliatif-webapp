@@ -4,23 +4,12 @@
 @endpush
 
 @php
-    $patientName = Auth::user()->name ?? 'Bapak Supriyono';
-    $patientAge = '62 Tahun';
-    $patientGender = 'Laki-laki';
-    $patientRm = 'No. RM: 23051567';
-    $patientRoom = 'Ruang: Mawar 3';
-    $nurseName = Auth::user()->name ?? 'Siti Rahmawati';
-    $nurseRole = 'Perawat';
-    $sessionCount = 2;
-    $maxSessions = 5;
-    $lastService = 'Harapan & Makna Hidup';
-    $lastServiceDate = now()->format('d M Y, H:i') . ' WIB';
-    $historyItems = [
-        ['label' => 'Sangat Tenang', 'date' => '15 Mei 2024, 10:15 WIB', 'status' => 'Sesi 1', 'tone' => 'good'],
-        ['label' => 'Tenang', 'date' => '16 Mei 2024, 09:30 WIB', 'status' => 'Sesi 2', 'tone' => 'calm'],
-        ['label' => 'Belum dievaluasi', 'date' => '-', 'status' => 'Sesi 3', 'tone' => 'neutral'],
-        ['label' => 'Belum dievaluasi', 'date' => '-', 'status' => 'Sesi 4', 'tone' => 'neutral'],
-        ['label' => 'Belum dievaluasi', 'date' => '-', 'status' => 'Sesi 5', 'tone' => 'neutral'],
+    $emotionOptions = [
+        ['value' => 'very_calm', 'label' => 'Sangat Tenang', 'desc' => 'Merasa sangat damai, penuh harapan dan bersyukur.', 'face' => 'face-happy'],
+        ['value' => 'calm', 'label' => 'Tenang', 'desc' => 'Merasa lebih tenang dan nyaman dari sebelumnya.', 'face' => 'face-calm'],
+        ['value' => 'neutral', 'label' => 'Biasa Saja', 'desc' => 'Belum ada perubahan yang signifikan dalam perasaan saya.', 'face' => 'face-neutral'],
+        ['value' => 'anxious_sad', 'label' => 'Cemas / Sedih', 'desc' => 'Masih merasa cemas, sedih, atau khawatir dengan kondisi saya.', 'face' => 'face-anxious'],
+        ['value' => 'distressed', 'label' => 'Sangat Tertekan', 'desc' => 'Merasa sangat tertekan, putus asa atau kehilangan harapan.', 'face' => 'face-distress'],
     ];
 @endphp
 
@@ -38,6 +27,16 @@
                 :badgeCount="3"
             />
 
+            @if (session('status') === 'evaluation-saved')
+                <div class="alert success">Evaluasi berhasil disimpan. Terima kasih telah berbagi perasaan Anda.</div>
+            @endif
+            @if ($errors->any())
+                <div class="alert warning">{{ $errors->first() }}</div>
+            @endif
+            @if ($hasReachedMax)
+                <div class="alert warning">Anda telah menyelesaikan seluruh 5 sesi evaluasi. Terima kasih atas partisipasi Anda.</div>
+            @endif
+
             <section class="card evaluation-hero">
                 <div class="patient-profile">
                     <div class="patient-avatar">{{ strtoupper(substr($patientName, 0, 1)) }}</div>
@@ -50,7 +49,7 @@
                 <div class="hero-metrics">
                     <div class="metric">
                         <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v3M17 2v3M4 7h16v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v3M16 2v3M3 7h18M5 5h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z M3 11h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </div>
                         <div>
                             <p class="metric-label">Sesi Layanan ke</p>
@@ -60,18 +59,18 @@
                     </div>
                     <div class="metric">
                         <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6-3.5-8-7.5C2 8.5 5 6 8 6c1.7 0 3.2 1 4 2.3C12.8 7 14.3 6 16 6c3 0 6 2.5 4 7.5-2 4-8 7.5-8 7.5z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </div>
                         <div>
                             <p class="metric-label">Layanan Terakhir</p>
                             <p class="metric-value">{{ $lastService }}</p>
                             <p class="metric-sub">{{ $lastServiceDate }}</p>
-                            <a class="metric-link" href="#">Lihat Detail</a>
+                            <a class="metric-link" href="{{ route('menu.emotional-evaluation') }}">Lihat Detail</a>
                         </div>
                     </div>
                     <div class="metric">
                         <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12zm0 2.5c-4 0-7.5 2-7.5 4.5V22h15v-3c0-2.5-3.5-4.5-7.5-4.5z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </div>
                         <div>
                             <p class="metric-label">Perawat Penanggung Jawab</p>
@@ -92,62 +91,39 @@
                             </div>
                         </div>
 
-                        <div class="emotion-grid">
-                            <div class="emotion-card selected">
-                                <div class="face face-happy">
-                                    <span class="eye left"></span>
-                                    <span class="eye right"></span>
-                                    <span class="mouth"></span>
-                                </div>
-                                <h5>Sangat Tenang</h5>
-                                <p>Merasa sangat damai, penuh harapan dan bersyukur.</p>
-                            </div>
-                            <div class="emotion-card">
-                                <div class="face face-calm">
-                                    <span class="eye left"></span>
-                                    <span class="eye right"></span>
-                                    <span class="mouth"></span>
-                                </div>
-                                <h5>Tenang</h5>
-                                <p>Merasa lebih tenang dan nyaman dari sebelumnya.</p>
-                            </div>
-                            <div class="emotion-card">
-                                <div class="face face-neutral">
-                                    <span class="eye left"></span>
-                                    <span class="eye right"></span>
-                                    <span class="mouth"></span>
-                                </div>
-                                <h5>Biasa Saja</h5>
-                                <p>Belum ada perubahan yang signifikan dalam perasaan saya.</p>
-                            </div>
-                            <div class="emotion-card">
-                                <div class="face face-anxious">
-                                    <span class="eye left"></span>
-                                    <span class="eye right"></span>
-                                    <span class="mouth"></span>
-                                </div>
-                                <h5>Cemas / Sedih</h5>
-                                <p>Masih merasa cemas, sedih, atau khawatir dengan kondisi saya.</p>
-                            </div>
-                            <div class="emotion-card">
-                                <div class="face face-distress">
-                                    <span class="eye left"></span>
-                                    <span class="eye right"></span>
-                                    <span class="mouth"></span>
-                                </div>
-                                <h5>Sangat Tertekan</h5>
-                                <p>Merasa sangat tertekan, putus asa atau kehilangan harapan.</p>
-                            </div>
-                        </div>
+                        @if (! $hasReachedMax)
+                            <form method="POST" action="{{ route('menu.emotional-evaluation.store') }}">
+                                @csrf
 
-                        <div class="note-section">
-                            <label for="evaluation-note">Catatan Tambahan (Opsional)</label>
-                            <textarea id="evaluation-note" rows="3" placeholder="Tuliskan perasaan atau hal yang ingin Anda sampaikan..."></textarea>
-                            <div class="note-footer">
-                                <span id="note-counter">0/300</span>
-                                <button type="button" class="primary-button">Simpan Evaluasi</button>
-                            </div>
-                        </div>
+                                <div class="emotion-grid">
+                                    @foreach ($emotionOptions as $emo)
+                                        <label class="emotion-card {{ $lastEmotion === $emo['value'] ? 'selected' : '' }}" data-value="{{ $emo['value'] }}">
+                                            <div class="face {{ $emo['face'] }}">
+                                                <span class="eye left"></span>
+                                                <span class="eye right"></span>
+                                                <span class="mouth"></span>
+                                            </div>
+                                            <h5>{{ $emo['label'] }}</h5>
+                                            <p>{{ $emo['desc'] }}</p>
+                                            <input type="radio" name="emotion" value="{{ $emo['value'] }}" @checked($lastEmotion === $emo['value']) required hidden>
+                                        </label>
+                                    @endforeach
+                                </div>
+                                <x-input-error :messages="$errors->get('emotion')" class="mt-2" />
+
+                                <div class="note-section">
+                                    <label for="evaluation-note">Catatan Tambahan (Opsional)</label>
+                                    <textarea id="evaluation-note" name="note" rows="3" maxlength="300" placeholder="Tuliskan perasaan atau hal yang ingin Anda sampaikan...">{{ $lastNote }}</textarea>
+                                    <x-input-error :messages="$errors->get('note')" class="mt-2" />
+                                    <div class="note-footer">
+                                        <span id="note-counter">0/300</span>
+                                        <button type="submit" class="primary-button">Simpan Evaluasi</button>
+                                    </div>
+                                </div>
+                            </form>
+                        @else
+                            <p class="empty-state">Anda telah menyelesaikan seluruh sesi evaluasi. Terima kasih.</p>
+                        @endif
                     </div>
 
                     <div class="card tips-card">
@@ -173,7 +149,7 @@
 
                         <div class="progress-line">
                             @for ($i = 1; $i <= $maxSessions; $i++)
-                                <div class="progress-step {{ $i < $sessionCount ? 'done' : ($i === $sessionCount ? 'current' : '') }}">
+                                <div class="progress-step {{ $i < $currentSessionNumber ? 'done' : ($i === $currentSessionNumber && !$hasReachedMax ? 'current' : '') }}">
                                     <span>{{ $i }}</span>
                                 </div>
                             @endfor
@@ -794,6 +770,37 @@
             color: #92400e;
         }
 
+        .alert {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+
+        .alert.success {
+            background: #ecfdf3;
+            color: #15803d;
+        }
+
+        .alert.warning {
+            background: #fff7ed;
+            color: #92400e;
+        }
+
+        .empty-state {
+            font-size: 0.85rem;
+            color: var(--muted);
+            text-align: center;
+            padding: 24px 0;
+        }
+
+        .emotion-card {
+            cursor: pointer;
+        }
+
+        .emotion-card input[type="radio"] {
+            display: none;
+        }
+
         @media (max-width: 1200px) {
             .dashboard-topbar {
                 display: flex;
@@ -854,13 +861,20 @@
     </style>
 
     <script>
+        document.querySelectorAll('.emotion-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.emotion-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                card.querySelector('input[type="radio"]').checked = true;
+            });
+        });
+
         const note = document.getElementById('evaluation-note');
         const counter = document.getElementById('note-counter');
         if (note && counter) {
-            note.addEventListener('input', () => {
-                const count = note.value.length;
-                counter.textContent = count + '/300';
-            });
+            const update = () => { counter.textContent = note.value.length + '/300'; };
+            note.addEventListener('input', update);
+            update();
         }
     </script>
 </x-app-layout>

@@ -17,6 +17,15 @@ class CaregiverAssessment extends Model
         'communication_level',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'anxiety_level' => 'integer',
+            'grief_level' => 'integer',
+            'communication_level' => 'integer',
+        ];
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

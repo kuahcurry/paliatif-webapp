@@ -21,7 +21,12 @@ class EcogAssessmentController extends Controller
         $score = (int) $validated['score'];
         $scoreLabel = $this->labelForScore($score);
 
-        $request->user()?->ecogAssessments()->create([
+        $user = $request->user();
+        if (! $user) {
+            return back()->withErrors(['user' => 'Anda harus login untuk melakukan pengkajian.']);
+        }
+
+        $user->ecogAssessments()->create([
             'respondent_initials' => $validated['respondent_initials'] ?? null,
             'age' => $validated['age'] ?? null,
             'gender' => $validated['gender'] ?? null,

@@ -4,26 +4,17 @@
 @endpush
 
 @php
-    $patientName = 'Bapak Supriyono';
-    $patientAge = '62 Tahun';
-    $patientGender = 'Laki-laki';
-    $patientRm = 'No. RM: 23051567';
-    $patientRoom = 'Ruang: Mawar 3';
-    $caregiverName = 'Siti Rahmawati (Anak)';
-    $nurseName = Auth::user()->name ?? 'Siti Rahmawati';
-    $nurseRole = 'Perawat';
-    $assessmentSummary = [
-        ['label' => 'Kecemasan', 'value' => 'Tinggi', 'tone' => 'warn'],
-        ['label' => 'Beban', 'value' => 'Sedang', 'tone' => 'neutral'],
-    ];
-    $categoryItems = [
-        ['label' => 'Pendampingan Spiritual', 'count' => 12],
-        ['label' => 'Komunikasi & Empati', 'count' => 10],
-        ['label' => 'Manajemen Emosi Caregiver', 'count' => 9],
-        ['label' => 'Perawatan Paliatif', 'count' => 8],
-        ['label' => 'Kehilangan & Duka', 'count' => 7],
-        ['label' => 'Self Care Caregiver', 'count' => 6],
-    ];
+    $_user = Auth::user();
+    $patientName = $_user->name ?? 'Pasien';
+    $patientAge = $_user->patient_age ? $_user->patient_age . ' Tahun' : '--';
+    $patientGender = $_user->patient_gender ?? '--';
+    $patientRm = $_user->patient_rm ? 'No. RM: ' . $_user->patient_rm : '--';
+    $patientRoom = $_user->patient_room ? 'Ruang: ' . $_user->patient_room : '--';
+    $caregiverName = $_user->name . ' (Caregiver)';
+    $nurseName = $_user->name;
+    $nurseRole = $_user->is_admin ? 'Admin' : 'Pasien';
+    $assessmentSummary = $assessmentSummary ?? [];
+    $categoryItems = $categoryItems ?? [];
 @endphp
 
 <x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen education-page">
@@ -53,17 +44,17 @@
                 <div class="patient-metrics">
                     <div class="metric">
                         <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12zm0 2.5c-4 0-7.5 2-7.5 4.5V22h15v-3c0-2.5-3.5-4.5-7.5-4.5z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </div>
                         <div>
                             <p class="metric-label">Caregiver Utama</p>
                             <p class="metric-value">{{ $caregiverName }}</p>
-                            <a class="metric-link" href="#">Lihat Profil Caregiver</a>
+                            <a class="metric-link" href="{{ route('profile.edit') }}">Lihat Profil Caregiver</a>
                         </div>
                     </div>
                     <div class="metric">
                         <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C7 6 5 10 5 14a7 7 0 0 0 14 0c0-4-2-8-7-12zm0 18a5 5 0 0 1-5-5c0-2.9 1.7-5.7 5-9 3.3 3.3 5 6.1 5 9a5 5 0 0 1-5 5z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </div>
                         <div>
                             <p class="metric-label">Ringkasan Pengkajian</p>
@@ -77,7 +68,7 @@
                     </div>
                     <div class="metric">
                         <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6l9-4 9 4-9 4-9-4zm0 5l9 4 9-4v7l-9 4-9-4v-7z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </div>
                         <div>
                             <p class="metric-label">Rekomendasi Modul untuk Anda</p>
@@ -103,7 +94,7 @@
                                 <h4>Rekomendasi untuk Anda</h4>
                                 <p>Modul yang disarankan sesuai kondisi dan kebutuhan Anda saat ini.</p>
                             </div>
-                            <a class="link" href="#">Lihat Semua</a>
+                            <a class="link" href="{{ route('education.index') }}">Lihat Semua</a>
                         </div>
 
                         @if ($recommendedModules->isEmpty())
@@ -117,14 +108,14 @@
                                         $duration = 4 + ($loop->index % 4);
                                         $durationLabel = $typeLabel === 'Video' ? $duration . ' menit video' : $duration . ' menit baca';
                                     @endphp
-                                    <div class="module-card">
+                                    <a class="module-card" href="{{ route('education.show', $module) }}">
                                         <div class="module-thumb {{ $thumbClass }}">
                                             <span class="type-pill {{ $thumbClass }}">{{ $typeLabel }}</span>
                                         </div>
                                         <h5>{{ $module->title }}</h5>
                                         <p>{{ \Illuminate\Support\Str::limit($module->summary ?? $module->content, 120) }}</p>
                                         <div class="module-meta">{{ $durationLabel }}</div>
-                                    </div>
+                                    </a>
                                 @endforeach
                             </div>
                         @endif
@@ -147,11 +138,11 @@
                                 <option value="grief" @selected($tag === 'grief')>Manajemen duka</option>
                                 <option value="spiritual_support" @selected($tag === 'spiritual_support')>Dukungan spiritual</option>
                             </select>
-                            <select aria-label="Durasi">
-                                <option>Semua Durasi</option>
+                            <select name="duration" aria-label="Durasi">
+                                <option value="">Semua Durasi</option>
                             </select>
-                            <select aria-label="Urutan">
-                                <option>Terbaru</option>
+                            <select name="sort" aria-label="Urutan">
+                                <option value="latest">Terbaru</option>
                             </select>
                             <button type="submit" class="ghost-button">Terapkan</button>
                         </form>
@@ -167,14 +158,14 @@
                                         $duration = 3 + ($loop->index % 5);
                                         $durationLabel = $typeLabel === 'Video' ? $duration . ' menit video' : $duration . ' menit baca';
                                     @endphp
-                                    <div class="module-card">
+                                    <a class="module-card" href="{{ route('education.show', $module) }}">
                                         <div class="module-thumb {{ $thumbClass }}">
                                             <span class="type-pill {{ $thumbClass }}">{{ $typeLabel }}</span>
                                         </div>
                                         <h5>{{ $module->title }}</h5>
                                         <p>{{ \Illuminate\Support\Str::limit($module->summary ?? $module->content, 110) }}</p>
                                         <div class="module-meta">{{ $durationLabel }}</div>
-                                    </div>
+                                    </a>
                                 @endforeach
                             </div>
                         @endif
@@ -200,14 +191,14 @@
                                 </div>
                             @endforeach
                         </div>
-                        <button class="ghost-button" type="button">Lihat Semua Kategori</button>
+                        <a href="{{ route('education.index') }}" class="ghost-button">Lihat Semua Kategori</a>
                     </div>
 
                     <div class="card help-card">
                         <div>
                             <h4>Butuh Bantuan?</h4>
                             <p>Jika Anda merasa perlu dukungan lebih lanjut dari tenaga profesional, kami siap membantu.</p>
-                            <button class="ghost-button" type="button">Hubungi Kami</button>
+                            <a href="{{ route('faq') }}" class="ghost-button">Hubungi Kami</a>
                         </div>
                         <div class="helper-illustration" aria-hidden="true">
                             <span class="helper-head"></span>
@@ -675,6 +666,14 @@
             padding: 12px;
             display: grid;
             gap: 8px;
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .module-card:hover {
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
         }
 
         .module-thumb {

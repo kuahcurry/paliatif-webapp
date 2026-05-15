@@ -24,7 +24,12 @@ class EsasAssessmentController extends Controller
 
         $totalScore = array_sum($validated);
 
-        $request->user()?->esasAssessments()->create(array_merge($validated, [
+        $user = $request->user();
+        if (! $user) {
+            return back()->withErrors(['user' => 'Anda harus login.']);
+        }
+
+        $user->esasAssessments()->create(array_merge($validated, [
             'total_score' => $totalScore,
         ]));
 

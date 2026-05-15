@@ -19,6 +19,10 @@ class ProfileUpdateRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'religion' => ['nullable', 'string', 'max:255'],
+            'patient_gender' => ['nullable', 'string', 'max:20'],
+            'patient_age' => ['nullable', 'integer', 'min:0', 'max:150'],
+            'patient_rm' => ['nullable', 'string', 'max:50'],
+            'patient_room' => ['nullable', 'string', 'max:50'],
             'email' => [
                 'required',
                 'string',

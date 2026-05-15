@@ -161,18 +161,18 @@
                 <div class="hero-metrics">
                     <div class="metric">
                         <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v3M17 2v3M4 7h16v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v3M16 2v3M3 7h18M5 5h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z M3 11h18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </div>
                         <div>
                             <p class="metric-label">Tanggal Pengkajian</p>
                             <p class="metric-value">{{ $assessmentDate }}</p>
                             <p class="metric-sub">{{ $assessmentTime }} WIB</p>
-                            <a class="metric-link" href="#">Ubah</a>
+                            <a class="metric-link" href="{{ route('menu.assessment') }}">Ubah</a>
                         </div>
                     </div>
                     <div class="metric">
                         <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12zm0 2.5c-4 0-7.5 2-7.5 4.5V22h15v-3c0-2.5-3.5-4.5-7.5-4.5z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </div>
                         <div>
                             <p class="metric-label">Dilakukan oleh</p>
@@ -182,7 +182,7 @@
                     </div>
                     <div class="metric">
                         <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h9l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM14 2v6h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </div>
                         <div>
                             <p class="metric-label">Status Pengkajian</p>
@@ -224,6 +224,9 @@
                         <div class="card-body">
                             @if (session('status') === 'swbs-saved')
                                 <div class="alert success">Pengkajian SWBS tersimpan.</div>
+                            @endif
+                            @if ($errors->hasAny(['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9', 'q10', 'q11', 'q12', 'q13', 'q14', 'q15', 'q16', 'q17', 'q18', 'q19', 'q20']))
+                                <div class="alert warning">Ada kesalahan pada pengisian SWBS. Pastikan semua pertanyaan telah dijawab.</div>
                             @endif
 
                             <form method="POST" action="{{ route('menu.assessment.swbs.store') }}" class="swbs-form">
@@ -373,6 +376,9 @@
                             @if (session('status') === 'esas-saved')
                                 <div class="alert success">Pengkajian ESAS tersimpan.</div>
                             @endif
+                            @if ($errors->hasAny(['pain', 'fatigue', 'nausea', 'stress', 'anxiety', 'drowsiness', 'appetite', 'wellbeing', 'shortness_of_breath', 'other_problem']))
+                                <div class="alert warning">Ada kesalahan pada pengisian ESAS. Pastikan semua gejala telah diisi.</div>
+                            @endif
 
                             <form method="POST" action="{{ route('menu.assessment.esas.store') }}" class="esas-form">
                                 @csrf
@@ -433,7 +439,7 @@
                                             </td>
                                             <td>{{ $assessmentBy }}</td>
                                             <td><span class="pill success">{{ $entry['result'] }}</span></td>
-                                            <td><button class="ghost-button" type="button">Lihat</button></td>
+                                            <td><span class="ghost-button" style="opacity:0.5;cursor:default;">Lihat</span></td>
                                         </tr>
                                     @empty
                                         <tr>

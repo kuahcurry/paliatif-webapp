@@ -29,6 +29,36 @@
             <x-input-error class="mt-2" :messages="$errors->get('religion')" />
         </div>
 
+        <div class="border-t pt-4">
+            <h3 class="text-sm font-semibold text-gray-900 mb-3">{{ __('Data Pasien') }}</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <x-input-label for="patient_gender" :value="__('Jenis Kelamin')" />
+                    <select id="patient_gender" name="patient_gender" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        <option value="">{{ __('Pilih') }}</option>
+                        <option value="Laki-laki" @selected(old('patient_gender', $user->patient_gender) === 'Laki-laki')>{{ __('Laki-laki') }}</option>
+                        <option value="Perempuan" @selected(old('patient_gender', $user->patient_gender) === 'Perempuan')>{{ __('Perempuan') }}</option>
+                    </select>
+                    <x-input-error class="mt-2" :messages="$errors->get('patient_gender')" />
+                </div>
+                <div>
+                    <x-input-label for="patient_age" :value="__('Usia (tahun)')" />
+                    <x-text-input id="patient_age" name="patient_age" type="number" min="0" max="150" class="mt-1 block w-full" :value="old('patient_age', $user->patient_age)" />
+                    <x-input-error class="mt-2" :messages="$errors->get('patient_age')" />
+                </div>
+                <div>
+                    <x-input-label for="patient_rm" :value="__('No. RM')" />
+                    <x-text-input id="patient_rm" name="patient_rm" type="text" class="mt-1 block w-full" :value="old('patient_rm', $user->patient_rm)" />
+                    <x-input-error class="mt-2" :messages="$errors->get('patient_rm')" />
+                </div>
+                <div>
+                    <x-input-label for="patient_room" :value="__('Ruang')" />
+                    <x-text-input id="patient_room" name="patient_room" type="text" class="mt-1 block w-full" :value="old('patient_room', $user->patient_room)" />
+                    <x-input-error class="mt-2" :messages="$errors->get('patient_room')" />
+                </div>
+            </div>
+        </div>
+
         <div>
             <x-input-label for="email" :value="__('Email')" />
             <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />

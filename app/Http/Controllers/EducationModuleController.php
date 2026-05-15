@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\CaregiverAssessment;
 use App\Models\EducationModule;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
@@ -15,10 +16,21 @@ class EducationModuleController extends Controller
         $tag = $request->query('tag', 'all');
         $tag = is_string($tag) ? $tag : 'all';
 
+        $search = $request->query('q');
+        $search = is_string($search) ? trim($search) : '';
+
         $modulesQuery = EducationModule::query()->where('is_active', true);
 
         if ($tag !== 'all') {
             $modulesQuery->whereJsonContains('tags', $tag);
+        }
+
+        if ($search !== '') {
+            $modulesQuery->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('summary', 'like', "%{$search}%")
+                  ->orWhere('content', 'like', "%{$search}%");
+            });
         }
 
         $modules = $modulesQuery->orderBy('title')->get();
@@ -36,6 +48,24 @@ class EducationModuleController extends Controller
             'recommendedTags' => $recommendedTags,
             'tag' => $tag,
             'hasAssessment' => (bool) $assessment,
+        ]);
+    }
+
+    public function show(EducationModule $educationModule): View
+    {
+        if (! $educationModule->is_active) {
+            abort(404);
+        }
+
+        $otherModules = EducationModule::where('is_active', true)
+            ->where('id', '!=', $educationModule->id)
+            ->inRandomOrder()
+            ->limit(4)
+            ->get();
+
+        return view('education.show', [
+            'module' => $educationModule,
+            'otherModules' => $otherModules,
         ]);
     }
 

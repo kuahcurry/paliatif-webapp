@@ -12,28 +12,45 @@
 
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard Spiritual') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('menu.assessment')" :active="request()->routeIs('menu.assessment')">
-                        {{ __('Pengkajian Awal') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('menu.spiritual-needs')" :active="request()->routeIs('menu.spiritual-needs')">
-                        {{ __('Kebutuhan Spiritual') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('menu.emotional-evaluation')" :active="request()->routeIs('menu.emotional-evaluation')">
-                        {{ __('Evaluasi Perasaan') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('prayers.index')" :active="request()->routeIs('prayers.*')">
-                        {{ __('Pohon Doa') }}
-                    </x-nav-link>
-                    @if (Auth::user()?->is_admin)
-                        <x-nav-link :href="route('admin.prayers.index')" :active="request()->routeIs('admin.prayers.*')">
-                            {{ __('Moderasi Doa') }}
+                    @if (request()->routeIs('admin.*'))
+                        @if (Auth::user()?->is_admin)
+                            <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                                {{ __('Dashboard') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.prayers.index')" :active="request()->routeIs('admin.prayers.*')">
+                                {{ __('Doa') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.journals.index')" :active="request()->routeIs('admin.journals.*')">
+                                {{ __('Jurnal') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.education.index')" :active="request()->routeIs('admin.education.*')">
+                                {{ __('Modul') }}
+                            </x-nav-link>
+                            <x-nav-link :href="route('admin.evaluations.index')" :active="request()->routeIs('admin.evaluations.*')">
+                                {{ __('Evaluasi') }}
+                            </x-nav-link>
+                        @endif
+                    @else
+                        <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                            {{ __('Dashboard Spiritual') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('admin.journals.index')" :active="request()->routeIs('admin.journals.*')">
-                            {{ __('Moderasi Jurnal') }}
+                        <x-nav-link :href="route('menu.assessment')" :active="request()->routeIs('menu.assessment')">
+                            {{ __('Pengkajian Awal') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('menu.spiritual-needs')" :active="request()->routeIs('menu.spiritual-needs')">
+                            {{ __('Kebutuhan Spiritual') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('menu.emotional-evaluation')" :active="request()->routeIs('menu.emotional-evaluation')">
+                            {{ __('Evaluasi Perasaan') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('prayers.index')" :active="request()->routeIs('prayers.*')">
+                            {{ __('Pohon Doa') }}
+                        </x-nav-link>
+                        @if (Auth::user()?->is_admin)
+                            <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">
+                                {{ __('Admin') }}
+                            </x-nav-link>
+                        @endif
                     @endif
                 </div>
             </div>
@@ -87,28 +104,23 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard Spiritual') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('menu.assessment')" :active="request()->routeIs('menu.assessment')">
-                {{ __('Pengkajian Awal') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('menu.spiritual-needs')" :active="request()->routeIs('menu.spiritual-needs')">
-                {{ __('Kebutuhan Spiritual') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('menu.emotional-evaluation')" :active="request()->routeIs('menu.emotional-evaluation')">
-                {{ __('Evaluasi Perasaan') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('prayers.index')" :active="request()->routeIs('prayers.*')">
-                {{ __('Pohon Doa') }}
-            </x-responsive-nav-link>
-            @if (Auth::user()?->is_admin)
-                <x-responsive-nav-link :href="route('admin.prayers.index')" :active="request()->routeIs('admin.prayers.*')">
-                    {{ __('Moderasi Doa') }}
-                </x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('admin.journals.index')" :active="request()->routeIs('admin.journals.*')">
-                    {{ __('Moderasi Jurnal') }}
-                </x-responsive-nav-link>
+            @if (request()->routeIs('admin.*'))
+                @if (Auth::user()?->is_admin)
+                    <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">{{ __('Dashboard') }}</x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.prayers.index')" :active="request()->routeIs('admin.prayers.*')">{{ __('Doa') }}</x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.journals.index')" :active="request()->routeIs('admin.journals.*')">{{ __('Jurnal') }}</x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.education.index')" :active="request()->routeIs('admin.education.*')">{{ __('Modul') }}</x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('admin.evaluations.index')" :active="request()->routeIs('admin.evaluations.*')">{{ __('Evaluasi') }}</x-responsive-nav-link>
+                @endif
+            @else
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">{{ __('Dashboard Spiritual') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('menu.assessment')" :active="request()->routeIs('menu.assessment')">{{ __('Pengkajian Awal') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('menu.spiritual-needs')" :active="request()->routeIs('menu.spiritual-needs')">{{ __('Kebutuhan Spiritual') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('menu.emotional-evaluation')" :active="request()->routeIs('menu.emotional-evaluation')">{{ __('Evaluasi Perasaan') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('prayers.index')" :active="request()->routeIs('prayers.*')">{{ __('Pohon Doa') }}</x-responsive-nav-link>
+                @if (Auth::user()?->is_admin)
+                    <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.dashboard')">{{ __('Admin') }}</x-responsive-nav-link>
+                @endif
             @endif
         </div>
 

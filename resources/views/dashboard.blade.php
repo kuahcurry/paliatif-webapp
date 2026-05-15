@@ -4,11 +4,12 @@
 @endpush
 
 @php
-    $patientName = Auth::user()->name ?? 'Pasien';
-    $patientAge = '62 Tahun';
-    $patientGender = 'Laki-laki';
-    $patientRoom = 'Ruang: Mawar 3';
-    $patientRm = 'No. RM: 23051567';
+    $_user = Auth::user();
+    $patientName = $_user->name ?? 'Pasien';
+    $patientAge = $_user->patient_age ? $_user->patient_age . ' Tahun' : '--';
+    $patientGender = $_user->patient_gender ?? '--';
+    $patientRm = $_user->patient_rm ? 'No. RM: ' . $_user->patient_rm : '--';
+    $patientRoom = $_user->patient_room ? 'Ruang: ' . $_user->patient_room : '--';
     $spiritualScoreLabel = $spiritualScoreToday !== null ? $spiritualScoreToday . '/100' : '--';
     $emotionLabel = $emotionScoreToday !== null ? number_format($emotionScoreToday, 1) . '/5' : '--';
 
@@ -23,27 +24,11 @@
         }
     }
 
-    $activityCards = [
-        [
-            'title' => 'Doa Pagi',
-            'description' => $recommendations[0] ?? 'Mulai hari dengan doa dan memohon ketenangan.',
-            'tone' => 'green',
-        ],
-        [
-            'title' => 'Dzikir & Istighfar',
-            'description' => $recommendations[1] ?? 'Bawa ketenangan dengan dzikir singkat.',
-            'tone' => 'blue',
-        ],
-        [
-            'title' => 'Refleksi Diri',
-            'description' => $recommendations[2] ?? 'Luangkan waktu untuk mensyukuri hari ini.',
-            'tone' => 'purple',
-        ],
-        [
-            'title' => 'Istirahat Tenang',
-            'description' => 'Ambil waktu untuk menenangkan pikiran dan tubuh.',
-            'tone' => 'leaf',
-        ],
+    $activityDefs = [
+        ['key' => 'doa', 'title' => 'Doa Pagi', 'tone' => 'green', 'default' => 'Mulai hari dengan doa dan memohon ketenangan.'],
+        ['key' => 'dzikir', 'title' => 'Dzikir & Istighfar', 'tone' => 'blue', 'default' => 'Bawa ketenangan dengan dzikir singkat.'],
+        ['key' => 'refleksi', 'title' => 'Refleksi Diri', 'tone' => 'purple', 'default' => 'Luangkan waktu untuk merefleksikan perasaan hari ini.'],
+        ['key' => 'istirahat', 'title' => 'Istirahat Tenang', 'tone' => 'leaf', 'default' => 'Ambil waktu untuk menenangkan pikiran dan tubuh.'],
     ];
 @endphp
 
@@ -63,22 +48,10 @@
 
             <div class="dashboard-alerts">
                 @if (session('status') === 'radar-saved')
-                    <div class="alert success">{{ __('Cek harian tersimpan.') }}</div>
+                    <div class="alert success">{{ __('Data tersimpan.') }}</div>
                 @endif
                 @if (session('status') === 'journal-saved')
-                    <div class="alert info">{{ __('Catatan reflektif tersimpan.') }}</div>
-                @endif
-                @if (! $hasToday)
-                    <div class="alert warning">
-                        <span>{{ __('Anda belum mengisi cek harian hari ini.') }}</span>
-                        <a href="#daily-check">{{ __('Isi sekarang') }}</a>
-                    </div>
-                @endif
-                @if ($errors->has('daily'))
-                    <div class="alert warning">{{ $errors->first('daily') }}</div>
-                @endif
-                @if ($errors->has('journal'))
-                    <div class="alert warning">{{ $errors->first('journal') }}</div>
+                    <div class="alert info">{{ __('Catatan tersimpan.') }}</div>
                 @endif
             </div>
 
@@ -94,7 +67,7 @@
                 <div class="hero-stats">
                     <div class="stat-card">
                         <div class="stat-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2v3M17 2v3M4 7h16v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7zm2 4h4v4H6z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v3M16 2v3M3 7h18M5 5h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/><path d="M3 11h18"/></svg>
                         </div>
                         <div>
                             <p class="stat-label">Hari Ini</p>
@@ -104,7 +77,7 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C7 6 5 10 5 14a7 7 0 0 0 14 0c0-4-2-8-7-12zm0 18a5 5 0 0 1-5-5c0-2.9 1.7-5.7 5-9 3.3 3.3 5 6.1 5 9a5 5 0 0 1-5 5z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
                         </div>
                         <div>
                             <p class="stat-label">Kondisi Umum</p>
@@ -114,17 +87,17 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 0-3 3V4z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                         </div>
                         <div>
                             <p class="stat-label">Aktivitas Rohani Hari Ini</p>
                             <p class="stat-value">{{ $activityHighlight }}</p>
-                            <a class="stat-link" href="#daily-check">Lihat Detail</a>
+                            <a class="stat-link" href="{{ route('menu.emotional-evaluation') }}">Lihat Detail</a>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21c0-6 3-11 9-13-1 7-5 12-9 13zm0 0C6 19 3 14 3 8c6 2 9 7 9 13z" fill="currentColor"/></svg>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
                         </div>
                         <div>
                             <p class="stat-label">Konsistensi</p>
@@ -142,7 +115,7 @@
                             <h4>Skor Spiritual Harian</h4>
                             <p>Skor spiritual Anda dalam {{ $range }} hari terakhir</p>
                         </div>
-                        <button class="ghost-button" type="button">Lihat Detail</button>
+                        <a href="{{ route('dashboard') }}?range=30" class="ghost-button">Lihat Detail</a>
                     </div>
                     <div class="chart-wrap">
                         <canvas id="spiritualScoreChart"></canvas>
@@ -155,7 +128,7 @@
                             <h4>Tingkat Gejala (ESAS)</h4>
                             <p>Rata-rata tingkat gejala Anda</p>
                         </div>
-                        <button class="ghost-button" type="button">Lihat Detail</button>
+                        <a href="{{ route('menu.assessment') }}" class="ghost-button">Lihat Detail</a>
                     </div>
                     <div class="esas-list">
                         @foreach ($esasScores as $esas)
@@ -176,7 +149,7 @@
                             <h4>Tren Emosi</h4>
                             <p>Bagaimana perasaan Anda dari hari ke hari</p>
                         </div>
-                        <button class="ghost-button" type="button">Lihat Detail</button>
+                        <a href="{{ route('menu.emotional-evaluation') }}" class="ghost-button">Lihat Detail</a>
                     </div>
                     <div class="emotion-chart">
                         <div class="emotion-legend">
@@ -227,15 +200,20 @@
                             <h4>Aktivitas Rohani yang Disarankan</h4>
                             <p>Pilih aktivitas yang sesuai dengan kondisi Anda saat ini</p>
                         </div>
-                        <button class="ghost-button" type="button">Lihat Semua</button>
+                        <a href="{{ route('education.index') }}" class="ghost-button">Lihat Semua</a>
                     </div>
                     <div class="activity-grid">
-                        @foreach ($activityCards as $activity)
-                            <div class="activity-card {{ $activity['tone'] }}">
+                        @foreach ($activityDefs as $def)
+                            @php
+                                $module = $recommendedActivities[$def['key']] ?? null;
+                                $desc = $module ? $module->summary : $def['default'];
+                                $route = $module ? route('education.show', $module) : route('education.index');
+                            @endphp
+                            <div class="activity-card {{ $def['tone'] }}">
                                 <div class="activity-icon"></div>
-                                <h5>{{ $activity['title'] }}</h5>
-                                <p>{{ $activity['description'] }}</p>
-                                <button type="button">Mulai</button>
+                                <h5>{{ $def['title'] }}</h5>
+                                <p>{{ $desc }}</p>
+                                <a href="{{ $route }}" class="activity-btn">Mulai</a>
                             </div>
                         @endforeach
                     </div>
@@ -245,15 +223,17 @@
                     <div class="card-header">
                         <div>
                             <h4>Tips Hari Ini</h4>
-                            <p>Jaga hati, jaga ketenangan</p>
+                            <p>Dari modul edukasi untuk Anda</p>
                         </div>
                     </div>
                     <div class="tips-visual"></div>
-                    <p class="tips-text">
-                        Ketika hati tenang, tubuh pun ikut merasakan kedamaian.
-                        Tarik napas dalam, hembuskan pelan, serahkan semua pada-Nya.
-                    </p>
-                    <button class="ghost-button" type="button">Baca Selengkapnya</button>
+                    @if ($dailyTip)
+                        <p class="tips-text">{{ $dailyTip->summary }}</p>
+                        <a href="{{ route('education.index') }}" class="ghost-button">Baca Selengkapnya</a>
+                    @else
+                        <p class="tips-text">Luangkan waktu sejenak untuk berdoa, berdzikir, atau merenung sesuai keyakinan Anda.</p>
+                        <a href="{{ route('education.index') }}" class="ghost-button">Baca Selengkapnya</a>
+                    @endif
                 </div>
             </section>
 
@@ -265,115 +245,7 @@
                 <span class="leaf-mark"></span>
             </section>
 
-            <section class="extras" id="daily-check">
-                <details class="accordion">
-                    <summary>Isi Cek Harian</summary>
-                    @if ($hasToday)
-                        <p class="muted">Anda sudah mengisi cek harian hari ini.</p>
-                    @else
-                        <form method="POST" action="{{ route('dashboard.radar.store') }}" class="form-grid">
-                            @csrf
 
-                            @php
-                                $questions = [
-                                    'score_meaning' => 'Makna hidup',
-                                    'score_closeness' => 'Kedekatan dengan Tuhan/yang Ilahi',
-                                    'score_peace' => 'Rasa damai',
-                                    'score_fear' => 'Rasa takut terhadap masa depan/kematian',
-                                    'score_loneliness' => 'Rasa kesepian',
-                                ];
-                                $esasQuestions = [
-                                    'symptom_pain' => 'Nyeri',
-                                    'symptom_fatigue' => 'Lelah',
-                                    'symptom_nausea' => 'Mual',
-                                    'symptom_anxiety' => 'Cemas',
-                                    'symptom_sadness' => 'Sedih',
-                                ];
-                            @endphp
-
-                            <div class="form-section">
-                                <h5>Skala Spiritual (1-5)</h5>
-                                @foreach ($questions as $field => $label)
-                                    <div class="form-row">
-                                        <label>{{ $label }}</label>
-                                        <div class="radio-group">
-                                            @for ($i = 1; $i <= 5; $i++)
-                                                <label>
-                                                    <input type="radio" name="{{ $field }}" value="{{ $i }}" @checked(old($field) == $i) @if ($i === 1) required @endif>
-                                                    <span>{{ $i }}</span>
-                                                </label>
-                                            @endfor
-                                        </div>
-                                        <x-input-error class="mt-2" :messages="$errors->get($field)" />
-                                    </div>
-                                @endforeach
-                            </div>
-
-                            <div class="form-section">
-                                <h5>Skala Gejala ESAS (1-5)</h5>
-                                @foreach ($esasQuestions as $field => $label)
-                                    <div class="form-row">
-                                        <label>{{ $label }}</label>
-                                        <div class="radio-group">
-                                            @for ($i = 1; $i <= 5; $i++)
-                                                <label>
-                                                    <input type="radio" name="{{ $field }}" value="{{ $i }}" @checked(old($field) == $i) @if ($i === 1) required @endif>
-                                                    <span>{{ $i }}</span>
-                                                </label>
-                                            @endfor
-                                        </div>
-                                        <x-input-error class="mt-2" :messages="$errors->get($field)" />
-                                    </div>
-                                @endforeach
-
-                                <div class="form-row">
-                                    <label>Gejala/keluhan utama (opsional)</label>
-                                    <textarea name="symptoms" rows="3">{{ old('symptoms') }}</textarea>
-                                    <x-input-error class="mt-2" :messages="$errors->get('symptoms')" />
-                                </div>
-                            </div>
-
-                            <button type="submit" class="primary-button">Simpan</button>
-                        </form>
-                    @endif
-                </details>
-
-                <details class="accordion" id="journal">
-                    <summary>Jurnal Reflektif</summary>
-                    @if ($hasJournalToday)
-                        <p class="muted">Catatan reflektif hari ini sudah dibuat.</p>
-                    @else
-                        <form method="POST" action="{{ route('journals.store') }}" class="form-grid">
-                            @csrf
-                            <div class="form-row">
-                                <label>Catatan hari ini</label>
-                                <textarea name="content" rows="4">{{ old('content') }}</textarea>
-                                <x-input-error class="mt-2" :messages="$errors->get('content')" />
-                            </div>
-                            <label class="checkbox-row">
-                                <input type="checkbox" name="is_shareable" value="1" @checked(old('is_shareable'))>
-                                <span>Izinkan tenaga kesehatan membaca catatan ini</span>
-                            </label>
-                            <button type="submit" class="primary-button">Simpan catatan</button>
-                        </form>
-                    @endif
-
-                    <div class="journal-list">
-                        @foreach ($journalEntries as $entry)
-                            <div class="journal-card">
-                                <span class="date">{{ $entry->entry_date->format('d M Y') }}</span>
-                                <p>{{ $entry->content }}</p>
-                                @if ($entry->provider_response)
-                                    <div class="response">
-                                        <strong>Respon tenaga kesehatan</strong>
-                                        <p>{{ $entry->provider_response }}</p>
-                                    </div>
-                                @endif
-                            </div>
-                        @endforeach
-                    </div>
-                </details>
-            </section>
         </main>
     </div>
 
@@ -553,6 +425,9 @@
             display: grid;
             place-items: center;
             color: #475569;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
         }
 
         .icon-button svg {
@@ -582,6 +457,9 @@
             border-radius: 16px;
             padding: 6px 12px;
             box-shadow: var(--shadow);
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
         }
 
         .avatar {
@@ -892,13 +770,15 @@
             color: var(--muted);
         }
 
-        .activity-card button {
+        .activity-btn {
             align-self: flex-start;
             border: 1px solid #e2e8f0;
             background: #fff;
             padding: 4px 10px;
             border-radius: 999px;
             font-size: 0.7rem;
+            text-decoration: none;
+            color: #475569;
         }
 
         .activity-card.green { border-color: #cfead5; }
@@ -946,116 +826,6 @@
             border-radius: 999px;
             background: #bbf7d0;
             display: inline-block;
-        }
-
-        .extras {
-            display: grid;
-            gap: 16px;
-        }
-
-        .accordion {
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: var(--shadow);
-        }
-
-        .accordion summary {
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        .form-grid {
-            display: grid;
-            gap: 16px;
-            margin-top: 16px;
-        }
-
-        .form-section {
-            display: grid;
-            gap: 12px;
-        }
-
-        .form-section h5 {
-            font-weight: 600;
-        }
-
-        .form-row {
-            display: grid;
-            gap: 8px;
-        }
-
-        .form-row label {
-            font-size: 0.85rem;
-            color: var(--muted);
-        }
-
-        .radio-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .radio-group label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: #f8fafc;
-            padding: 6px 10px;
-            border-radius: 999px;
-            font-size: 0.75rem;
-        }
-
-        .checkbox-row {
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .form-row textarea,
-        .form-grid textarea {
-            width: 100%;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            padding: 10px;
-            font-size: 0.85rem;
-        }
-
-        .primary-button {
-            background: #4f9b4f;
-            color: #fff;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 12px;
-            font-weight: 600;
-            width: fit-content;
-        }
-
-        .journal-list {
-            display: grid;
-            gap: 12px;
-            margin-top: 16px;
-        }
-
-        .journal-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 12px;
-            font-size: 0.85rem;
-            color: var(--muted);
-        }
-
-        .journal-card .date {
-            font-size: 0.7rem;
-        }
-
-        .journal-card .response {
-            margin-top: 10px;
-            background: #f8fafc;
-            padding: 10px;
-            border-radius: 10px;
-            color: #1f2937;
         }
 
         @media (max-width: 1200px) {
@@ -1114,7 +884,6 @@
         }
     </style>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const scoreLabels = @json($chartLabels);
         const scoreTrend = @json($scoreTrend);
