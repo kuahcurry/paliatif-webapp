@@ -31,7 +31,7 @@ Route::post('/pohon-doa/{prayer}/support', [PrayerController::class, 'support'])
     ->middleware('throttle:10,1')
     ->name('prayers.support');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [SpiritualDashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard/radar', [SpiritualDashboardController::class, 'store'])->name('dashboard.radar.store');
 });

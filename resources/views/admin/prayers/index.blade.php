@@ -98,7 +98,7 @@
         .brand-icon span { width: 22px; height: 22px; border-radius: 999px; background: #63b96b; display: block; }
         .sidebar-brand h1 { font-size: 0.95rem; color: var(--text); }
         .sidebar-brand p { font-size: 0.8rem; color: var(--muted); }
-        .sidebar-nav { display: flex; flex-direction: column; gap: 8px; }
+        .sidebar-nav { display: flex; flex-direction: column; gap: 10px; }
         .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; color: var(--muted); text-decoration: none; font-size: 0.9rem; }
         .nav-icon { width: 20px; height: 20px; display: grid; place-items: center; color: currentColor; }
         .nav-icon svg { width: 18px; height: 18px; }

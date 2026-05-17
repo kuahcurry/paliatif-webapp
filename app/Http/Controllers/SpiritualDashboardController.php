@@ -32,16 +32,12 @@ class SpiritualDashboardController extends Controller
         $latestLog = $allLogs->first();
         $hasToday = $latestLog?->date?->isSameDay($today) ?? false;
 
-        $dailyTip = EducationModule::where('is_active', true)
-            ->inRandomOrder()
-            ->first();
+        $dailyTip = $this->getDailyTrivia();
 
-        $recommendedActivities = [
-            'doa' => EducationModule::where('is_active', true)->whereJsonContains('tags', 'spiritual_support')->inRandomOrder()->first(),
-            'dzikir' => EducationModule::where('is_active', true)->whereJsonContains('tags', 'coping')->inRandomOrder()->first(),
-            'refleksi' => EducationModule::where('is_active', true)->whereJsonContains('tags', 'grief')->inRandomOrder()->first(),
-            'istirahat' => EducationModule::where('is_active', true)->inRandomOrder()->first(),
-        ];
+        $highlightedModules = EducationModule::where('is_active', true)
+            ->where('is_highlighted', true)
+            ->take(4)
+            ->get();
 
         $overallStatus = $this->buildOverallStatus($latestLog);
         $spiritualScoreToday = $latestLog ? $this->calculateSpiritualScore($latestLog) : null;
@@ -74,7 +70,7 @@ class SpiritualDashboardController extends Controller
             'trendText' => $this->buildTrendText($logs, $range),
             'recommendations' => $this->buildRecommendations($latestLog),
             'dailyTip' => $dailyTip,
-            'recommendedActivities' => $recommendedActivities,
+            'highlightedModules' => $highlightedModules,
             'overallStatus' => $overallStatus,
             'spiritualScoreToday' => $spiritualScoreToday,
             'emotionScoreToday' => $emotionScoreToday,
@@ -389,5 +385,45 @@ class SpiritualDashboardController extends Controller
         ];
 
         return $map[$date->format('l')] ?? $date->format('l');
+    }
+
+    private function getDailyTrivia(): array
+    {
+        $tips = [
+            ['text' => 'Meditasi selama 10 menit sehari dapat menurunkan kadar kortisol (hormon stres) hingga 14%, meningkatkan ketenangan dan kejernihan pikiran.', 'source' => 'Journal of Health Psychology'],
+            ['text' => 'Berdoa secara rutin terbukti meningkatkan rasa harapan dan menurunkan tingkat kecemasan pada pasien paliatif.', 'source' => 'Palliative Medicine Journal'],
+            ['text' => 'Menulis jurnal rasa syukur selama 5 menit sehari dapat meningkatkan kualitas tidur hingga 25%.', 'source' => 'Applied Psychology: Health and Well-Being'],
+            ['text' => 'Koneksi spiritual yang kuat dapat membantu seseorang merasa lebih bermakna, meskipun menghadapi kondisi sulit.', 'source' => 'WHO Palliative Care Guidelines'],
+            ['text' => 'Teknik pernapasan dalam (deep breathing) selama 4-7-8 detik membantu menenangkan sistem saraf dan mengurangi rasa cemas.', 'source' => 'Harvard Medical School'],
+            ['text' => 'Mendengarkan musik yang menenangkan dapat menurunkan tekanan darah dan mengurangi persepsi nyeri.', 'source' => 'Journal of Advanced Nursing'],
+            ['text' => 'Berbagi perasaan dengan orang yang dipercaya dapat meringankan beban emosional hingga 50%.', 'source' => 'American Psychological Association'],
+            ['text' => 'Aktivitas spiritual seperti dzikir atau doa memiliki efek yang mirip dengan meditasi pada gelombang otak.', 'source' => 'Neuroscience Letters'],
+            ['text' => 'Tersenyum, bahkan ketika dipaksakan, dapat merangsang pelepasan endorfin dan serotonin yang membuat perasaan lebih baik.', 'source' => 'Psychological Science'],
+            ['text' => 'Pasien yang memiliki dukungan spiritual melaporkan kualitas hidup 30% lebih tinggi dibanding yang tidak.', 'source' => 'Journal of Clinical Oncology'],
+            ['text' => 'Matahari pagi membantu tubuh memproduksi vitamin D yang berperan dalam menstabilkan suasana hati.', 'source' => 'Journal of Internal Medicine'],
+            ['text' => 'Sentuhan lembut seperti memegang tangan orang tersayang dapat menurunkan hormon stres secara signifikan.', 'source' => 'Psychological Science'],
+            ['text' => 'Membaca ayat-ayat suci atau doa sebelum tidur membantu menenangkan pikiran dan meningkatkan kualitas istirahat.', 'source' => 'Sleep Medicine Reviews'],
+            ['text' => 'Rasa syukur meningkatkan aktivitas di area otak yang terkait dengan kebahagiaan dan kepuasan hidup.', 'source' => 'NeuroImage Journal'],
+            ['text' => 'Berjalan kaki ringan selama 15 menit sehari bisa meningkatkan suasana hati dan energi secara keseluruhan.', 'source' => 'American Journal of Preventive Medicine'],
+            ['text' => 'Minum air putih yang cukup membantu menjaga konsentrasi dan mencegah kelelahan berlebihan.', 'source' => 'Journal of Nutrition'],
+            ['text' => 'Memaafkan orang lain tidak hanya membebaskan mereka, tapi juga menurunkan tekanan darah dan stres Anda sendiri.', 'source' => 'Journal of Behavioral Medicine'],
+            ['text' => 'Aroma lavender dan melati terbukti memiliki efek menenangkan dan dapat membantu mengurangi kecemasan.', 'source' => 'Frontiers in Behavioral Neuroscience'],
+            ['text' => 'Komunitas dan dukungan sosial adalah salah satu faktor terkuat untuk kesehatan mental jangka panjang.', 'source' => 'The Lancet Psychiatry'],
+            ['text' => 'Ritual keagamaan memberikan struktur dan makna yang membantu seseorang menghadapi ketidakpastian.', 'source' => 'Journal of Religion and Health'],
+            ['text' => 'Memelihara tanaman di dalam ruangan dapat menurunkan stres dan meningkatkan perasaan tenang.', 'source' => 'Journal of Physiological Anthropology'],
+            ['text' => 'Refleksi diri selama 10 menit setiap malam membantu mengenali pola pikir dan emosi lebih baik.', 'source' => 'Mindfulness Journal'],
+            ['text' => 'Tertawa secara teratur meningkatkan sistem kekebalan tubuh dan mengurangi hormon stres.', 'source' => 'Mayo Clinic'],
+            ['text' => 'Konsumsi makanan yang kaya omega-3 seperti ikan dapat membantu mengurangi gejala depresi ringan.', 'source' => 'Translational Psychiatry'],
+            ['text' => 'Bercerita atau mendengarkan kisah inspiratif dapat meningkatkan rasa harapan dan keterhubungan.', 'source' => 'Narrative Inquiry in Bioethics'],
+            ['text' => 'Mindfulness atau kesadaran penuh membantu mengurangi rumination (pikiran berulang negatif) hingga 40%.', 'source' => 'Clinical Psychology Review'],
+            ['text' => 'Tidur yang berkualitas selama 7-8 jam sangat penting untuk pemulihan emosional dan fisik.', 'source' => 'Nature and Science of Sleep'],
+            ['text' => 'Memeluk seseorang selama 20 detik memicu pelepasan oksitosin yang membuat perasaan lebih aman dan dicintai.', 'source' => 'Psychoneuroendocrinology'],
+            ['text' => 'Warna hijau dan biru dari alam terbukti menurunkan detak jantung dan tekanan darah.', 'source' => 'Environmental Health and Preventive Medicine'],
+            ['text' => 'Melakukan kebaikan untuk orang lain, sekecil apapun, meningkatkan rasa bahagia dan kepuasan hidup.', 'source' => 'Journal of Social Psychology'],
+        ];
+
+        $index = Carbon::today()->dayOfYear % count($tips);
+
+        return $tips[$index];
     }
 }

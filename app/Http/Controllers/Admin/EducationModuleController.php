@@ -56,6 +56,7 @@ class EducationModuleController extends Controller
 
         $validated = $request->validate($rules);
         $validated['is_active'] = $request->boolean('is_active');
+        $validated['is_highlighted'] = $request->boolean('is_highlighted');
 
         if ($request->hasFile('video_file')) {
             $validated['video_path'] = $request->file('video_file')->store('videos', 'public');
@@ -99,6 +100,7 @@ class EducationModuleController extends Controller
 
         $validated = $request->validate($rules);
         $validated['is_active'] = $request->boolean('is_active');
+        $validated['is_highlighted'] = $request->boolean('is_highlighted');
 
         if ($request->hasFile('video_file')) {
             if ($educationModule->video_path) {

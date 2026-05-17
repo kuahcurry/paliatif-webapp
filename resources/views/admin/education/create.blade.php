@@ -89,6 +89,11 @@
                         <label><input type="checkbox" name="is_active" value="1" @checked(old('is_active', true))> Aktif</label>
                     </div>
 
+                    <div class="field">
+                        <label><input type="checkbox" name="is_highlighted" value="1" @checked(old('is_highlighted', false))> Tambahkan ke aktivitas yang disarankan</label>
+                        <small style="font-size: 0.72rem; color: #94a3b8;">Modul ini akan ditampilkan di dashboard pengguna sebagai rekomendasi.</small>
+                    </div>
+
                     <div class="form-actions">
                         <button type="submit" class="primary-button">Simpan</button>
                         <a href="{{ route('admin.education.index') }}" class="ghost-button">Batal</a>
@@ -119,7 +124,7 @@
         .brand-icon span { width: 22px; height: 22px; border-radius: 999px; background: #63b96b; display: block; }
         .sidebar-brand h1 { font-size: 0.95rem; color: #0f172a; }
         .sidebar-brand p { font-size: 0.8rem; color: var(--muted); }
-        .sidebar-nav { display: flex; flex-direction: column; gap: 8px; }
+        .sidebar-nav { display: flex; flex-direction: column; gap: 10px; }
         .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; color: var(--muted); text-decoration: none; font-size: 0.9rem; }
         .nav-icon { width: 20px; height: 20px; display: grid; place-items: center; }
         .nav-icon svg { width: 18px; height: 18px; }

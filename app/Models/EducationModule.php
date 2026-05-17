@@ -17,6 +17,7 @@ class EducationModule extends Model
         'content',
         'tags',
         'is_active',
+        'is_highlighted',
         'video_path',
         'image_path',
     ];
@@ -26,6 +27,7 @@ class EducationModule extends Model
         return [
             'tags' => 'array',
             'is_active' => 'boolean',
+            'is_highlighted' => 'boolean',
         ];
     }
 }

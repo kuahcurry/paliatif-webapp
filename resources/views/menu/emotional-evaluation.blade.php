@@ -598,16 +598,35 @@
         .face-distress { background: #fca5a5; }
 
         .face-neutral .mouth {
+            width: 20px;
             height: 0;
-            border-color: #1f2937 transparent transparent transparent;
-            top: 40px;
+            border: none;
+            border-top: 3px solid #1f2937;
+            border-radius: 0;
+            top: 42px;
+            left: 25px;
         }
 
-        .face-anxious .mouth,
+        .face-anxious .mouth {
+            width: 18px;
+            height: 8px;
+            border-color: transparent transparent #1f2937 transparent;
+            border-radius: 0 0 999px 999px;
+            border-width: 3px;
+            top: 40px;
+            left: 26px;
+            transform: rotate(180deg);
+        }
+
         .face-distress .mouth {
-            height: 0;
-            border-color: #1f2937 transparent transparent transparent;
-            top: 42px;
+            width: 24px;
+            height: 10px;
+            border-color: transparent transparent #1f2937 transparent;
+            border-radius: 0 0 999px 999px;
+            border-width: 3px;
+            top: 38px;
+            left: 23px;
+            transform: rotate(180deg);
         }
 
         .note-section {

@@ -23,12 +23,7 @@
         }
     }
 
-    $activityDefs = [
-        ['key' => 'doa', 'title' => 'Doa Pagi', 'tone' => 'green', 'default' => 'Mulai hari dengan doa dan memohon ketenangan.', 'icon' => '<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="2"/>'],
-        ['key' => 'dzikir', 'title' => 'Dzikir & Istighfar', 'tone' => 'blue', 'default' => 'Bawa ketenangan dengan dzikir singkat.', 'icon' => '<path d="M12 3c-4 0-7 3-7 7 0 4 3 11 7 11s7-7 7-11c0-4-3-7-7-7zM9 9h6M9 13h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'],
-        ['key' => 'refleksi', 'title' => 'Refleksi Diri', 'tone' => 'purple', 'default' => 'Luangkan waktu untuk merefleksikan perasaan hari ini.', 'icon' => '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'],
-        ['key' => 'istirahat', 'title' => 'Istirahat Tenang', 'tone' => 'leaf', 'default' => 'Ambil waktu untuk menenangkan pikiran dan tubuh.', 'icon' => '<path d="M12 3v18M3 12h18M12 12l-4-4M12 12l4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'],
-    ];
+    $toneColors = ['green', 'blue', 'purple', 'leaf'];
 @endphp
 
 <x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen dashboard-page">
@@ -52,7 +47,26 @@
                 @if (session('status') === 'journal-saved')
                     <div class="alert info">{{ __('Catatan tersimpan.') }}</div>
                 @endif
+                @if (session('status') === 'verification-link-sent')
+                    <div class="alert success">{{ __('Link verifikasi baru telah dikirim ke alamat email Anda.') }}</div>
+                @endif
             </div>
+
+            @if (! Auth::user()->hasVerifiedEmail())
+                <div class="verify-banner">
+                    <div class="verify-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    </div>
+                    <div class="verify-body">
+                        <strong>Email Anda belum terverifikasi.</strong>
+                        <p>Silakan periksa kotak masuk email Anda dan klik tautan verifikasi. Beberapa fitur mungkin terbatas.</p>
+                    </div>
+                    <form method="POST" action="{{ route('verification.send') }}">
+                        @csrf
+                        <button type="submit" class="verify-resend-btn">Kirim Ulang</button>
+                    </form>
+                </div>
+            @endif
 
             @if (! $hasToday)
                 <section class="checkin-prompt" x-data="{ open: true }" x-show="open">
@@ -329,57 +343,49 @@
                     </div>
                 </div>
 
+                @if ($highlightedModules->count() > 0)
                 <div class="card">
                     <div class="card-header">
                         <div>
                             <h4>Aktivitas Rohani yang Disarankan</h4>
-                            <p>Pilih aktivitas yang sesuai dengan kondisi Anda saat ini</p>
+                            <p>Modul edukasi pilihan untuk kondisi Anda</p>
                         </div>
                         <a href="{{ route('education.index') }}" class="ghost-button">Lihat Semua</a>
                     </div>
                     <div class="activity-grid">
-                        @foreach ($activityDefs as $def)
-                            @php
-                                $module = $recommendedActivities[$def['key']] ?? null;
-                                $desc = $module ? $module->summary : $def['default'];
-                                $route = $module ? route('education.show', $module) : route('education.index');
-                            @endphp
-                            <div class="activity-card {{ $def['tone'] }}">
+                        @foreach ($highlightedModules as $index => $module)
+                            <div class="activity-card {{ $toneColors[$index % 4] }}">
                                 <div class="activity-icon">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $def['icon'] !!}</svg>
+                                    @if ($module->type === 'video')
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                    @else
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                                    @endif
                                 </div>
-                                <h5>{{ $def['title'] }}</h5>
-                                <p>{{ $desc }}</p>
-                                <a href="{{ $route }}" class="activity-btn">Mulai</a>
+                                <h5>{{ $module->title }}</h5>
+                                <p>{{ Str::limit($module->summary, 80) }}</p>
+                                <a href="{{ route('education.show', $module) }}" class="activity-btn">Mulai</a>
                             </div>
                         @endforeach
                     </div>
                 </div>
+                @endif
 
-                <div class="card tips-card">
-                    <div class="card-header">
-                        <div>
-                            <h4>Tips Hari Ini</h4>
-                            <p>Dari modul edukasi untuk Anda</p>
-                        </div>
+                <div class="card tips-card-v2">
+                    <div class="tips-icon-wrap">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     </div>
-                    <div class="tips-visual"></div>
-                    @if ($dailyTip)
-                        <p class="tips-text">{{ $dailyTip->summary }}</p>
-                        <a href="{{ route('education.index') }}" class="ghost-button">Baca Selengkapnya</a>
-                    @else
-                        <p class="tips-text">Luangkan waktu sejenak untuk berdoa, berdzikir, atau merenung sesuai keyakinan Anda.</p>
-                        <a href="{{ route('education.index') }}" class="ghost-button">Baca Selengkapnya</a>
-                    @endif
+                    <div class="tips-body">
+                        <h5>Tahukah Anda?</h5>
+                        <p class="tips-text">{{ $dailyTip['text'] }}</p>
+                        <span class="tips-source">— {{ $dailyTip['source'] }}</span>
+                    </div>
                 </div>
             </section>
 
             <section class="footer-note">
-                <div>
-                    <strong>Teruslah merawat ruh dengan kebaikan setiap hari.</strong>
-                    <p>Perjalanan spiritual adalah proses, bukan tujuan. Setiap langkah kecil adalah kemajuan.</p>
-                </div>
-                <span class="leaf-mark"></span>
+                <span class="footer-leaf">🌿</span>
+                <span>Teruslah merawat ruh dengan kebaikan setiap hari.</span>
             </section>
 
 
@@ -997,21 +1003,115 @@
 
         .footer-note {
             background: #f0fdf4;
-            border-radius: 16px;
-            padding: 16px;
+            border-radius: 12px;
+            padding: 10px 16px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            font-size: 0.85rem;
+            gap: 8px;
+            font-size: 0.8rem;
             color: #166534;
+            font-weight: 500;
         }
 
-        .leaf-mark {
-            width: 32px;
-            height: 32px;
-            border-radius: 999px;
-            background: #bbf7d0;
-            display: inline-block;
+        .footer-leaf {
+            font-size: 1rem;
+        }
+
+        .tips-card-v2 {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+        }
+
+        .tips-icon-wrap {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #fef3c7;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+            color: #b45309;
+        }
+
+        .tips-icon-wrap svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .tips-body h5 {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: #92400e;
+            margin-bottom: 4px;
+        }
+
+        .tips-source {
+            font-size: 0.7rem;
+            color: #b45309;
+            font-style: italic;
+            margin-top: 4px;
+            display: block;
+        }
+        .verify-banner {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border: 1px solid #fde68a;
+            border-radius: 14px;
+            padding: 14px 20px;
+            margin-bottom: 4px;
+        }
+
+        .verify-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: #fef3c7;
+            display: grid;
+            place-items: center;
+            color: #d97706;
+            flex-shrink: 0;
+        }
+
+        .verify-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .verify-body {
+            flex: 1;
+        }
+
+        .verify-body strong {
+            font-size: 0.85rem;
+            color: #92400e;
+        }
+
+        .verify-body p {
+            font-size: 0.78rem;
+            color: #b45309;
+            margin: 2px 0 0;
+        }
+
+        .verify-resend-btn {
+            background: #f59e0b;
+            color: #fff;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.78rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background 0.2s ease;
+        }
+
+        .verify-resend-btn:hover {
+            background: #d97706;
         }
 
         .checkin-prompt {

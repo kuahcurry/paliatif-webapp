@@ -33,7 +33,7 @@
                     <div class="tree-visual">
                         <div class="tree-visual-glow"></div>
                         <div class="tree-image-wrapper">
-                            <img src="{{ asset('build/assets/tree/stage' . $treeStage . '.png') }}"
+                            <img src="{{ asset('images/tree/stage' . $treeStage . '.png') }}"
                                  alt="{{ $stageName }}"
                                  class="tree-image"
                                  id="treeImage">

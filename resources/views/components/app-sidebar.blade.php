@@ -66,37 +66,45 @@
 @endphp
 
 <div class="sidebar-brand">
-    <a href="{{ route('dashboard') }}"><img src="{{ asset('build/assets/logontulisan.png') }}" alt="Terapi Rohani" style="height:72px;width:auto;display:block;margin:4px 0;"></a>
+    <a href="{{ route('dashboard') }}"><img src="{{ asset('images/logontulisan.png') }}" alt="Terapi Rohani" class="sidebar-logo-full" style="height:72px;width:auto;display:block;margin:4px 0;"></a>
+    <a href="{{ route('dashboard') }}" class="sidebar-logo-mini" style="display:none;"><img src="{{ asset('images/logo.png') }}" alt="RH" style="height:36px;width:auto;"></a>
     @if ($brandLine)
-        <small>{{ $brandLine }}</small>
+        <small class="nav-label">{{ $brandLine }}</small>
     @endif
 </div>
+
+<button type="button" class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar" title="Perkecil/Perbesar Menu">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path class="toggle-collapse" d="M15 18l-6-6 6-6"/>
+        <path class="toggle-expand" d="M9 18l6-6-6-6" style="display:none"/>
+    </svg>
+</button>
 
 <nav class="sidebar-nav">
     @if (Auth::check() && request()->routeIs('admin.*'))
         @foreach ($adminItems as $item)
             @php $isActive = $active ? $active === $item['key'] : request()->routeIs($item['routeIs']); @endphp
-            <a class="nav-item {{ $isActive ? 'is-active' : '' }}" href="{{ route($item['route']) }}">
+            <a class="nav-item {{ $isActive ? 'is-active' : '' }}" href="{{ route($item['route']) }}" title="{{ $item['label'] }}">
                 <span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true">{!! $item['icon'] !!}</svg></span>
-                {{ $item['label'] }}
+                <span class="nav-label">{{ $item['label'] }}</span>
             </a>
         @endforeach
     @else
         @foreach ($navItems as $item)
             @php $isActive = $active ? $active === $item['key'] : request()->routeIs($item['routeIs']); @endphp
-            <a class="nav-item {{ $isActive ? 'is-active' : '' }}" href="{{ route($item['route']) }}">
+            <a class="nav-item {{ $isActive ? 'is-active' : '' }}" href="{{ route($item['route']) }}" title="{{ $item['label'] }}">
                 <span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true">{!! $item['icon'] !!}</svg></span>
-                {{ $item['label'] }}
+                <span class="nav-label">{{ $item['label'] }}</span>
             </a>
         @endforeach
         @if ($adminItems)
             <div class="sidebar-divider"></div>
-            <div class="sidebar-section-label">Admin</div>
+            <div class="sidebar-section-label nav-label">Admin</div>
             @foreach ($adminItems as $item)
                 @php $isActive = $active ? $active === $item['key'] : request()->routeIs($item['routeIs']); @endphp
-                <a class="nav-item {{ $isActive ? 'is-active' : '' }}" href="{{ route($item['route']) }}">
+                <a class="nav-item {{ $isActive ? 'is-active' : '' }}" href="{{ route($item['route']) }}" title="{{ $item['label'] }}">
                     <span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true">{!! $item['icon'] !!}</svg></span>
-                    {{ $item['label'] }}
+                    <span class="nav-label">{{ $item['label'] }}</span>
                 </a>
             @endforeach
         @endif
@@ -118,5 +126,108 @@
         color: #94a3b8;
         padding: 4px 12px 8px;
     }
+
+    .sidebar-toggle {
+        border: none;
+        background: #f1f5f9;
+        border-radius: 10px;
+        width: 32px;
+        height: 32px;
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        color: #64748b;
+        transition: all 0.2s ease;
+        align-self: flex-end;
+        margin-top: -8px;
+        margin-bottom: -8px;
+    }
+
+    .sidebar-toggle:hover {
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    .sidebar-toggle svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* Collapsed sidebar styles */
+    .sidebar-collapsed {
+        width: 72px !important;
+        padding: 16px 10px !important;
+        align-items: center;
+    }
+
+    .sidebar-collapsed .sidebar-logo-full {
+        display: none !important;
+    }
+
+    .sidebar-collapsed .sidebar-logo-mini {
+        display: block !important;
+    }
+
+    .sidebar-collapsed .sidebar-brand {
+        justify-content: center;
+    }
+
+    .sidebar-collapsed .nav-label {
+        display: none;
+    }
+
+    .sidebar-collapsed .sidebar-divider {
+        margin: 8px 0;
+    }
+
+    .sidebar-collapsed .nav-item {
+        justify-content: center;
+        padding: 10px;
+    }
+
+    .sidebar-collapsed .nav-icon {
+        width: 22px;
+        height: 22px;
+    }
+
+    .sidebar-collapsed .sidebar-toggle {
+        align-self: center;
+    }
+
+    .sidebar-collapsed .toggle-collapse {
+        display: none;
+    }
+
+    .sidebar-collapsed .toggle-expand {
+        display: block !important;
+    }
 </style>
 
+<script>
+    function toggleSidebar() {
+        const sidebar = document.querySelector('[class*="-sidebar"]');
+        const layout = sidebar?.parentElement;
+        if (!sidebar) return;
+
+        const isCollapsed = sidebar.classList.toggle('sidebar-collapsed');
+
+        if (layout) {
+            layout.style.gridTemplateColumns = isCollapsed ? '72px 1fr' : '260px 1fr';
+        }
+
+        localStorage.setItem('sidebarCollapsed', isCollapsed ? '1' : '0');
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        if (localStorage.getItem('sidebarCollapsed') === '1') {
+            const sidebar = document.querySelector('[class*="-sidebar"]');
+            const layout = sidebar?.parentElement;
+            if (sidebar) {
+                sidebar.classList.add('sidebar-collapsed');
+                if (layout) {
+                    layout.style.gridTemplateColumns = '72px 1fr';
+                }
+            }
+        }
+    });
+</script>

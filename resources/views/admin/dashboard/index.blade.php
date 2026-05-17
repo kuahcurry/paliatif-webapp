@@ -133,7 +133,7 @@
         .sidebar-brand h1 { font-size: 0.95rem; color: var(--text); }
         .sidebar-brand p { font-size: 0.8rem; color: var(--muted); }
         .sidebar-brand small { font-size: 0.7rem; color: #94a3b8; }
-        .sidebar-nav { display: flex; flex-direction: column; gap: 8px; }
+        .sidebar-nav { display: flex; flex-direction: column; gap: 10px; }
         .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; color: var(--muted); text-decoration: none; font-size: 0.9rem; }
         .nav-icon { width: 20px; height: 20px; display: grid; place-items: center; color: currentColor; }
         .nav-icon svg { width: 18px; height: 18px; }

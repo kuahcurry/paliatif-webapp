@@ -306,11 +306,7 @@
                                     <div class="field">
                                         <label for="marital_status">Status pernikahan</label>
                                         <input id="marital_status" name="marital_status" type="text" value="{{ old('marital_status', $latestEcog?->marital_status ?: $userMaritalStatus) }}" placeholder="Menikah / Belum" />
-                                    </div>
-                                    <div class="field">
-                                        <label for="cancer_stage">Stadium kanker</label>
-                                        <input id="cancer_stage" name="cancer_stage" type="text" value="{{ old('cancer_stage', $latestEcog?->cancer_stage) }}" placeholder="Stadium" />
-                                    </div>
+                                </div>
                                 </div>
 
                                 <div class="ecog-table">
