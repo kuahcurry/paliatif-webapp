@@ -13,7 +13,7 @@ use App\Http\Controllers\EducationModuleController;
 use App\Http\Controllers\EmotionalEvaluationController;
 use App\Http\Controllers\JournalController;
 use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\SpiritualNeedController;
+use App\Http\Controllers\PrayerTreeController;
 use App\Http\Controllers\PrayerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SpiritualDashboardController;
@@ -24,7 +24,9 @@ Route::get('/', function () {
 });
 
 Route::get('/pohon-doa', [PrayerController::class, 'index'])->name('prayers.index');
-Route::post('/pohon-doa', [PrayerController::class, 'store'])->name('prayers.store');
+Route::post('/pohon-doa', [PrayerController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('prayers.store');
 Route::post('/pohon-doa/{prayer}/support', [PrayerController::class, 'support'])
     ->middleware('throttle:10,1')
     ->name('prayers.support');
@@ -41,7 +43,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/pengkajian-awal/ecog', [EcogAssessmentController::class, 'store'])->name('menu.assessment.ecog.store');
     Route::post('/pengkajian-awal/esas', [EsasAssessmentController::class, 'store'])->name('menu.assessment.esas.store');
 
-    Route::get('/kebutuhan-spiritual', [SpiritualNeedController::class, 'index'])->name('menu.spiritual-needs');
+    Route::get('/pohon-spiritual', [PrayerTreeController::class, 'index'])->name('menu.prayer-tree');
 
     Route::get('/evaluasi-perasaan', [EmotionalEvaluationController::class, 'index'])->name('menu.emotional-evaluation');
     Route::post('/evaluasi-perasaan', [EmotionalEvaluationController::class, 'store'])->name('menu.emotional-evaluation.store');

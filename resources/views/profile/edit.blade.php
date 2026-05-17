@@ -14,49 +14,62 @@
     $statusTone = $emailVerified ? 'good' : 'warn';
 @endphp
 
-<x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen settings-page">
-    <div class="settings-layout">
-        <aside class="settings-sidebar">
+<x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen dashboard-page">
+    <div class="dashboard-layout">
+        <aside class="dashboard-sidebar">
             <x-app-sidebar />
         </aside>
 
-        <main class="settings-main">
+        <main class="dashboard-main profile-page">
             <x-app-topbar
-                class="settings-topbar"
+                class="dashboard-topbar"
                 title="Pengaturan Akun"
                 subtitle="Kelola profil dan keamanan Anda"
-                :showMenuButton="true"
                 :badgeCount="0"
             />
 
-            <section class="card profile-card">
-                <div class="profile-main">
-                    <div class="profile-avatar">{{ strtoupper(substr($userName, 0, 1)) }}</div>
-                    <div>
-                        <h3>{{ $userName }}</h3>
-                        <p class="muted">{{ $userEmail }}</p>
-                    </div>
+            <section class="profile-hero">
+                <div class="profile-avatar">{{ strtoupper(substr($userName, 0, 1)) }}</div>
+                <div class="profile-info">
+                    <h3>{{ $userName }}</h3>
+                    <p class="profile-email">{{ $userEmail }}</p>
+                    <span class="status-badge {{ $statusTone }}">{{ $statusLabel }}</span>
                 </div>
-                <div class="profile-status">
-                    <span class="status-pill {{ $statusTone }}">{{ $statusLabel }}</span>
-                    <p class="muted">Perbarui informasi akun secara berkala untuk keamanan.</p>
+                <div class="profile-hint">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                    <span>Perbarui informasi akun secara berkala untuk keamanan.</span>
                 </div>
             </section>
 
             <section class="settings-body">
                 <div class="settings-main-column">
                     <div class="card form-card">
-                        @include('profile.partials.update-profile-information-form')
+                        <div class="card-header">
+                            <h4>Informasi Profil</h4>
+                            <p>Perbarui informasi profil dan alamat email akun Anda.</p>
+                        </div>
+                        <div class="card-body">
+                            @include('profile.partials.update-profile-information-form')
+                        </div>
                     </div>
 
                     <div class="card form-card">
-                        @include('profile.partials.update-password-form')
+                        <div class="card-header">
+                            <h4>Perbarui Kata Sandi</h4>
+                            <p>Pastikan akun Anda menggunakan kata sandi yang kuat dan acak.</p>
+                        </div>
+                        <div class="card-body">
+                            @include('profile.partials.update-password-form')
+                        </div>
                     </div>
                 </div>
 
                 <aside class="settings-side">
                     <div class="card tips-card">
-                        <h4>Tips Keamanan</h4>
+                        <div class="tips-header">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10c0-4-3.5-6-8-6s-8 2-8 6c0 6 8 10 8 10z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>
+                            <h4>Tips Keamanan</h4>
+                        </div>
                         <ul>
                             <li>Gunakan kata sandi minimal 8 karakter dengan kombinasi huruf dan angka.</li>
                             <li>Perbarui kata sandi secara berkala untuk menjaga keamanan akun.</li>
@@ -80,21 +93,22 @@
             --text: #0f172a;
             --muted: #64748b;
             --accent: #4f9b4f;
-            --shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+            --accent-soft: #e9f6e9;
+            --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
         }
 
-        .settings-page {
-            background: #f4f6fb;
+        .dashboard-page {
+            background: #f5f7fb;
             font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, sans-serif;
         }
 
-        .settings-layout {
+        .dashboard-layout {
             display: grid;
             grid-template-columns: 260px 1fr;
             min-height: 100vh;
         }
 
-        .settings-sidebar {
+        .dashboard-sidebar {
             background: var(--surface);
             padding: 28px 20px;
             border-right: 1px solid #edf2f7;
@@ -110,23 +124,6 @@
             font-weight: 700;
         }
 
-        .brand-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: 16px;
-            background: #dff3df;
-            display: grid;
-            place-items: center;
-        }
-
-        .brand-icon span {
-            width: 22px;
-            height: 22px;
-            border-radius: 999px;
-            background: #63b96b;
-            display: block;
-        }
-
         .sidebar-brand h1 {
             font-size: 0.95rem;
             color: var(--text);
@@ -137,15 +134,10 @@
             color: var(--muted);
         }
 
-        .sidebar-brand small {
-            font-size: 0.7rem;
-            color: #94a3b8;
-        }
-
         .sidebar-nav {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
         }
 
         .nav-item {
@@ -157,6 +149,7 @@
             color: var(--muted);
             text-decoration: none;
             font-size: 0.9rem;
+            transition: all 0.2s ease;
         }
 
         .nav-item.is-active,
@@ -178,83 +171,10 @@
             height: 18px;
         }
 
-        .sidebar-footer {
-            margin-top: auto;
-        }
-
-        .footer-card {
-            background: #f8fafc;
-            border-radius: 16px;
-            padding: 16px;
-            font-size: 0.75rem;
-            color: var(--muted);
-        }
-
-        .footer-title {
-            font-weight: 700;
-            color: var(--text);
-        }
-
-        .footer-subtitle {
-            margin-bottom: 6px;
-        }
-
-        .settings-main {
-            padding: 26px 32px 48px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .settings-topbar {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: center;
-        }
-
-        .settings-topbar > div:not(.topbar-actions) {
-            grid-column: 2;
-            text-align: center;
-        }
-
-        .settings-topbar .ghost-button {
-            grid-column: 1;
-            justify-self: start;
-        }
-
-        .settings-topbar .topbar-actions {
-            grid-column: 3;
-            justify-self: end;
-        }
-
-        .settings-topbar h2 {
-            font-size: 1.4rem;
-            font-weight: 700;
-        }
-
-        .settings-topbar p {
-            color: var(--muted);
-            font-size: 0.85rem;
-        }
-
-        .ghost-button {
-            border: 1px solid #e2e8f0;
-            background: #fff;
-            color: #475569;
-            border-radius: 12px;
-            padding: 6px 12px;
-            font-size: 0.85rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-
         .topbar-actions {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .icon-button {
@@ -269,6 +189,9 @@
             display: grid;
             place-items: center;
             color: #475569;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
         }
 
         .icon-button svg {
@@ -280,7 +203,7 @@
             position: absolute;
             top: -4px;
             right: -4px;
-            background: #22c55e;
+            background: #ef4444;
             color: #ffffff;
             font-size: 0.65rem;
             width: 18px;
@@ -298,13 +221,16 @@
             border-radius: 16px;
             padding: 6px 12px;
             box-shadow: var(--shadow);
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
         }
 
         .avatar {
             width: 34px;
             height: 34px;
             border-radius: 999px;
-            background: #e0f2fe;
+            background: #dbeafe;
             color: #1d4ed8;
             font-weight: 700;
             display: grid;
@@ -321,67 +247,121 @@
             color: var(--muted);
         }
 
-        .card {
-            background: var(--surface);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: var(--shadow);
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
+        .chevron {
+            color: var(--muted);
         }
 
-        .profile-card {
+        .dashboard-topbar {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
+            position: relative;
+        }
+
+        .dashboard-topbar > div:first-child {
+            text-align: center;
+        }
+
+        .dashboard-topbar .topbar-actions {
+            position: absolute;
+            right: 0;
+        }
+
+        .dashboard-topbar h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+        }
+
+        .dashboard-topbar p {
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .dashboard-main {
+            padding: 28px 32px 48px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .profile-page .dashboard-main {
             gap: 20px;
         }
 
-        .profile-main {
+        .profile-hero {
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 18px;
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 24px 28px;
+            box-shadow: var(--shadow);
         }
 
         .profile-avatar {
             width: 64px;
             height: 64px;
             border-radius: 18px;
-            background: #e2f4e2;
+            background: linear-gradient(135deg, #dff3df, #c8e6c8);
             display: grid;
             place-items: center;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: #2f855a;
+            flex-shrink: 0;
         }
 
-        .muted {
-            color: var(--muted);
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-info h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text);
+        }
+
+        .profile-email {
             font-size: 0.8rem;
+            color: var(--muted);
+            margin: 2px 0 6px;
         }
 
-        .profile-status {
-            display: grid;
-            gap: 6px;
-            text-align: right;
-        }
-
-        .status-pill {
+        .status-badge {
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            padding: 4px 10px;
+            padding: 3px 10px;
             border-radius: 999px;
             font-size: 0.7rem;
             font-weight: 600;
+        }
+
+        .status-badge.good {
             background: #dcfce7;
             color: #166534;
         }
 
-        .status-pill.warn {
+        .status-badge.warn {
             background: #fee2e2;
             color: #b91c1c;
+        }
+
+        .profile-hint {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 0.78rem;
+            flex-shrink: 0;
+            max-width: 220px;
+        }
+
+        .profile-hint svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            color: #94a3b8;
         }
 
         .settings-body {
@@ -390,23 +370,226 @@
             gap: 20px;
         }
 
-        .settings-main-column,
-        .settings-side {
+        .settings-main-column {
             display: grid;
-            gap: 8px;
+            gap: 20px;
         }
 
-        .form-card section header h2 {
+        .card {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #eef2f6;
+        }
+
+        .card-header h4 {
+            font-size: 1rem;
             font-weight: 700;
+            color: var(--text);
+            margin: 0 0 2px;
         }
 
-        .form-card section header p {
+        .card-header p {
             font-size: 0.8rem;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .card-body > section header {
+            display: none;
+        }
+
+        .card-body form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card-body form > div {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .card-body form label,
+        .card-body form .text-sm.font-medium.text-gray-900 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .card-body form input:not([type="radio"]):not([type="checkbox"]),
+        .card-body form select,
+        .card-body form textarea {
+            border: 1px solid #d1dbe6;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.85rem;
+            width: 100%;
+            color: #1e293b;
+            background: #fff;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .card-body form input:focus,
+        .card-body form select:focus,
+        .card-body form textarea:focus {
+            outline: none;
+            border-color: #4f9b4f;
+            box-shadow: 0 0 0 3px rgba(79, 155, 79, 0.15);
+        }
+
+        .card-body form .border-t {
+            border-top: 1px solid #eef2f6;
+            padding-top: 16px;
+            margin-top: 4px;
+        }
+
+        .card-body form .border-t h3 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #2d6a4f;
+            margin-bottom: 12px;
+        }
+
+        .card-body form .grid.grid-cols-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .card-body form button[type="submit"] {
+            padding: 10px 28px;
+            background: #4f9b4f;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-family: 'Manrope', sans-serif;
+            transition: background 0.15s;
+            align-self: flex-start;
+        }
+
+        .card-body form button[type="submit"]:hover {
+            background: #3d8b3d;
+        }
+
+        .card-body form .inline-flex {
+            margin-top: 8px;
+        }
+
+        .card-body form .text-sm.text-gray-600 {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .card-body form .text-green-600 {
+            color: #2f855a;
+        }
+
+        .card-body form .mt-2 {
+            margin-top: 4px;
+        }
+
+        .data-diri {
+            border-top: 1px solid #eef2f6;
+            padding-top: 16px;
+            margin-top: 4px;
+        }
+
+        .data-diri h3 {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #2d6a4f;
+            margin: 0 0 12px;
+        }
+
+        .data-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .verify-note {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 8px;
+        }
+
+        .verify-link {
+            text-decoration: underline;
+            background: none;
+            border: none;
+            color: #4f9b4f;
+            cursor: pointer;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.8rem;
+            padding: 0;
+        }
+
+        .verify-sent {
+            font-size: 0.8rem;
+            color: #2f855a;
+            margin-top: 8px;
+        }
+
+        .form-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .saved-notice {
+            font-size: 0.8rem;
+            color: #2f855a;
+        }
+
+        .card-body form .text-red-600,
+        .card-body form [x-show="errors"] {
+            font-size: 0.75rem;
+            color: #dc2626;
         }
 
         .settings-side {
             display: grid;
             gap: 20px;
+            align-content: start;
+        }
+
+        .tips-card {
+            background: linear-gradient(135deg, #f0f9f0 0%, #eaf7ea 100%);
+            border: 1px solid #d4edda;
+        }
+
+        .tips-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .tips-header svg {
+            width: 22px;
+            height: 22px;
+            color: #4f9b4f;
+            flex-shrink: 0;
+        }
+
+        .tips-header h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1a4731;
+            margin: 0;
         }
 
         .tips-card ul {
@@ -414,36 +597,212 @@
             padding: 0;
             margin: 0;
             display: grid;
-            gap: 8px;
+            gap: 10px;
             font-size: 0.78rem;
-            color: var(--muted);
+            color: #4a7a5a;
+        }
+
+        .tips-card ul li {
+            padding-left: 18px;
+            position: relative;
+        }
+
+        .tips-card ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 7px;
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: #4f9b4f;
         }
 
         .danger-card {
-            border: 1px solid #fee2e2;
+            border: 1px solid #fecaca;
+            background: #fef2f2;
+        }
+
+        .danger-card section header h2 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #991b1b;
+            margin: 0 0 4px;
+        }
+
+        .danger-card section header p {
+            font-size: 0.78rem;
+            color: #b91c1c;
+            margin: 0;
+        }
+
+        .danger-card button {
+            padding: 10px 20px;
+            background: #dc2626;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-family: 'Manrope', sans-serif;
+            transition: background 0.15s;
+            margin-top: 12px;
+        }
+
+        .danger-card button:hover {
+            background: #b91c1c;
+        }
+
+        .ghost-button {
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #475569;
+            border-radius: 12px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            font-family: 'Manrope', sans-serif;
+        }
+
+        .danger-btn {
+            padding: 10px 20px;
+            background: #dc2626;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-family: 'Manrope', sans-serif;
+            transition: background 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .danger-btn:hover {
+            background: #b91c1c;
+        }
+
+        .confirm-overlay {
+            position: fixed;
+            inset: 0;
+            overflow-y: auto;
+            padding: 24px;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .confirm-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            transition: opacity 0.3s;
+        }
+
+        .confirm-dialog {
+            position: relative;
+            background: #fff;
+            border-radius: 20px;
+            padding: 28px;
+            max-width: 440px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2);
+        }
+
+        .confirm-dialog h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0 0 6px;
+        }
+
+        .confirm-dialog > p {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin: 0 0 18px;
+        }
+
+        .confirm-password {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-bottom: 18px;
+        }
+
+        .confirm-password label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .confirm-password input {
+            border: 1px solid #d1dbe6;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.85rem;
+            width: 75%;
+        }
+
+        .confirm-password input:focus {
+            outline: none;
+            border-color: #dc2626;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+        }
+
+        .confirm-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .overflow-hidden {
+            overflow: hidden;
         }
 
         @media (max-width: 1200px) {
-            .profile-card {
-                flex-direction: column;
-                align-items: flex-start;
+            .profile-hero {
+                flex-wrap: wrap;
             }
 
-            .profile-status {
-                text-align: left;
+            .profile-hint {
+                max-width: none;
+                width: 100%;
             }
 
             .settings-body {
                 grid-template-columns: 1fr;
             }
+
+            .dashboard-topbar {
+                flex-direction: column;
+                align-items: flex-start;
+                justify-content: space-between;
+            }
+
+            .dashboard-topbar > div:first-child {
+                text-align: left;
+            }
+
+            .dashboard-topbar .topbar-actions {
+                position: static;
+            }
         }
 
         @media (max-width: 900px) {
-            .settings-layout {
+            .dashboard-layout {
                 grid-template-columns: 1fr;
             }
 
-            .settings-sidebar {
+            .dashboard-sidebar {
                 position: sticky;
                 top: 0;
                 z-index: 10;
@@ -452,8 +811,7 @@
                 gap: 12px;
             }
 
-            .sidebar-brand,
-            .sidebar-footer {
+            .sidebar-brand {
                 display: none;
             }
 
@@ -462,20 +820,8 @@
                 flex-wrap: nowrap;
             }
 
-            .settings-topbar {
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-
-            .settings-topbar > div:not(.topbar-actions) {
-                text-align: left;
-            }
-
-            .settings-topbar .topbar-actions {
-                justify-self: auto;
-                align-self: flex-start;
+            .nav-item {
+                white-space: nowrap;
             }
         }
     </style>

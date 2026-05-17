@@ -43,7 +43,6 @@
                     <div>
                         <h3>{{ $patientName }}</h3>
                         <p>{{ $patientAge }}, {{ $patientGender }}</p>
-                        <p class="muted">{{ $patientRm }} - {{ $patientRoom }}</p>
                     </div>
                 </div>
                 <div class="hero-metrics">
@@ -66,16 +65,6 @@
                             <p class="metric-value">{{ $lastService }}</p>
                             <p class="metric-sub">{{ $lastServiceDate }}</p>
                             <a class="metric-link" href="{{ route('menu.emotional-evaluation') }}">Lihat Detail</a>
-                        </div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </div>
-                        <div>
-                            <p class="metric-label">Perawat Penanggung Jawab</p>
-                            <p class="metric-value">{{ $nurseName }}</p>
-                            <p class="metric-sub">{{ $nurseRole }}</p>
                         </div>
                     </div>
                 </div>
@@ -469,7 +458,7 @@
 
         .hero-metrics {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 12px;
         }
 
@@ -818,7 +807,7 @@
                 align-self: flex-start;
             }
             .hero-metrics {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+                grid-template-columns: 1fr 1fr;
             }
 
             .evaluation-content {

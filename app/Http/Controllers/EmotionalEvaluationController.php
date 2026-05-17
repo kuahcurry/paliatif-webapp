@@ -55,8 +55,7 @@ class EmotionalEvaluationController extends Controller
             'patientName' => $user->name,
             'patientAge' => $user->patient_age ? $user->patient_age . ' Tahun' : '--',
             'patientGender' => $user->patient_gender ?? '--',
-            'patientRm' => $user->patient_rm ? 'No. RM: ' . $user->patient_rm : '--',
-            'patientRoom' => $user->patient_room ? 'Ruang: ' . $user->patient_room : '--',
+
             'nurseName' => $user->name,
             'nurseRole' => $user->is_admin ? 'Admin' : 'Pasien',
             'sessionCount' => $sessionCount,

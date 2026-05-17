@@ -19,7 +19,6 @@
                 class="intervention-topbar"
                 title="Kebutuhan Spiritual"
                 subtitle="Intervensi spiritual harian pasien paliatif"
-                :showMenuButton="true"
                 :badgeCount="3"
             />
 
@@ -29,20 +28,9 @@
                     <div>
                         <h3>{{ $patientName }}</h3>
                         <p>{{ $patientAge }}, {{ $patientGender }}</p>
-                        <p class="muted">{{ $patientRm }} - {{ $patientRoom }}</p>
                     </div>
                 </div>
                 <div class="patient-metrics">
-                    <div class="metric">
-                        <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </div>
-                        <div>
-                            <p class="metric-label">Perawat Penanggung Jawab</p>
-                            <p class="metric-value">{{ $nurseName }}</p>
-                            <p class="metric-sub">{{ $nurseRole }}</p>
-                        </div>
-                    </div>
                     <div class="metric">
                         <div class="metric-icon">
                             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -443,7 +431,7 @@
 
         .patient-metrics {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 12px;
         }
 

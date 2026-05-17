@@ -15,6 +15,7 @@ class PrayerController extends Controller
         $visibility = $request->query('visibility', 'all');
         $category = $request->query('category', 'all');
         $search = trim((string) $request->query('q', ''));
+        $search = str_replace(['%', '_'], ['\\%', '\\_'], $search);
 
         $query = Prayer::query()->with('user')->orderByDesc('created_at');
 

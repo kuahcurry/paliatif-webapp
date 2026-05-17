@@ -8,8 +8,7 @@
     $patientName = $_user->name ?? 'Pasien';
     $patientAge = $_user->patient_age ? $_user->patient_age . ' Tahun' : '--';
     $patientGender = $_user->patient_gender ?? '--';
-    $patientRm = $_user->patient_rm ? 'No. RM: ' . $_user->patient_rm : '--';
-    $patientRoom = $_user->patient_room ? 'Ruang: ' . $_user->patient_room : '--';
+
     $spiritualScoreLabel = $spiritualScoreToday !== null ? $spiritualScoreToday . '/100' : '--';
     $emotionLabel = $emotionScoreToday !== null ? number_format($emotionScoreToday, 1) . '/5' : '--';
 
@@ -25,10 +24,10 @@
     }
 
     $activityDefs = [
-        ['key' => 'doa', 'title' => 'Doa Pagi', 'tone' => 'green', 'default' => 'Mulai hari dengan doa dan memohon ketenangan.'],
-        ['key' => 'dzikir', 'title' => 'Dzikir & Istighfar', 'tone' => 'blue', 'default' => 'Bawa ketenangan dengan dzikir singkat.'],
-        ['key' => 'refleksi', 'title' => 'Refleksi Diri', 'tone' => 'purple', 'default' => 'Luangkan waktu untuk merefleksikan perasaan hari ini.'],
-        ['key' => 'istirahat', 'title' => 'Istirahat Tenang', 'tone' => 'leaf', 'default' => 'Ambil waktu untuk menenangkan pikiran dan tubuh.'],
+        ['key' => 'doa', 'title' => 'Doa Pagi', 'tone' => 'green', 'default' => 'Mulai hari dengan doa dan memohon ketenangan.', 'icon' => '<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="2"/>'],
+        ['key' => 'dzikir', 'title' => 'Dzikir & Istighfar', 'tone' => 'blue', 'default' => 'Bawa ketenangan dengan dzikir singkat.', 'icon' => '<path d="M12 3c-4 0-7 3-7 7 0 4 3 11 7 11s7-7 7-11c0-4-3-7-7-7zM9 9h6M9 13h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'],
+        ['key' => 'refleksi', 'title' => 'Refleksi Diri', 'tone' => 'purple', 'default' => 'Luangkan waktu untuk merefleksikan perasaan hari ini.', 'icon' => '<path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'],
+        ['key' => 'istirahat', 'title' => 'Istirahat Tenang', 'tone' => 'leaf', 'default' => 'Ambil waktu untuk menenangkan pikiran dan tubuh.', 'icon' => '<path d="M12 3v18M3 12h18M12 12l-4-4M12 12l4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'],
     ];
 @endphp
 
@@ -55,13 +54,121 @@
                 @endif
             </div>
 
+            @if (! $hasToday)
+                <section class="checkin-prompt" x-data="{ open: true }" x-show="open">
+                    <div class="checkin-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+                    </div>
+                    <div class="checkin-body">
+                        <h4>Belum Mengisi Cek Harian</h4>
+                        <p>Pantau kondisi spiritual dan fisik Anda hari ini dengan mengisi cek harian.</p>
+                        <button class="primary-button" @click="open = false; document.getElementById('checkinModal').classList.add('show')">
+                            Isi Cek Harian
+                        </button>
+                    </div>
+                    <button class="checkin-dismiss" @click="open = false">&times;</button>
+                </section>
+
+                <div class="modal-overlay" x-data x-ref="checkinModal" id="checkinModal" @click.self="document.getElementById('checkinModal').classList.remove('show')">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3>Cek Harian Spiritual</h3>
+                            <p>Nilailah kondisi spiritual dan fisik Anda hari ini (skala 1–5)</p>
+                            <button class="modal-close" @click="document.getElementById('checkinModal').classList.remove('show')" type="button">&times;</button>
+                        </div>
+                        <form method="POST" action="{{ route('dashboard.radar.store') }}">
+                            @csrf
+                            @if ($errors->has('daily'))
+                                <div class="alert warning">{{ $errors->first('daily') }}</div>
+                            @endif
+
+                            <div class="checkin-section">
+                                <h4>Kondisi Spiritual</h4>
+                                <p class="section-desc">Seberapa Anda merasakan hal-hal berikut <strong>hari ini</strong>?</p>
+
+                                @php
+                                    $spiritualDims = [
+                                        ['id' => 'score_meaning', 'label' => 'Makna Hidup', 'desc' => 'Merasa hidup hari ini bermakna'],
+                                        ['id' => 'score_closeness', 'label' => 'Kedekatan dengan Tuhan', 'desc' => 'Merasa dekat dengan Tuhan/Yang Ilahi'],
+                                        ['id' => 'score_peace', 'label' => 'Rasa Damai', 'desc' => 'Merasa tenang dan damai'],
+                                        ['id' => 'score_fear', 'label' => 'Rasa Takut', 'desc' => 'Merasa cemas atau takut'],
+                                        ['id' => 'score_loneliness', 'label' => 'Rasa Kesepian', 'desc' => 'Merasa sendiri atau terisolasi'],
+                                    ];
+                                @endphp
+
+                                @foreach ($spiritualDims as $dim)
+                                    <div class="checkin-field">
+                                        <label>{{ $dim['label'] }}</label>
+                                        <p class="field-desc">{{ $dim['desc'] }}</p>
+                                        <div class="scale-group">
+                                            @for ($i = 1; $i <= 5; $i++)
+                                                <label class="scale-option">
+                                                    <input type="radio" name="{{ $dim['id'] }}" value="{{ $i }}" required>
+                                                    <span class="scale-num">{{ $i }}</span>
+                                                </label>
+                                            @endfor
+                                        </div>
+                                        <x-input-error :messages="$errors->get($dim['id'])" class="mt-1" />
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <div class="checkin-section">
+                                <h4>Gejala Fisik</h4>
+                                <p class="section-desc">Seberapa berat gejala berikut Anda rasakan <strong>hari ini</strong>?</p>
+
+                                @php
+                                    $symptomDims = [
+                                        ['id' => 'symptom_pain', 'label' => 'Nyeri'],
+                                        ['id' => 'symptom_fatigue', 'label' => 'Lelah'],
+                                        ['id' => 'symptom_nausea', 'label' => 'Mual'],
+                                        ['id' => 'symptom_anxiety', 'label' => 'Cemas'],
+                                        ['id' => 'symptom_sadness', 'label' => 'Sedih'],
+                                    ];
+                                @endphp
+
+                                @foreach ($symptomDims as $dim)
+                                    <div class="checkin-field">
+                                        <label>{{ $dim['label'] }}</label>
+                                        <div class="scale-group">
+                                            @for ($i = 1; $i <= 5; $i++)
+                                                <label class="scale-option">
+                                                    <input type="radio" name="{{ $dim['id'] }}" value="{{ $i }}" required>
+                                                    <span class="scale-num">{{ $i }}</span>
+                                                </label>
+                                            @endfor
+                                        </div>
+                                        <x-input-error :messages="$errors->get($dim['id'])" class="mt-1" />
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <div class="checkin-section">
+                                <h4>Gejala Lainnya (Opsional)</h4>
+                                <textarea name="symptoms" rows="2" placeholder="Ceritakan keluhan lain yang Anda rasakan...">{{ old('symptoms') }}</textarea>
+                                @if ($errors->has('symptoms'))
+                                    <x-input-error :messages="$errors->get('symptoms')" class="mt-1" />
+                                @endif
+                            </div>
+
+                            <div class="checkin-footer">
+                                <p class="checkin-disclaimer">Cek harian ini bersifat saring (screening) dan bukan diagnosis medis.</p>
+                                <div class="checkin-actions">
+                                    <button type="button" class="ghost-button" @click="document.getElementById('checkinModal').classList.remove('show')">Nanti Saja</button>
+                                    <button type="submit" class="primary-button">Simpan Cek Harian</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            @endif
+
             <section class="hero-card">
                 <div class="patient-profile">
                     <div class="patient-avatar">{{ strtoupper(substr($patientName, 0, 1)) }}</div>
                     <div>
                         <h3>{{ $patientName }}</h3>
                         <p>{{ $patientAge }}, {{ $patientGender }}</p>
-                        <p class="muted">{{ $patientRm }} - {{ $patientRoom }}</p>
                     </div>
                 </div>
                 <div class="hero-stats">
@@ -77,21 +184,11 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                        </div>
-                        <div>
-                            <p class="stat-label">Kondisi Umum</p>
-                            <span class="status-pill {{ $overallStatus['tone'] }}">{{ $overallStatus['label'] }}</span>
-                            <p class="stat-sub">Diperbarui: {{ now()->format('H:i') }} WIB</p>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                         </div>
                         <div>
-                            <p class="stat-label">Aktivitas Rohani Hari Ini</p>
-                            <p class="stat-value">{{ $activityHighlight }}</p>
+                            <p class="stat-label">Aktivitas Rohani</p>
+                            <p class="stat-value stat-value-sm">{{ $activityHighlight }}</p>
                             <a class="stat-link" href="{{ route('menu.emotional-evaluation') }}">Lihat Detail</a>
                         </div>
                     </div>
@@ -135,7 +232,7 @@
                             <div class="esas-item">
                                 <div class="esas-label">{{ $esas['label'] }}</div>
                                 <div class="esas-bar">
-                                    <span style="width: {{ ($esas['value'] ?? 0) * 20 }}%"></span>
+                                    <span style="width: {{ ($esas['value'] ?? 0) * 10 }}%"></span>
                                 </div>
                                 <div class="esas-value">{{ $esas['value'] ?? '-' }}</div>
                             </div>
@@ -167,29 +264,67 @@
             </section>
 
             <section class="grid-row grid-3">
-                <div class="card">
+                <div class="card summary-card">
                     <div class="card-header">
                         <div>
                             <h4>Ringkasan Hari Ini</h4>
                             <p>{{ $todayDayName }}, {{ $todayDate }}</p>
                         </div>
                     </div>
-                    <div class="summary-quote">
-                        <p>"Sesungguhnya bersama kesulitan ada kemudahan."</p>
-                        <span>(QS. Al-Insyirah: 6)</span>
-                    </div>
-                    <div class="summary-list">
-                        <div>
-                            <span>Skor Spiritual</span>
-                            <strong>{{ $spiritualScoreLabel }}</strong>
+                    <div class="summary-grid">
+                        <div class="summary-item">
+                            <div class="summary-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                            </div>
+                            <div class="summary-body">
+                                <span class="summary-label">Skor Spiritual</span>
+                                <span class="summary-value">{{ $spiritualScoreLabel }}</span>
+                            </div>
                         </div>
-                        <div>
-                            <span>Kondisi Emosi</span>
-                            <strong>{{ $emotionText }}</strong>
+                        <div class="summary-item">
+                            <div class="summary-icon calm">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="9" r="1"/></svg>
+                            </div>
+                            <div class="summary-body">
+                                <span class="summary-label">Kondisi Emosi</span>
+                                <span class="summary-value">{{ $emotionText }}</span>
+                            </div>
                         </div>
-                        <div>
-                            <span>Aktivitas Rohani</span>
-                            <strong>{{ $activityHighlight }}</strong>
+                        <div class="summary-item">
+                            <div class="summary-icon journal">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 10h16M4 14h12M4 18h8"/></svg>
+                            </div>
+                            <div class="summary-body">
+                                <span class="summary-label">Jurnal Hari Ini</span>
+                                <span class="summary-value">{{ $todayJournals }} entri</span>
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-icon prayer">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s-8-4-8-10c0-4 3.5-6 8-6s8 2 8 6c0 6-8 10-8 10z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>
+                            </div>
+                            <div class="summary-body">
+                                <span class="summary-label">Doa Terkirim</span>
+                                <span class="summary-value">{{ $totalPrayers }} doa</span>
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-icon tree">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s-8-4-8-10c0-4 3.5-6 8-6s8 2 8 6c0 6-8 10-8 10z M12 6v10 M9 9l3 3 3-3"/></svg>
+                            </div>
+                            <div class="summary-body">
+                                <span class="summary-label">Pohon Doa</span>
+                                <span class="summary-value">Tahap {{ $treeStage }}/7</span>
+                            </div>
+                        </div>
+                        <div class="summary-item">
+                            <div class="summary-icon {{ $hasSwbs && $hasEcog && $hasEsas ? 'assessment-done' : 'assessment' }}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z"/><path d="M9 13l2 2 4-4"/></svg>
+                            </div>
+                            <div class="summary-body">
+                                <span class="summary-label">Pengkajian</span>
+                                <span class="summary-value">{{ $hasSwbs && $hasEcog && $hasEsas ? 'Lengkap' : 'Belum Lengkap' }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -210,7 +345,9 @@
                                 $route = $module ? route('education.show', $module) : route('education.index');
                             @endphp
                             <div class="activity-card {{ $def['tone'] }}">
-                                <div class="activity-icon"></div>
+                                <div class="activity-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $def['icon'] !!}</svg>
+                                </div>
                                 <h5>{{ $def['title'] }}</h5>
                                 <p>{{ $desc }}</p>
                                 <a href="{{ $route }}" class="activity-btn">Mulai</a>
@@ -557,7 +694,7 @@
 
         .hero-stats {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 12px;
         }
 
@@ -595,6 +732,10 @@
             font-weight: 600;
             font-size: 0.85rem;
             color: var(--text);
+        }
+
+        .stat-value-sm {
+            font-size: 0.75rem;
         }
 
         .stat-sub {
@@ -715,26 +856,59 @@
         .emotion-dot.tense { background: #f97316; }
         .emotion-dot.sad { background: #ef4444; }
 
-        .summary-quote {
-            background: #eef7ee;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            color: #2f855a;
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
         }
 
-        .summary-list {
-            display: grid;
+        .summary-item {
+            display: flex;
+            align-items: center;
             gap: 10px;
-            font-size: 0.8rem;
+            padding: 10px 12px;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .summary-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #e5f6e5;
+            display: grid;
+            place-items: center;
+            color: #3f7a3f;
+            flex-shrink: 0;
+        }
+
+        .summary-icon svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        .summary-icon.calm { background: #dbeafe; color: #1d4ed8; }
+        .summary-icon.journal { background: #ede9fe; color: #6d28d9; }
+        .summary-icon.prayer { background: #fef3c7; color: #b45309; }
+        .summary-icon.tree { background: #d1fae5; color: #059669; }
+        .summary-icon.assessment { background: #fee2e2; color: #b91c1c; }
+        .summary-icon.assessment-done { background: #dcfce7; color: #15803d; }
+
+        .summary-body {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .summary-label {
+            font-size: 0.68rem;
             color: var(--muted);
         }
 
-        .summary-list div {
-            display: flex;
-            justify-content: space-between;
-            padding-bottom: 6px;
-            border-bottom: 1px solid #f1f5f9;
+        .summary-value {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text);
         }
 
         .activity-grid {
@@ -758,6 +932,14 @@
             height: 28px;
             border-radius: 10px;
             background: #e2e8f0;
+            display: grid;
+            place-items: center;
+        }
+
+        .activity-icon svg {
+            width: 16px;
+            height: 16px;
+            color: #475569;
         }
 
         .activity-card h5 {
@@ -787,9 +969,13 @@
         .activity-card.leaf { border-color: #d1fae5; }
 
         .activity-card.green .activity-icon { background: #dcfce7; }
+        .activity-card.green .activity-icon svg { color: #16a34a; }
         .activity-card.blue .activity-icon { background: #dbeafe; }
+        .activity-card.blue .activity-icon svg { color: #2563eb; }
         .activity-card.purple .activity-icon { background: #ede9fe; }
+        .activity-card.purple .activity-icon svg { color: #7c3aed; }
         .activity-card.leaf .activity-icon { background: #d1fae5; }
+        .activity-card.leaf .activity-icon svg { color: #059669; }
 
         .tips-card {
             display: flex;
@@ -826,6 +1012,265 @@
             border-radius: 999px;
             background: #bbf7d0;
             display: inline-block;
+        }
+
+        .checkin-prompt {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: linear-gradient(135deg, #f0f9f0 0%, #e8f5e8 100%);
+            border: 1px solid #c8e6c8;
+            border-radius: 16px;
+            padding: 18px 24px;
+            margin-bottom: 16px;
+        }
+
+        .checkin-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: #d4edda;
+            display: grid;
+            place-items: center;
+            color: #2f855a;
+            flex-shrink: 0;
+        }
+
+        .checkin-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .checkin-body {
+            flex: 1;
+        }
+
+        .checkin-body h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1a4731;
+            margin: 0 0 2px;
+        }
+
+        .checkin-body p {
+            font-size: 0.8rem;
+            color: #4a7a5a;
+            margin: 0 0 8px;
+        }
+
+        .checkin-dismiss {
+            border: none;
+            background: none;
+            font-size: 1.4rem;
+            color: #6b9e7a;
+            cursor: pointer;
+            padding: 4px 8px;
+            line-height: 1;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 24px;
+            max-width: 680px;
+            width: 100%;
+            padding: 32px;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2);
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            margin-bottom: 24px;
+            padding-right: 36px;
+        }
+
+        .modal-header h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0 0 4px;
+        }
+
+        .modal-header p {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            border: none;
+            background: #f1f5f9;
+            border-radius: 10px;
+            width: 36px;
+            height: 36px;
+            display: grid;
+            place-items: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--muted);
+        }
+
+        .modal-close:hover {
+            background: #e2e8f0;
+        }
+
+        .checkin-section {
+            margin-bottom: 28px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .checkin-section:last-of-type {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .checkin-section h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #2d6a4f;
+            margin: 0 0 4px;
+        }
+
+        .section-desc {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin: 0 0 16px;
+        }
+
+        .checkin-field {
+            margin-bottom: 18px;
+        }
+
+        .checkin-field label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+
+        .field-desc {
+            font-size: 0.75rem;
+            color: var(--muted);
+            margin: 0 0 8px;
+        }
+
+        .scale-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .scale-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .scale-option input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .scale-num {
+            display: grid;
+            place-items: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: #f1f5f9;
+            color: #475569;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.15s;
+            border: 2px solid transparent;
+        }
+
+        .scale-option input:checked + .scale-num {
+            background: #d4edda;
+            color: #2f855a;
+            border-color: #4f9b4f;
+        }
+
+        .scale-option:hover .scale-num {
+            background: #e2e8f0;
+        }
+
+        .checkin-section textarea {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-family: 'Manrope', sans-serif;
+            font-size: 0.85rem;
+            resize: vertical;
+        }
+
+        .checkin-section textarea:focus {
+            outline: none;
+            border-color: #4f9b4f;
+            box-shadow: 0 0 0 3px rgba(79, 155, 79, 0.15);
+        }
+
+        .checkin-footer {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .checkin-disclaimer {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            margin: 0;
+            font-style: italic;
+        }
+
+        .checkin-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .primary-button {
+            padding: 10px 24px;
+            background: #4f9b4f;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-family: 'Manrope', sans-serif;
+            transition: background 0.15s;
+        }
+
+        .primary-button:hover {
+            background: #3d8b3d;
         }
 
         @media (max-width: 1200px) {
@@ -885,87 +1330,94 @@
     </style>
 
     <script>
-        const scoreLabels = @json($chartLabels);
-        const scoreTrend = @json($scoreTrend);
-        const emotionTrend = @json($emotionTrend);
+        function initCharts(retries) {
+            if (typeof Chart === 'undefined') {
+                if ((retries || 0) < 20) setTimeout(function(){ initCharts((retries || 0) + 1); }, 100);
+                return;
+            }
+            const scoreLabels = @json($chartLabels);
+            const scoreTrend = @json($scoreTrend);
+            const emotionTrend = @json($emotionTrend);
 
-        const scoreCtx = document.getElementById('spiritualScoreChart');
-        if (scoreCtx) {
-            new Chart(scoreCtx, {
-                type: 'line',
-                data: {
-                    labels: scoreLabels,
-                    datasets: [
-                        {
-                            label: 'Skor Spiritual',
-                            data: scoreTrend,
-                            borderColor: '#5aa85a',
-                            backgroundColor: 'rgba(90, 168, 90, 0.12)',
-                            tension: 0.4,
-                            fill: true,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#5aa85a',
+            const scoreCtx = document.getElementById('spiritualScoreChart');
+            if (scoreCtx) {
+                new Chart(scoreCtx, {
+                    type: 'line',
+                    data: {
+                        labels: scoreLabels,
+                        datasets: [
+                            {
+                                label: 'Skor Spiritual',
+                                data: scoreTrend,
+                                borderColor: '#5aa85a',
+                                backgroundColor: 'rgba(90, 168, 90, 0.12)',
+                                tension: 0.4,
+                                fill: true,
+                                pointRadius: 4,
+                                pointBackgroundColor: '#5aa85a',
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                min: 0,
+                                max: 100,
+                                ticks: {
+                                    stepSize: 20,
+                                },
+                            },
                         },
-                    ],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            min: 0,
-                            max: 100,
-                            ticks: {
-                                stepSize: 20,
+                        plugins: {
+                            legend: {
+                                display: false,
                             },
                         },
                     },
-                    plugins: {
-                        legend: {
-                            display: false,
-                        },
-                    },
-                },
-            });
-        }
+                });
+            }
 
-        const emotionCtx = document.getElementById('emotionTrendChart');
-        if (emotionCtx) {
-            new Chart(emotionCtx, {
-                type: 'line',
-                data: {
-                    labels: scoreLabels,
-                    datasets: [
-                        {
-                            label: 'Emosi',
-                            data: emotionTrend,
-                            borderColor: '#60a5fa',
-                            backgroundColor: 'rgba(96, 165, 250, 0.15)',
-                            tension: 0.4,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#60a5fa',
+            const emotionCtx = document.getElementById('emotionTrendChart');
+            if (emotionCtx) {
+                new Chart(emotionCtx, {
+                    type: 'line',
+                    data: {
+                        labels: scoreLabels,
+                        datasets: [
+                            {
+                                label: 'Emosi',
+                                data: emotionTrend,
+                                borderColor: '#60a5fa',
+                                backgroundColor: 'rgba(96, 165, 250, 0.15)',
+                                tension: 0.4,
+                                pointRadius: 4,
+                                pointBackgroundColor: '#60a5fa',
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                min: 1,
+                                max: 5,
+                                ticks: {
+                                    stepSize: 1,
+                                },
+                            },
                         },
-                    ],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            min: 1,
-                            max: 5,
-                            ticks: {
-                                stepSize: 1,
+                        plugins: {
+                            legend: {
+                                display: false,
                             },
                         },
                     },
-                    plugins: {
-                        legend: {
-                            display: false,
-                        },
-                    },
-                },
-            });
+                });
+            }
         }
+        document.addEventListener('DOMContentLoaded', initCharts);
     </script>
 </x-app-layout>

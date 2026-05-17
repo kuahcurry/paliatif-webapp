@@ -48,10 +48,9 @@ class SpiritualNeedController extends Controller
 
         return view('menu.spiritual-needs', [
             'patientName' => $user->name,
-            'patientAge' => '62 Tahun',
-            'patientGender' => 'Laki-laki',
-            'patientRm' => 'No. RM: 23051567',
-            'patientRoom' => 'Ruang: Mawar 3',
+            'patientAge' => $user->patient_age ? $user->patient_age . ' Tahun' : '--',
+            'patientGender' => $user->patient_gender ?? '--',
+
             'nurseName' => $user->name,
             'nurseRole' => $user->is_admin ? 'Admin' : 'Pasien',
             'interventionFocus' => $intervention->focus,

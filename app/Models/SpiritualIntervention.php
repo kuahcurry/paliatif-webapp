@@ -15,6 +15,7 @@ class SpiritualIntervention extends Model
         'focus',
         'current_step',
         'total_steps',
+        'progress_points',
     ];
 
     protected function casts(): array
@@ -22,6 +23,7 @@ class SpiritualIntervention extends Model
         return [
             'current_step' => 'integer',
             'total_steps' => 'integer',
+            'progress_points' => 'integer',
         ];
     }
 

@@ -18,6 +18,7 @@ class EducationModuleController extends Controller
 
         $search = $request->query('q');
         $search = is_string($search) ? trim($search) : '';
+        $search = str_replace(['%', '_'], ['\\%', '\\_'], $search);
 
         $modulesQuery = EducationModule::query()->where('is_active', true);
 
@@ -42,12 +43,37 @@ class EducationModuleController extends Controller
         $recommendedTags = $this->buildRecommendedTags($assessment);
         $recommendedModules = $this->filterByTags($recommendedTags);
 
+        $dailyTip = EducationModule::where('is_active', true)
+            ->inRandomOrder()
+            ->first();
+
+        $categoryItems = collect(['coping', 'communication', 'grief', 'spiritual_support'])->map(fn ($t) => [
+            'tag' => $t,
+            'label' => match ($t) {
+                'coping' => 'Coping dan Tenang',
+                'communication' => 'Komunikasi',
+                'grief' => 'Manajemen Duka',
+                'spiritual_support' => 'Dukungan Spiritual',
+                default => $t,
+            },
+            'count' => EducationModule::where('is_active', true)->whereJsonContains('tags', $t)->count(),
+            'color' => match ($t) {
+                'coping' => '#f59e0b',
+                'communication' => '#3b82f6',
+                'grief' => '#ef4444',
+                'spiritual_support' => '#22c55e',
+                default => '#94a3b8',
+            },
+        ]);
+
         return view('education.index', [
             'modules' => $modules,
             'recommendedModules' => $recommendedModules,
             'recommendedTags' => $recommendedTags,
             'tag' => $tag,
             'hasAssessment' => (bool) $assessment,
+            'dailyTip' => $dailyTip,
+            'categoryItems' => $categoryItems,
         ]);
     }
 

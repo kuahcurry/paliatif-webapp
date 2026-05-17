@@ -37,8 +37,8 @@
                         <x-nav-link :href="route('menu.assessment')" :active="request()->routeIs('menu.assessment')">
                             {{ __('Pengkajian Awal') }}
                         </x-nav-link>
-                        <x-nav-link :href="route('menu.spiritual-needs')" :active="request()->routeIs('menu.spiritual-needs')">
-                            {{ __('Kebutuhan Spiritual') }}
+                        <x-nav-link :href="route('menu.prayer-tree')" :active="request()->routeIs('menu.prayer-tree')">
+                            {{ __('Pohon Doa') }}
                         </x-nav-link>
                         <x-nav-link :href="route('menu.emotional-evaluation')" :active="request()->routeIs('menu.emotional-evaluation')">
                             {{ __('Evaluasi Perasaan') }}
@@ -115,7 +115,7 @@
             @else
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">{{ __('Dashboard Spiritual') }}</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('menu.assessment')" :active="request()->routeIs('menu.assessment')">{{ __('Pengkajian Awal') }}</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('menu.spiritual-needs')" :active="request()->routeIs('menu.spiritual-needs')">{{ __('Kebutuhan Spiritual') }}</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('menu.prayer-tree')" :active="request()->routeIs('menu.prayer-tree')">{{ __('Pohon Doa') }}</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('menu.emotional-evaluation')" :active="request()->routeIs('menu.emotional-evaluation')">{{ __('Evaluasi Perasaan') }}</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('prayers.index')" :active="request()->routeIs('prayers.*')">{{ __('Pohon Doa') }}</x-responsive-nav-link>
                 @if (Auth::user()?->is_admin)

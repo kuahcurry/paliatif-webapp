@@ -17,6 +17,8 @@ class EducationModule extends Model
         'content',
         'tags',
         'is_active',
+        'video_path',
+        'image_path',
     ];
 
     protected function casts(): array

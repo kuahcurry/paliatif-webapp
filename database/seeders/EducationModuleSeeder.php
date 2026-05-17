@@ -31,7 +31,7 @@ class EducationModuleSeeder extends Seeder
                 'title' => 'Komunikasi empatik di fase terminal',
                 'summary' => 'Cara menyampaikan dukungan tanpa menghakimi.',
                 'type' => 'video',
-                'url' => 'https://example.com/video/komunikasi-empatik',
+                'url' => 'https://www.youtube.com/watch?v=9K1a8WQsGOU',
                 'tags' => ['communication'],
             ],
             [
@@ -45,7 +45,7 @@ class EducationModuleSeeder extends Seeder
                 'title' => 'Dukungan spiritual keluarga',
                 'summary' => 'Cara sederhana mendampingi pasien secara spiritual.',
                 'type' => 'video',
-                'url' => 'https://example.com/video/dukungan-spiritual',
+                'url' => 'https://www.youtube.com/watch?v=InH4t1NNmBo',
                 'tags' => ['spiritual_support'],
             ],
             [

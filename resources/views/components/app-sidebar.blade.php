@@ -20,11 +20,11 @@
             'icon' => '<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2 M15 2H9a1 1 0 0 0-1 1v2a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1z M9 13l2 2 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
         ],
         [
-            'key' => 'spiritual-needs',
-            'label' => __('Intervensi'),
-            'route' => 'menu.spiritual-needs',
-            'routeIs' => 'menu.spiritual-needs',
-            'icon' => '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+            'key' => 'prayer-tree',
+            'label' => __('Pohon Doa'),
+            'route' => 'menu.prayer-tree',
+            'routeIs' => 'menu.prayer-tree',
+            'icon' => '<path d="M12 22s-8-4-8-10c0-4 3.5-6 8-6s8 2 8 6c0 6-8 10-8 10z M12 6v10 M9 9l3 3 3-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
         ],
         [
             'key' => 'evaluation',
@@ -66,20 +66,14 @@
 @endphp
 
 <div class="sidebar-brand">
-    <div class="brand-icon">
-        <span></span>
-    </div>
-    <div>
-        <h1>Terapi Rohani</h1>
-        <p>Pasien Paliatif</p>
-        @if ($brandLine)
-            <small>{{ $brandLine }}</small>
-        @endif
-    </div>
+    <a href="{{ route('dashboard') }}"><img src="{{ asset('build/assets/logontulisan.png') }}" alt="Terapi Rohani" style="height:72px;width:auto;display:block;margin:4px 0;"></a>
+    @if ($brandLine)
+        <small>{{ $brandLine }}</small>
+    @endif
 </div>
 
 <nav class="sidebar-nav">
-    @if (request()->routeIs('admin.*'))
+    @if (Auth::check() && request()->routeIs('admin.*'))
         @foreach ($adminItems as $item)
             @php $isActive = $active ? $active === $item['key'] : request()->routeIs($item['routeIs']); @endphp
             <a class="nav-item {{ $isActive ? 'is-active' : '' }}" href="{{ route($item['route']) }}">

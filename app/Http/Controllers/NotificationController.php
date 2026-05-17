@@ -28,7 +28,7 @@ class NotificationController extends Controller
 
         $userNotification->markAsRead();
 
-        if ($userNotification->url) {
+        if ($userNotification->url && str_starts_with($userNotification->url, '/')) {
             return redirect()->to($userNotification->url);
         }
 

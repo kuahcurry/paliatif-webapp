@@ -56,6 +56,16 @@ class SpiritualDashboardController extends Controller
         $esasScores = $this->buildEsasScores($latestLog);
         $todayLabel = $this->formatDayName($today);
 
+        $todayJournals = $user->journalEntries()->whereDate('created_at', $today)->count();
+        $todayEvaluations = $user->emotionalEvaluations()->whereDate('created_at', $today)->count();
+        $totalPrayers = $user->prayers()->count();
+        $intervention = $user->spiritualIntervention()->first();
+        $treeStage = $intervention?->current_step ?? 1;
+        $totalActivities = $intervention?->progress_points ?? 0;
+        $hasSwbs = $user->swbsAssessments()->exists();
+        $hasEcog = $user->ecogAssessments()->exists();
+        $hasEsas = $user->esasAssessments()->exists();
+
         return view('dashboard', [
             'range' => $range,
             'hasToday' => $hasToday,
@@ -76,6 +86,14 @@ class SpiritualDashboardController extends Controller
             'esasScores' => $esasScores,
             'todayDate' => $today->format('d M Y'),
             'todayDayName' => $todayLabel,
+            'todayJournals' => $todayJournals,
+            'todayEvaluations' => $todayEvaluations,
+            'totalPrayers' => $totalPrayers,
+            'treeStage' => $treeStage,
+            'totalActivities' => $totalActivities,
+            'hasSwbs' => $hasSwbs,
+            'hasEcog' => $hasEcog,
+            'hasEsas' => $hasEsas,
         ]);
     }
 
@@ -334,12 +352,27 @@ class SpiritualDashboardController extends Controller
 
     private function buildEsasScores(?SpiritualRadarLog $log): array
     {
+        $user = request()->user();
+        $esas = $user?->esasAssessments()->latest()->first();
+
+        if (! $esas) {
+            return [
+                ['label' => 'Nyeri', 'value' => null],
+                ['label' => 'Lelah', 'value' => null],
+                ['label' => 'Mual', 'value' => null],
+                ['label' => 'Cemas', 'value' => null],
+                ['label' => 'Mengantuk', 'value' => null],
+                ['label' => 'Nafsu Makan', 'value' => null],
+            ];
+        }
+
         return [
-            ['label' => 'Nyeri', 'value' => $log?->symptom_pain],
-            ['label' => 'Lelah', 'value' => $log?->symptom_fatigue],
-            ['label' => 'Mual', 'value' => $log?->symptom_nausea],
-            ['label' => 'Cemas', 'value' => $log?->symptom_anxiety],
-            ['label' => 'Sedih', 'value' => $log?->symptom_sadness],
+            ['label' => 'Nyeri', 'value' => $esas->pain],
+            ['label' => 'Lelah', 'value' => $esas->fatigue],
+            ['label' => 'Mual', 'value' => $esas->nausea],
+            ['label' => 'Cemas', 'value' => $esas->anxiety],
+            ['label' => 'Mengantuk', 'value' => $esas->drowsiness],
+            ['label' => 'Nafsu Makan', 'value' => $esas->appetite],
         ];
     }
 

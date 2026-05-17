@@ -10,25 +10,26 @@ class CaregiverAssessmentController extends Controller
 {
     public function index(Request $request): View
     {
-        $latestAssessment = $request->user()?->caregiverAssessments()
+        $user = $request->user();
+        $latestAssessment = $user?->caregiverAssessments()
             ->orderByDesc('created_at')
             ->first();
 
-        $ecogHistory = $request->user()?->ecogAssessments()
+        $ecogHistory = $user?->ecogAssessments()
             ->orderByDesc('created_at')
             ->take(5)
             ->get() ?? collect();
 
         $latestEcog = $ecogHistory->first();
 
-        $esasHistory = $request->user()?->esasAssessments()
+        $esasHistory = $user?->esasAssessments()
             ->orderByDesc('created_at')
             ->take(5)
             ->get() ?? collect();
 
         $latestEsas = $esasHistory->first();
 
-        $swbsHistory = $request->user()?->swbsAssessments()
+        $swbsHistory = $user?->swbsAssessments()
             ->orderByDesc('created_at')
             ->take(5)
             ->get() ?? collect();
@@ -60,7 +61,6 @@ class CaregiverAssessmentController extends Controller
             ->sortByDesc('date')
             ->take(8)
             ->values();
-
         return view('menu.assessment', [
             'latestAssessment' => $latestAssessment,
             'ecogHistory' => $ecogHistory,
@@ -70,6 +70,10 @@ class CaregiverAssessmentController extends Controller
             'swbsHistory' => $swbsHistory,
             'latestSwbs' => $latestSwbs,
             'assessmentHistory' => $assessmentHistory,
+            'userInitials' => $user ? strtoupper(substr($user->name, 0, 2)) : '',
+            'userAge' => $user?->patient_age,
+            'userGender' => $user?->patient_gender,
+            'userMaritalStatus' => $user?->marital_status,
         ]);
     }
 

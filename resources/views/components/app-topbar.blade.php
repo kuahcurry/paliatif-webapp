@@ -7,8 +7,8 @@
 
 @php
     $user = Auth::user();
-    $resolvedUserName = $user->name ?? 'Pengguna';
-    $resolvedUserRole = $user && $user->is_admin ? 'Admin' : 'Pasien';
+    $resolvedUserName = $user?->name ?? 'Pengguna';
+    $resolvedUserRole = $user?->is_admin ? 'Admin' : 'Pasien';
     $avatarLetter = strtoupper(substr($resolvedUserName, 0, 1));
     $unreadCount = $user ? $user->unreadNotifications()->count() : 0;
     $recentNotifications = $user ? $user->notifications()->orderByDesc('created_at')->take(5)->get() : collect();
@@ -27,6 +27,7 @@
         @endif
     </div>
     <div class="topbar-actions">
+        @auth
         <div class="notif-wrapper" @click.outside="notifOpen = false">
             <button class="icon-button" type="button" aria-label="Notifikasi" @click="notifOpen = ! notifOpen">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2zm7-6V11a7 7 0 1 0-14 0v5l-2 2v1h18v-1z" fill="currentColor"/></svg>
@@ -71,9 +72,11 @@
                 @endif
             </div>
         </div>
+        @endauth
 
         <a href="{{ route('faq') }}" class="icon-button" type="button" aria-label="Bantuan">?</a>
 
+        @auth
         <div class="profile-wrapper" @click.outside="profileOpen = false">
             <button class="user-chip" type="button" @click="profileOpen = ! profileOpen">
                 <div class="avatar">{{ $avatarLetter }}</div>
@@ -92,6 +95,10 @@
                 </form>
             </div>
         </div>
+        @else
+        <a href="{{ route('login') }}" class="ghost-button">Masuk</a>
+        <a href="{{ route('register') }}" class="primary-button-sm">Daftar</a>
+        @endauth
     </div>
 </header>
 
@@ -99,6 +106,14 @@
     .icon-button svg {
         width: 20px;
         height: 20px;
+    }
+
+    .user-name {
+        font-weight: 700 !important;
+    }
+
+    .patient-profile h3 {
+        font-weight: 700 !important;
     }
 
     .notif-wrapper, .profile-wrapper {
@@ -226,5 +241,18 @@
 
     .profile-dropdown-item:hover {
         background: #f8fafc;
+    }
+
+    .primary-button-sm {
+        background: #4f9b4f;
+        color: #fff;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.82rem;
+        cursor: pointer;
+        text-decoration: none;
+        white-space: nowrap;
     }
 </style>

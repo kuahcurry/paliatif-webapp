@@ -4,18 +4,20 @@
 @endpush
 
 @php
-    $patientName = Auth::user()->name ?? 'Bapak Supriyono';
-    $patientAge = '62 Tahun';
-    $patientGender = 'Laki-laki';
-    $patientRm = 'No. RM: 23051567';
-    $patientRoom = 'Ruang: Mawar 3';
+    $_user = Auth::user();
+    $patientName = $_user->name ?? 'Pengguna';
+    $patientAge = $_user->patient_age ? $_user->patient_age . ' Tahun' : '--';
+    $patientGender = $_user->patient_gender ?? '--';
     $assessmentDate = now()->format('d M Y');
     $assessmentTime = now()->format('H:i');
-    $assessmentBy = Auth::user()->name ?? 'Siti Rahmawati';
-    $assessmentRole = 'Perawat';
-    $statusLabel = $latestAssessment ? 'Dalam Proses' : 'Belum Dimulai';
-    $statusTone = $latestAssessment ? 'status-pill success' : 'status-pill warning';
-    $lastSaved = $latestAssessment?->updated_at?->format('H:i') ?? now()->format('H:i');
+    $assessmentBy = $_user->name;
+    $hasSwbs = !is_null($latestSwbs);
+    $hasEcog = !is_null($latestEcog);
+    $hasEsas = !is_null($latestEsas);
+    $completedCount = ($hasSwbs ? 1 : 0) + ($hasEcog ? 1 : 0) + ($hasEsas ? 1 : 0);
+    $statusLabel = $completedCount === 0 ? 'Belum Dimulai' : ($completedCount === 3 ? 'Lengkap' : 'Dalam Proses');
+    $statusTone = $completedCount === 0 ? 'status-pill warning' : ($completedCount === 3 ? 'status-pill success' : 'status-pill info');
+    $lastSaved = now()->format('H:i');
     $ecogOptions = [
         [
             'score' => 0,
@@ -155,7 +157,6 @@
                     <div>
                         <h3>{{ $patientName }}</h3>
                         <p>{{ $patientAge }}, {{ $patientGender }}</p>
-                        <p class="muted">{{ $patientRm }} - {{ $patientRoom }}</p>
                     </div>
                 </div>
                 <div class="hero-metrics">
@@ -172,22 +173,12 @@
                     </div>
                     <div class="metric">
                         <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </div>
-                        <div>
-                            <p class="metric-label">Dilakukan oleh</p>
-                            <p class="metric-value">{{ $assessmentBy }}</p>
-                            <p class="metric-sub">{{ $assessmentRole }}</p>
-                        </div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-icon">
                             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM14 2v6h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </div>
                         <div>
                             <p class="metric-label">Status Pengkajian</p>
                             <span class="{{ $statusTone }}">{{ $statusLabel }}</span>
-                            <p class="metric-sub">Simpan terakhir: {{ $lastSaved }} WIB</p>
+                            <p class="metric-sub">SWBS {{ $hasSwbs ? '✔' : '✗' }} &middot; ECOG {{ $hasEcog ? '✔' : '✗' }} &middot; ESAS {{ $hasEsas ? '✔' : '✗' }}</p>
                         </div>
                     </div>
                 </div>
@@ -195,6 +186,10 @@
 
             <section class="assessment-content">
                 <div class="assessment-main">
+                    <div class="notice info">
+                        <strong>Petunjuk Pengisian:</strong> Instrumen pengkajian ini bersifat opsional. Isilah sesuai dengan kondisi dan kebutuhan Anda. Tidak semua bagian harus diisi.
+                    </div>
+
                     <div class="card is-collapsed" data-collapsible>
                         <div class="card-header">
                             <div>
@@ -203,10 +198,9 @@
                             </div>
                             <div class="card-actions">
                                 @if (!$latestSwbs)
-                                    <span class="status-chip warning" title="Belum diisi" aria-label="Belum diisi">!</span>
-                                    <span class="status-text warning">Perlu diisi!</span>
+                                    <span class="status-chip warning">Perlu Diisi</span>
                                 @else
-                                    <span class="status-chip success" title="Sudah diisi" aria-label="Sudah diisi">✓</span>
+                                    <span class="status-chip success">Sudah Diisi</span>
                                 @endif
                                 <div class="swbs-legend">
                                     @foreach ($swbsScale as $option)
@@ -271,10 +265,9 @@
                             </div>
                             <div class="card-actions">
                                 @if (!$latestEcog)
-                                    <span class="status-chip warning" title="Belum diisi" aria-label="Belum diisi">!</span>
-                                    <span class="status-text warning">Perlu diisi!</span>
+                                    <span class="status-chip warning">Perlu Diisi</span>
                                 @else
-                                    <span class="status-chip success" title="Sudah diisi" aria-label="Sudah diisi">✓</span>
+                                    <span class="status-chip success">Sudah Diisi</span>
                                 @endif
                                 <div class="score-legend">
                                     @foreach ($scoreLegend as $legend)
@@ -300,19 +293,19 @@
                                 <div class="ecog-meta">
                                     <div class="field">
                                         <label for="respondent_initials">Inisial responden</label>
-                                        <input id="respondent_initials" name="respondent_initials" type="text" value="{{ old('respondent_initials', $latestEcog?->respondent_initials) }}" placeholder="Mis. AH" />
+                                        <input id="respondent_initials" name="respondent_initials" type="text" value="{{ old('respondent_initials', $latestEcog?->respondent_initials ?: $userInitials) }}" placeholder="Mis. AH" />
                                     </div>
                                     <div class="field">
                                         <label for="age">Umur</label>
-                                        <input id="age" name="age" type="number" min="0" max="130" value="{{ old('age', $latestEcog?->age) }}" placeholder="Tahun" />
+                                        <input id="age" name="age" type="number" min="0" max="130" value="{{ old('age', $latestEcog?->age ?: $userAge) }}" placeholder="Tahun" />
                                     </div>
                                     <div class="field">
                                         <label for="gender">Jenis kelamin</label>
-                                        <input id="gender" name="gender" type="text" value="{{ old('gender', $latestEcog?->gender) }}" placeholder="Laki-laki / Perempuan" />
+                                        <input id="gender" name="gender" type="text" value="{{ old('gender', $latestEcog?->gender ?: $userGender) }}" placeholder="Laki-laki / Perempuan" />
                                     </div>
                                     <div class="field">
                                         <label for="marital_status">Status pernikahan</label>
-                                        <input id="marital_status" name="marital_status" type="text" value="{{ old('marital_status', $latestEcog?->marital_status) }}" placeholder="Menikah / Belum" />
+                                        <input id="marital_status" name="marital_status" type="text" value="{{ old('marital_status', $latestEcog?->marital_status ?: $userMaritalStatus) }}" placeholder="Menikah / Belum" />
                                     </div>
                                     <div class="field">
                                         <label for="cancer_stage">Stadium kanker</label>
@@ -359,10 +352,9 @@
                             </div>
                             <div class="card-actions">
                                 @if (!$latestEsas)
-                                    <span class="status-chip warning" title="Belum diisi" aria-label="Belum diisi">!</span>
-                                    <span class="status-text warning">Perlu diisi!</span>
+                                    <span class="status-chip warning">Perlu Diisi</span>
                                 @else
-                                    <span class="status-chip success" title="Sudah diisi" aria-label="Sudah diisi">✓</span>
+                                    <span class="status-chip success">Sudah Diisi</span>
                                 @endif
                                 <button type="button" class="collapse-toggle" aria-expanded="false" aria-label="Perluas atau minimalkan">
                                     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -451,6 +443,10 @@
                         </div>
 
                         <p class="muted small">Pengkajian awal sebaiknya dilakukan pada awal perawatan dan dievaluasi secara berkala.</p>
+                    </div>
+
+                    <div class="notice warning">
+                        <strong>Perhatian:</strong> Hasil pengkajian ini merupakan alat <em>screening</em> awal dan <strong>bukan merupakan diagnosis medis</strong>. Konsultasikan dengan tenaga kesehatan profesional untuk evaluasi lebih lanjut.
                     </div>
 
                     <details class="accordion">
@@ -763,10 +759,21 @@
         .alert {
             padding: 12px 16px;
             border-radius: 12px;
-            background: #ecfdf3;
-            color: #15803d;
             font-size: 0.85rem;
         }
+
+        .alert.success { background: #ecfdf3; color: #15803d; }
+
+        .notice {
+            padding: 14px 18px;
+            border-radius: 14px;
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        .notice.info { background: #eff6ff; color: #1e40af; border-left: 4px solid #3b82f6; }
+        .notice.warning { background: #fff7ed; color: #92400e; border-left: 4px solid #f97316; }
+        .notice strong { font-weight: 700; }
 
         .card {
             background: var(--surface);
@@ -792,13 +799,12 @@
         }
 
         .status-chip {
-            width: 24px;
-            height: 24px;
+            display: inline-flex;
+            padding: 3px 10px;
             border-radius: 999px;
-            display: grid;
-            place-items: center;
-            font-size: 0.75rem;
-            font-weight: 700;
+            font-size: 0.7rem;
+            font-weight: 600;
+            white-space: nowrap;
         }
 
         .status-chip.warning {
@@ -809,15 +815,6 @@
         .status-chip.success {
             background: #dcfce7;
             color: #15803d;
-        }
-
-        .status-text {
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .status-text.warning {
-            color: #92400e;
         }
 
         .collapse-toggle {
@@ -878,7 +875,7 @@
 
         .hero-metrics {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 12px;
         }
 
@@ -937,6 +934,7 @@
 
         .status-pill.success { background: #dcfce7; color: #15803d; }
         .status-pill.warning { background: #ffedd5; color: #c2410c; }
+        .status-pill.info { background: #e0f2fe; color: #0369a1; }
 
         .assessment-content {
             display: grid;

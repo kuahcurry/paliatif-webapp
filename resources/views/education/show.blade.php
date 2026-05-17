@@ -14,7 +14,6 @@
                 class="education-topbar"
                 title="{{ $module->title }}"
                 subtitle="Modul Edukasi"
-                :showMenuButton="true"
             />
 
             <nav class="breadcrumb">
@@ -31,19 +30,46 @@
                         <p class="detail-summary">{{ $module->summary }}</p>
                     </div>
 
-                    @if ($module->type === 'video' && $module->url)
+                    @php
+                        $isYoutube = $module->type === 'video' && $module->url && preg_match('/(youtube\.com|youtu\.be)/', $module->url);
+                        $embedUrl = '';
+                        if ($isYoutube) {
+                            preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $module->url, $matches);
+                            if (isset($matches[1])) {
+                                $embedUrl = 'https://www.youtube.com/embed/' . $matches[1];
+                            }
+                        }
+                    @endphp
+                    @if ($module->type === 'video' && ($module->url || $module->video_path))
                         <div class="video-wrapper">
-                            <div class="video-placeholder">
-                                <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                                <p>Tautan video: <a href="{{ $module->url }}" target="_blank">{{ $module->url }}</a></p>
-                            </div>
+                            @if ($embedUrl)
+                                <div class="video-embed">
+                                    <iframe src="{{ $embedUrl }}" frameborder="0" allowfullscreen></iframe>
+                                </div>
+                            @elseif ($module->video_path)
+                                <video controls class="video-player" style="width:100%;max-height:500px;border-radius:12px;">
+                                    <source src="{{ Storage::url($module->video_path) }}" type="video/mp4">
+                                </video>
+                            @else
+                                <div class="video-placeholder">
+                                    <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                    <p>Tautan video: <a href="{{ $module->url }}" target="_blank">{{ $module->url }}</a></p>
+                                </div>
+                            @endif
                         </div>
                     @endif
 
-                    @if ($module->type === 'article' && $module->content)
-                        <div class="article-content">
-                            {!! nl2br(e($module->content)) !!}
-                        </div>
+                    @if ($module->type === 'article' && ($module->content || $module->image_path))
+                        @if ($module->image_path)
+                            <div class="article-image">
+                                <img src="{{ Storage::url($module->image_path) }}" alt="{{ $module->title }}">
+                            </div>
+                        @endif
+                        @if ($module->content)
+                            <div class="article-content">
+                                {!! nl2br(e($module->content)) !!}
+                            </div>
+                        @endif
                     @endif
 
                     @if ($module->tags)
@@ -128,10 +154,16 @@
         .type-badge { display: inline-flex; width: fit-content; padding: 4px 12px; border-radius: 999px; font-size: 0.72rem; font-weight: 600; }
         .type-badge.video { background: #f3e8ff; color: #7c3aed; }
         .type-badge.article { background: #dcfce7; color: #15803d; }
-        .video-wrapper { background: #f8fafc; border-radius: 16px; padding: 40px 20px; text-align: center; }
+        .video-wrapper { background: #f8fafc; border-radius: 16px; overflow: hidden; }
+        .video-wrapper:not(:has(.video-embed)) { padding: 40px 20px; text-align: center; }
         .video-placeholder { display: grid; gap: 12px; justify-items: center; color: var(--muted); }
+        .video-embed { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+        .video-embed iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         .video-placeholder a { color: #2f855a; }
         .article-content { font-size: 0.92rem; line-height: 1.8; color: var(--text); white-space: pre-wrap; }
+        .article-image { border-radius: 16px; overflow: hidden; }
+        .article-image img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 16px; }
+        .video-player { background: #000; border-radius: 12px; }
         .detail-tags { display: flex; flex-wrap: wrap; gap: 6px; }
         .tag { background: #f1f5f9; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; color: #475569; }
         .empty-state { font-size: 0.85rem; color: var(--muted); text-align: center; padding: 16px; }

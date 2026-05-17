@@ -11,16 +11,12 @@ class PatientDataSeeder extends Seeder
     {
         User::where('email', 'admin@example.com')->update([
             'patient_gender' => 'Laki-laki',
-            'patient_age' => 62,
-            'patient_rm' => '23051567',
-            'patient_room' => 'Mawar 3',
+            'patient_birth_date' => '1964-05-15',
         ]);
 
         User::where('email', 'test@example.com')->update([
             'patient_gender' => 'Perempuan',
-            'patient_age' => 55,
-            'patient_rm' => '24011234',
-            'patient_room' => 'Melati 1',
+            'patient_birth_date' => '1969-03-20',
         ]);
     }
 }

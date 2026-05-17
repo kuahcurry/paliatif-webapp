@@ -8,13 +8,11 @@
     $patientName = $_user->name ?? 'Pasien';
     $patientAge = $_user->patient_age ? $_user->patient_age . ' Tahun' : '--';
     $patientGender = $_user->patient_gender ?? '--';
-    $patientRm = $_user->patient_rm ? 'No. RM: ' . $_user->patient_rm : '--';
-    $patientRoom = $_user->patient_room ? 'Ruang: ' . $_user->patient_room : '--';
+
     $patientAdmit = $_user->created_at ? $_user->created_at->format('d M Y') : '--';
     $patientStatus = $patientStatus ?? 'Dalam Pemantauan';
     $patientStatusTime = 'Diperbarui: ' . now()->format('H:i') . ' WIB';
-    $nurseName = $_user->name;
-    $nurseRole = $_user->is_admin ? 'Admin' : 'Pasien';
+
     $writeCategories = $writeCategories ?? ['Perasaan', 'Harapan', 'Doa', 'Syukur', 'Kekhawatiran', 'Lainnya'];
     $historyCategories = $historyCategories ?? $writeCategories;
     $summaryItems = $summaryItems ?? [];
@@ -37,52 +35,7 @@
                 class="journal-topbar"
                 title="Jurnal Harian"
                 subtitle="Catatan Reflektif Pasien & Keluarga"
-                :showMenuButton="true"
-                :badgeCount="3"
             />
-
-            <section class="card patient-card">
-                <div class="patient-profile">
-                    <div class="patient-avatar">{{ strtoupper(substr($patientName, 0, 1)) }}</div>
-                    <div>
-                        <h3>{{ $patientName }}</h3>
-                        <p>{{ $patientAge }}, {{ $patientGender }}</p>
-                        <p class="muted">{{ $patientRm }} - {{ $patientRoom }}</p>
-                    </div>
-                </div>
-                <div class="patient-metrics">
-                    <div class="metric">
-                        <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v3M16 2v3M3 7h18M5 5h14a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </div>
-                        <div>
-                            <p class="metric-label">Tanggal Masuk</p>
-                            <p class="metric-value">{{ $patientAdmit }}</p>
-                        </div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </div>
-                        <div>
-                            <p class="metric-label">Kondisi Umum</p>
-                            <span class="status-pill good">{{ $patientStatus }}</span>
-                            <p class="metric-sub">{{ $patientStatusTime }}</p>
-                        </div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </div>
-                        <div>
-                            <p class="metric-label">Perawat Penanggung Jawab</p>
-                            <p class="metric-value">{{ $nurseName }}</p>
-                            <p class="metric-sub">{{ $nurseRole }}</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
             <section class="journal-body">
                 <div class="journal-left">
                     <div class="card">
@@ -136,7 +89,7 @@
                                         <label class="toggle">
                                             <input type="checkbox" name="is_shareable" value="1" @checked(old('is_shareable'))>
                                             <span class="toggle-track"><span class="toggle-thumb"></span></span>
-                                            <span>Izinkan perawat membaca catatan ini</span>
+                                            <span>Izinkan tenaga kesehatan membaca catatan ini</span>
                                         </label>
 
                                         <div class="compose-actions">
@@ -185,12 +138,12 @@
                                         <div class="history-content">
                                             <div class="history-top">
                                                 <span class="category-pill">{{ $category }}</span>
-                                                <span class="history-time">{{ $entry->entry_date->format('H:i') }} WIB</span>
+                                                <span class="history-time">{{ $entry->created_at->format('H:i') }} WIB</span>
                                             </div>
                                             <p class="history-text">{{ $entry->content }}</p>
                                             <p class="history-meta">
                                                 @if ($entry->provider_response)
-                                                    Dilihat oleh {{ $nurseName }}, {{ $nurseRole }}
+                                                    Telah direspon oleh tenaga kesehatan
                                                 @elseif ($entry->is_shareable)
                                                     Belum dibaca oleh tenaga kesehatan
                                                 @else
@@ -595,7 +548,7 @@
 
         .patient-metrics {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 12px;
         }
 

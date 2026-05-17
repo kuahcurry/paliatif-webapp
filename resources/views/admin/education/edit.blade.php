@@ -57,9 +57,27 @@
                     </div>
 
                     <div class="field" id="url-field" style="display: none;">
-                        <label for="url">URL Video</label>
-                        <input id="url" type="url" name="url" value="{{ old('url', $module->url) }}" placeholder="https://example.com/video/...">
+                        <label for="url">URL Video (YouTube)</label>
+                        <input id="url" type="url" name="url" value="{{ old('url', $module->url) }}" placeholder="https://www.youtube.com/watch?v=...">
                         <x-input-error :messages="$errors->get('url')" />
+                    </div>
+
+                    <div class="field" id="video-file-field" style="display: none;">
+                        <label for="video_file">Upload Video (maks. 100MB, mp4/mov/avi/mkv)</label>
+                        <input id="video_file" type="file" name="video_file" accept=".mp4,.mov,.avi,.mkv">
+                        @if ($module->video_path)
+                            <p class="text-muted" style="font-size:0.75rem;margin-top:4px;">Video saat ini: <a href="{{ Storage::url($module->video_path) }}" target="_blank">Lihat file</a></p>
+                        @endif
+                        <x-input-error :messages="$errors->get('video_file')" />
+                    </div>
+
+                    <div class="field" id="image-file-field">
+                        <label for="image_file">Upload Gambar Artikel (maks. 5MB, jpg/jpeg/webp)</label>
+                        <input id="image_file" type="file" name="image_file" accept=".jpg,.jpeg,.webp">
+                        @if ($module->image_path)
+                            <p class="text-muted" style="font-size:0.75rem;margin-top:4px;">Gambar saat ini: <a href="{{ Storage::url($module->image_path) }}" target="_blank">Lihat file</a></p>
+                        @endif
+                        <x-input-error :messages="$errors->get('image_file')" />
                     </div>
 
                     <div class="field">
@@ -90,7 +108,9 @@
         function toggleTypeFields() {
             const type = document.getElementById('type').value;
             document.getElementById('content-field').style.display = type === 'article' ? '' : 'none';
+            document.getElementById('image-file-field').style.display = type === 'article' ? '' : 'none';
             document.getElementById('url-field').style.display = type === 'video' ? '' : 'none';
+            document.getElementById('video-file-field').style.display = type === 'video' ? '' : 'none';
         }
         toggleTypeFields();
     </script>

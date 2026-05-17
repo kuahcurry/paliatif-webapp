@@ -11,8 +11,16 @@
 
         <!-- Religion -->
         <div class="mt-4">
-            <x-input-label for="religion" :value="__('Agama (opsional)')" />
-            <x-text-input id="religion" class="block mt-1 w-full" type="text" name="religion" :value="old('religion')" autocomplete="off" />
+            <x-input-label for="religion" :value="__('Agama')" />
+            <select id="religion" name="religion" class="block mt-1 w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                <option value="">{{ __('Pilih agama') }}</option>
+                <option value="Islam" @selected(old('religion') === 'Islam')>Islam</option>
+                <option value="Kristen Protestan" @selected(old('religion') === 'Kristen Protestan')>Kristen Protestan</option>
+                <option value="Kristen Katolik" @selected(old('religion') === 'Kristen Katolik')>Kristen Katolik</option>
+                <option value="Hindu" @selected(old('religion') === 'Hindu')>Hindu</option>
+                <option value="Buddha" @selected(old('religion') === 'Buddha')>Buddha</option>
+                <option value="Konghucu" @selected(old('religion') === 'Konghucu')>Konghucu</option>
+            </select>
             <x-input-error :messages="$errors->get('religion')" class="mt-2" />
         </div>
 

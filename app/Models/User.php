@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -11,9 +11,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'religion', 'email', 'password', 'is_admin', 'patient_gender', 'patient_age', 'patient_rm', 'patient_room'])]
+#[Fillable(['name', 'religion', 'email', 'password', 'patient_gender', 'patient_age', 'patient_birth_date', 'marital_status'])]
 #[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
@@ -30,7 +30,16 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_admin' => 'boolean',
             'patient_age' => 'integer',
+            'patient_birth_date' => 'date',
         ];
+    }
+
+    public function getPatientAgeAttribute(): ?int
+    {
+        if ($this->patient_birth_date) {
+            return $this->patient_birth_date->age;
+        }
+        return $this->attributes['patient_age'] ?? null;
     }
 
     public function spiritualRadarLogs(): HasMany

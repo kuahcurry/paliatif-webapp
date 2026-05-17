@@ -8,13 +8,14 @@
     $patientName = $_user->name ?? 'Pasien';
     $patientAge = $_user->patient_age ? $_user->patient_age . ' Tahun' : '--';
     $patientGender = $_user->patient_gender ?? '--';
-    $patientRm = $_user->patient_rm ? 'No. RM: ' . $_user->patient_rm : '--';
-    $patientRoom = $_user->patient_room ? 'Ruang: ' . $_user->patient_room : '--';
-    $caregiverName = $_user->name . ' (Caregiver)';
-    $nurseName = $_user->name;
-    $nurseRole = $_user->is_admin ? 'Admin' : 'Pasien';
     $assessmentSummary = $assessmentSummary ?? [];
-    $categoryItems = $categoryItems ?? [];
+    $tagIcons = [
+        'coping' => '<path d="M12 3c-4 0-7 3-7 7 0 4 3 11 7 11s7-7 7-11c0-4-3-7-7-7zM9 9h6M9 13h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+        'communication' => '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+        'grief' => '<path d="M19 14c1.5-2.5 2-5 2-5.5a4.5 4.5 0 0 0-9 0c0 .5.5 3 2 5.5M12 3C8 6 6 10 6 14a6 6 0 0 0 12 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+        'spiritual_support' => '<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+    ];
+    $firstTag = fn($tags) => $tags ? $tagIcons[$tags[0]] ?? null : null;
 @endphp
 
 <x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen education-page">
@@ -28,60 +29,10 @@
                 class="education-topbar"
                 title="Modul Edukasi untuk Caregiver"
                 subtitle="Edukasi spiritual-psikososial"
-                :showMenuButton="true"
-                :badgeCount="3"
             />
-
-            <section class="card patient-card">
-                <div class="patient-profile">
-                    <div class="patient-avatar">{{ strtoupper(substr($patientName, 0, 1)) }}</div>
-                    <div>
-                        <h3>{{ $patientName }}</h3>
-                        <p>{{ $patientAge }}, {{ $patientGender }}</p>
-                        <p class="muted">{{ $patientRm }} - {{ $patientRoom }}</p>
-                    </div>
-                </div>
-                <div class="patient-metrics">
-                    <div class="metric">
-                        <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </div>
-                        <div>
-                            <p class="metric-label">Caregiver Utama</p>
-                            <p class="metric-value">{{ $caregiverName }}</p>
-                            <a class="metric-link" href="{{ route('profile.edit') }}">Lihat Profil Caregiver</a>
-                        </div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12h-4l-3 9L9 3l-3 9H2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </div>
-                        <div>
-                            <p class="metric-label">Ringkasan Pengkajian</p>
-                            <div class="metric-tags">
-                                @foreach ($assessmentSummary as $summary)
-                                    <span class="status-pill {{ $summary['tone'] }}">{{ $summary['label'] }}: {{ $summary['value'] }}</span>
-                                @endforeach
-                            </div>
-                            <a class="metric-link" href="{{ route('menu.assessment') }}">Lihat Hasil Pengkajian</a>
-                        </div>
-                    </div>
-                    <div class="metric">
-                        <div class="metric-icon">
-                            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </div>
-                        <div>
-                            <p class="metric-label">Rekomendasi Modul untuk Anda</p>
-                            <p class="metric-value">Konten sesuai hasil pengkajian</p>
-                            <a class="metric-link" href="#recommended">Lihat Rekomendasi</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
             @if (! $hasAssessment)
                 <div class="notice warning">
-                    Rekomendasi akan lebih tepat jika pengkajian caregiver sudah diisi.
+                    Rekomendasi akan lebih tepat jika pengkajian sudah diisi.
                     <a href="{{ route('menu.assessment') }}">Isi pengkajian sekarang</a>
                 </div>
             @endif
@@ -110,6 +61,9 @@
                                     @endphp
                                     <a class="module-card" href="{{ route('education.show', $module) }}">
                                         <div class="module-thumb {{ $thumbClass }}">
+                                            @if ($icon = $firstTag($module->tags))
+                                                <svg class="thumb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">{!! $icon !!}</svg>
+                                            @endif
                                             <span class="type-pill {{ $thumbClass }}">{{ $typeLabel }}</span>
                                         </div>
                                         <h5>{{ $module->title }}</h5>
@@ -138,9 +92,6 @@
                                 <option value="grief" @selected($tag === 'grief')>Manajemen duka</option>
                                 <option value="spiritual_support" @selected($tag === 'spiritual_support')>Dukungan spiritual</option>
                             </select>
-                            <select name="duration" aria-label="Durasi">
-                                <option value="">Semua Durasi</option>
-                            </select>
                             <select name="sort" aria-label="Urutan">
                                 <option value="latest">Terbaru</option>
                             </select>
@@ -160,6 +111,9 @@
                                     @endphp
                                     <a class="module-card" href="{{ route('education.show', $module) }}">
                                         <div class="module-thumb {{ $thumbClass }}">
+                                            @if ($icon = $firstTag($module->tags))
+                                                <svg class="thumb-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">{!! $icon !!}</svg>
+                                            @endif
                                             <span class="type-pill {{ $thumbClass }}">{{ $typeLabel }}</span>
                                         </div>
                                         <h5>{{ $module->title }}</h5>
@@ -173,7 +127,7 @@
                 </div>
 
                 <aside class="education-right">
-                    <div class="card">
+                    <div class="card category-card">
                         <div class="section-header">
                             <div>
                                 <h4>Kategori Modul</h4>
@@ -182,35 +136,56 @@
                         </div>
                         <div class="category-list">
                             @foreach ($categoryItems as $item)
-                                <div class="category-item">
-                                    <div>
-                                        <span class="category-dot"></span>
-                                        {{ $item['label'] }}
+                                @php
+                                    $catColors = match ($item['tag']) {
+                                        'coping' => ['bg' => '#fef3c7', 'text' => '#92400e', 'icon' => 'M12 3c-4 0-7 3-7 7 0 4 3 11 7 11s7-7 7-11c0-4-3-7-7-7zM9 9h6M9 13h3'],
+                                        'communication' => ['bg' => '#dbeafe', 'text' => '#1e40af', 'icon' => 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'],
+                                        'grief' => ['bg' => '#fee2e2', 'text' => '#991b1b', 'icon' => 'M19 14c1.5-2.5 2-5 2-5.5a4.5 4.5 0 0 0-9 0c0 .5.5 3 2 5.5M12 3C8 6 6 10 6 14a6 6 0 0 0 12 0'],
+                                        'spiritual_support' => ['bg' => '#dcfce7', 'text' => '#166534', 'icon' => 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z'],
+                                        default => ['bg' => '#f1f5f9', 'text' => '#475569', 'icon' => 'M12 6l8 4-8 4-8-4 8-4z'],
+                                    };
+                                    $isActive = $tag === $item['tag'];
+                                @endphp
+                                <a href="{{ $isActive ? route('education.index') : route('education.index', ['tag' => $item['tag']]) }}" class="category-item {{ $isActive ? 'active' : '' }}">
+                                    <div class="category-item-left">
+                                        <span class="category-icon" style="background: {{ $catColors['bg'] }}; color: {{ $catColors['text'] }}">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="{{ $catColors['icon'] }}"/></svg>
+                                        </span>
+                                        <span class="category-label">{{ $item['label'] }}</span>
                                     </div>
-                                    <span class="category-count">{{ $item['count'] }}</span>
-                                </div>
+                                    <span class="category-count" style="background: {{ $catColors['bg'] }}; color: {{ $catColors['text'] }}">{{ $item['count'] }}</span>
+                                </a>
                             @endforeach
                         </div>
-                        <a href="{{ route('education.index') }}" class="ghost-button">Lihat Semua Kategori</a>
                     </div>
 
                     <div class="card help-card">
-                        <div>
+                        <div class="help-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                        </div>
+                        <div class="help-content">
                             <h4>Butuh Bantuan?</h4>
                             <p>Jika Anda merasa perlu dukungan lebih lanjut dari tenaga profesional, kami siap membantu.</p>
-                            <a href="{{ route('faq') }}" class="ghost-button">Hubungi Kami</a>
-                        </div>
-                        <div class="helper-illustration" aria-hidden="true">
-                            <span class="helper-head"></span>
-                            <span class="helper-body"></span>
+                            <a href="{{ route('faq') }}" class="help-button">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                Hubungi Kami
+                            </a>
                         </div>
                     </div>
 
                     <div class="card tips-card">
-                        <h4>Tips Hari Ini</h4>
-                        <p>Luangkan waktu sejenak untuk diri sendiri setiap hari, meski hanya 10 menit. Anda juga berhak untuk merasa lelah.</p>
-                        <div class="tips-icon" aria-hidden="true">
-                            <span></span>
+                        <div class="tips-glow"></div>
+                        <div class="tips-content">
+                            <div class="tips-icon-wrap">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s-8-4-8-10c0-4 3.5-6 8-6s8 2 8 6c0 6-8 10-8 10z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>
+                            </div>
+                            <h4>Tips Hari Ini</h4>
+                            @if ($dailyTip)
+                                <p>{{ $dailyTip->summary ?? Str::limit($dailyTip->content, 150) }}</p>
+                                <a href="{{ route('education.show', $dailyTip) }}" class="tips-link">Baca selengkapnya</a>
+                            @else
+                                <p>Luangkan waktu sejenak untuk diri sendiri setiap hari, meski hanya 10 menit. Anda juga berhak untuk merasa lelah.</p>
+                            @endif
                         </div>
                     </div>
                 </aside>
@@ -537,7 +512,7 @@
 
         .patient-metrics {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 12px;
         }
 
@@ -692,6 +667,16 @@
             background: linear-gradient(120deg, #bbf7d0, #dbeafe);
         }
 
+        .thumb-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 36px;
+            height: 36px;
+            color: rgba(0,0,0,0.15);
+        }
+
         .type-pill {
             position: absolute;
             top: 10px;
@@ -730,7 +715,7 @@
 
         .filter-bar {
             display: grid;
-            grid-template-columns: 2fr repeat(3, minmax(0, 1fr)) auto;
+            grid-template-columns: 2fr repeat(2, minmax(0, 1fr)) auto;
             gap: 8px;
             align-items: center;
         }
@@ -748,102 +733,208 @@
             color: var(--muted);
         }
 
+        .category-card .section-header {
+            margin-bottom: 4px;
+        }
+
         .category-list {
             display: grid;
-            gap: 10px;
+            gap: 6px;
         }
 
         .category-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 0.8rem;
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: #f8fafc;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .category-item:hover {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+        }
+
+        .category-item.active {
+            background: #f0fdf4;
+            border-color: #86efac;
+        }
+
+        .category-item-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .category-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+        }
+
+        .category-icon svg {
+            width: 17px;
+            height: 17px;
+        }
+
+        .category-label {
+            font-size: 0.82rem;
+            font-weight: 600;
             color: #1f2937;
         }
 
-        .category-item div {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .category-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 999px;
-            background: #22c55e;
+        .category-item:hover .category-label {
+            color: #166534;
         }
 
         .category-count {
-            font-size: 0.75rem;
-            background: #f1f5f9;
-            padding: 4px 8px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 10px;
             border-radius: 999px;
-            color: #475569;
+            min-width: 28px;
+            text-align: center;
         }
 
         .help-card {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+            background: linear-gradient(135deg, #fef9c3 0%, #fef3c7 100%);
+            border: 1px solid #fde68a;
+        }
+
+        .help-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: #fff;
             display: grid;
-            grid-template-columns: 1fr auto;
-            gap: 12px;
+            place-items: center;
+            color: #d97706;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(217,119,6,0.12);
+        }
+
+        .help-icon svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .help-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .help-content h4 {
+            font-weight: 700;
+            color: #92400e;
+        }
+
+        .help-content p {
+            font-size: 0.78rem;
+            color: #a16207;
+            line-height: 1.5;
+        }
+
+        .help-button {
+            display: inline-flex;
             align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border-radius: 10px;
+            background: #fff;
+            color: #92400e;
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid #fde68a;
+            align-self: flex-start;
+            transition: all 0.2s ease;
         }
 
-        .helper-illustration {
-            width: 70px;
-            height: 70px;
-            position: relative;
+        .help-button:hover {
+            background: #92400e;
+            color: #fff;
+            border-color: #92400e;
         }
 
-        .helper-head {
-            position: absolute;
-            top: 8px;
-            left: 20px;
-            width: 30px;
-            height: 30px;
-            border-radius: 999px;
-            background: #fde68a;
-        }
-
-        .helper-body {
-            position: absolute;
-            bottom: 6px;
-            left: 12px;
-            width: 46px;
-            height: 32px;
-            border-radius: 16px 16px 12px 12px;
-            background: #a5b4fc;
+        .help-button svg {
+            width: 16px;
+            height: 16px;
         }
 
         .tips-card {
             position: relative;
             overflow: hidden;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 1px solid #bbf7d0;
         }
 
-        .tips-card p {
-            font-size: 0.8rem;
-            color: var(--muted);
-        }
-
-        .tips-icon {
+        .tips-glow {
             position: absolute;
-            right: 16px;
-            bottom: 12px;
-            width: 48px;
-            height: 48px;
-            border-radius: 16px;
-            background: #dcfce7;
+            top: -40px;
+            right: -40px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(34,197,94,0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .tips-content {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tips-icon-wrap {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: #fff;
             display: grid;
             place-items: center;
+            color: #16a34a;
+            box-shadow: 0 2px 8px rgba(22,163,74,0.12);
         }
 
-        .tips-icon span {
-            width: 22px;
-            height: 22px;
-            border-radius: 999px 999px 0 999px;
-            background: #22c55e;
-            transform: rotate(-20deg);
-            display: block;
+        .tips-icon-wrap svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .tips-content h4 {
+            font-weight: 700;
+            color: #166534;
+        }
+
+        .tips-content p {
+            font-size: 0.78rem;
+            color: #15803d;
+            line-height: 1.5;
+        }
+
+        .tips-link {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #16a34a;
+            text-decoration: none;
+        }
+
+        .tips-link:hover {
+            text-decoration: underline;
         }
 
         @media (max-width: 1300px) {
