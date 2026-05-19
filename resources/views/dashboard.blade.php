@@ -1400,31 +1400,21 @@
             .dashboard-layout {
                 grid-template-columns: 1fr;
             }
+        }
 
-            .dashboard-sidebar {
-                position: sticky;
-                top: 0;
-                z-index: 10;
-                flex-direction: row;
-                overflow-x: auto;
+        @media (max-width: 640px) {
+            .hero-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .patient-profile {
+                flex-direction: column;
+                text-align: center;
                 gap: 12px;
             }
-
-            .sidebar-brand,
-            .sidebar-footer {
-                display: none;
-            }
-
-            .sidebar-nav {
-                flex-direction: row;
-            }
-
-            .nav-item {
-                white-space: nowrap;
-            }
-
-            .activity-grid {
-                grid-template-columns: 1fr;
+            
+            .dashboard-topbar {
+                text-align: center;
             }
         }
     </style>

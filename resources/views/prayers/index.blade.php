@@ -565,19 +565,6 @@
         @media (max-width: 900px) {
             .prayer-layout { grid-template-columns: 1fr; }
 
-            .prayer-sidebar {
-                position: sticky;
-                top: 0;
-                z-index: 10;
-                flex-direction: row;
-                overflow-x: auto;
-                gap: 12px;
-            }
-
-            .sidebar-brand, .sidebar-footer { display: none; }
-            .sidebar-nav { flex-direction: row; }
-            .nav-item { white-space: nowrap; }
-
             .prayer-topbar {
                 display: flex;
                 flex-direction: column;

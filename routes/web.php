@@ -23,6 +23,46 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::get('/setup-storage', function () {
+    $docRoot = $_SERVER['DOCUMENT_ROOT'];
+    $sourceDir = base_path();
+    
+    $output = "Document Root: $docRoot<br>";
+    $output .= "Source Dir: $sourceDir<br><br>";
+    
+    $storagePath = $docRoot . '/storage';
+    $targetPath = $sourceDir . '/storage/app/public';
+    
+    if (file_exists($storagePath)) {
+        if (is_link($storagePath)) {
+            $output .= "storage in doc root is already a link.<br>";
+            $output .= "Points to: " . readlink($storagePath) . "<br>";
+        } else {
+            $output .= "storage in doc root exists but is NOT a link. It's a regular directory.<br>";
+            $backupPath = $docRoot . '/storage_backup_' . time();
+            rename($storagePath, $backupPath);
+            $output .= "Renamed existing storage folder to: " . basename($backupPath) . "<br>";
+            
+            try {
+                symlink($targetPath, $storagePath);
+                $output .= "Successfully created symlink in doc root!<br>";
+            } catch (\Exception $e) {
+                $output .= "Failed to create symlink: " . $e->getMessage() . "<br>";
+            }
+        }
+    } else {
+        $output .= "storage in doc root DOES NOT exist.<br>";
+        try {
+            symlink($targetPath, $storagePath);
+            $output .= "Successfully created symlink in doc root!<br>";
+        } catch (\Exception $e) {
+            $output .= "Failed to create symlink: " . $e->getMessage() . "<br>";
+        }
+    }
+    
+    return $output;
+});
+
 Route::get('/pohon-doa', [PrayerController::class, 'index'])->name('prayers.index');
 Route::post('/pohon-doa', [PrayerController::class, 'store'])
     ->middleware('throttle:5,1')

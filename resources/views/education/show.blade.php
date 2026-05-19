@@ -1,188 +1,523 @@
 @push('head')
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700,800|merriweather:300,400,700&display=swap" rel="stylesheet" />
 @endpush
 
-<x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen education-page">
-    <div class="education-layout">
-        <aside class="education-sidebar">
+<x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen reader-page">
+    <div class="reader-layout">
+        <aside class="reader-sidebar">
             <x-app-sidebar />
         </aside>
 
-        <main class="education-main">
-            <x-app-topbar
-                class="education-topbar"
-                title="{{ $module->title }}"
-                subtitle="Modul Edukasi"
-            />
-
-            <nav class="breadcrumb">
-                <a href="{{ route('education.index') }}">Modul Edukasi</a>
-                <span>/</span>
-                <span>{{ $module->title }}</span>
+        <main class="reader-main">
+            {{-- Sticky reading topbar --}}
+            <nav class="reader-topbar">
+                <a href="{{ route('education.index') }}" class="back-link">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+                    Modul Edukasi
+                </a>
+                <div class="topbar-right">
+                    <span class="type-pill {{ $module->type }}">{{ $module->type === 'video' ? '▶ Video' : '📄 Artikel' }}</span>
+                    <span class="read-time">{{ ceil(str_word_count($module->content ?? '') / 200) ?: 3 }} menit baca</span>
+                </div>
             </nav>
 
-            <div class="module-detail">
-                <div class="card detail-card">
-                    <div class="detail-header">
-                        <span class="type-badge {{ $module->type }}">{{ $module->type === 'video' ? 'Video' : 'Artikel' }}</span>
-                        <h2>{{ $module->title }}</h2>
-                        <p class="detail-summary">{{ $module->summary }}</p>
-                    </div>
+            {{-- Article container (Medium-style centered column) --}}
+            <article class="article-container">
 
-                    @php
-                        $isYoutube = $module->type === 'video' && $module->url && preg_match('/(youtube\.com|youtu\.be)/', $module->url);
-                        $embedUrl = '';
-                        if ($isYoutube) {
-                            preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $module->url, $matches);
-                            if (isset($matches[1])) {
-                                $embedUrl = 'https://www.youtube.com/embed/' . $matches[1];
-                            }
-                        }
-                    @endphp
-                    @if ($module->type === 'video' && ($module->url || $module->video_path))
-                        <div class="video-wrapper">
-                            @if ($embedUrl)
-                                <div class="video-embed">
-                                    <iframe src="{{ $embedUrl }}" frameborder="0" allowfullscreen></iframe>
-                                </div>
-                            @elseif ($module->video_path)
-                                <video controls class="video-player" style="width:100%;max-height:500px;border-radius:12px;">
-                                    <source src="{{ Storage::url($module->video_path) }}" type="video/mp4">
-                                </video>
-                            @else
-                                <div class="video-placeholder">
-                                    <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                                    <p>Tautan video: <a href="{{ $module->url }}" target="_blank">{{ $module->url }}</a></p>
-                                </div>
-                            @endif
-                        </div>
-                    @endif
-
-                    @if ($module->type === 'article' && ($module->content || $module->image_path))
-                        @if ($module->image_path)
-                            <div class="article-image">
-                                <img src="{{ Storage::url($module->image_path) }}" alt="{{ $module->title }}">
-                            </div>
-                        @endif
-                        @if ($module->content)
-                            <div class="article-content">
-                                {!! nl2br(e($module->content)) !!}
-                            </div>
-                        @endif
-                    @endif
-
+                {{-- Hero section --}}
+                <header class="article-header">
                     @if ($module->tags)
-                        <div class="detail-tags">
+                        <div class="article-tags-top">
                             @foreach ($module->tags as $tag)
-                                <span class="tag">{{ $tag }}</span>
+                                @php
+                                    $tagLabels = ['coping' => 'Coping & Tenang', 'communication' => 'Komunikasi', 'grief' => 'Manajemen Duka', 'spiritual_support' => 'Dukungan Spiritual'];
+                                @endphp
+                                <a href="{{ route('education.index', ['tag' => $tag]) }}" class="tag-link">{{ $tagLabels[$tag] ?? $tag }}</a>
                             @endforeach
                         </div>
                     @endif
-                </div>
-
-                <div class="card">
-                    <div class="section-header">
-                        <div>
-                            <h4>Modul Lainnya</h4>
-                            <p>Jelajahi modul edukasi lainnya</p>
+                    <h1>{{ $module->title }}</h1>
+                    @if ($module->summary)
+                        <p class="article-subtitle">{{ $module->summary }}</p>
+                    @endif
+                    <div class="article-meta">
+                        <div class="meta-author">
+                            <span class="author-avatar">RH</span>
+                            <div>
+                                <span class="author-name">Ruang Hening</span>
+                                <span class="meta-date">{{ $module->created_at->translatedFormat('d F Y') }}</span>
+                            </div>
                         </div>
-                        <a href="{{ route('education.index') }}" class="ghost-button">Lihat Semua</a>
                     </div>
-                    @if ($otherModules->isNotEmpty())
-                        <div class="other-modules">
-                            @foreach ($otherModules as $other)
-                                <a class="other-module-card" href="{{ route('education.show', $other) }}">
-                                    <span class="type-badge mini {{ $other->type }}">{{ $other->type === 'video' ? 'Video' : 'Artikel' }}</span>
-                                    <h5>{{ $other->title }}</h5>
-                                    <p>{{ Str::limit($other->summary, 80) }}</p>
-                                </a>
+                </header>
+
+                {{-- Featured image --}}
+                @if ($module->type === 'article' && $module->image_path)
+                    <figure class="article-hero-image">
+                        <img src="{{ Storage::url($module->image_path) }}" alt="{{ $module->title }}">
+                    </figure>
+                @endif
+
+                {{-- Video embed --}}
+                @php
+                    $isYoutube = $module->type === 'video' && $module->url && preg_match('/(youtube\.com|youtu\.be)/', $module->url);
+                    $embedUrl = '';
+                    if ($isYoutube) {
+                        preg_match('/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/', $module->url, $matches);
+                        if (isset($matches[1])) {
+                            $embedUrl = 'https://www.youtube.com/embed/' . $matches[1];
+                        }
+                    }
+                @endphp
+                @if ($module->type === 'video' && ($module->url || $module->video_path))
+                    <div class="video-section">
+                        @if ($embedUrl)
+                            <div class="video-embed">
+                                <iframe src="{{ $embedUrl }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            </div>
+                        @elseif ($module->video_path)
+                            <video controls class="video-native">
+                                <source src="{{ Storage::url($module->video_path) }}" type="video/mp4">
+                            </video>
+                        @else
+                            <div class="video-link-box">
+                                <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                <p>Tonton video: <a href="{{ $module->url }}" target="_blank" rel="noopener">{{ $module->url }}</a></p>
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
+                {{-- Article body --}}
+                @if ($module->content)
+                    <div class="article-body">
+                        {!! nl2br(e($module->content)) !!}
+                    </div>
+                @endif
+
+                {{-- Bottom tags --}}
+                @if ($module->tags)
+                    <footer class="article-footer">
+                        <div class="footer-tags">
+                            @foreach ($module->tags as $tag)
+                                @php $tagLabels = ['coping' => 'Coping & Tenang', 'communication' => 'Komunikasi', 'grief' => 'Manajemen Duka', 'spiritual_support' => 'Dukungan Spiritual']; @endphp
+                                <span class="footer-tag">{{ $tagLabels[$tag] ?? $tag }}</span>
                             @endforeach
                         </div>
-                    @else
-                        <p class="empty-state">Belum ada modul lain.</p>
-                    @endif
-                </div>
-            </div>
+                    </footer>
+                @endif
+            </article>
+
+            {{-- Related modules --}}
+            @if ($otherModules->isNotEmpty())
+                <section class="related-section">
+                    <div class="related-header">
+                        <h3>Baca juga</h3>
+                        <a href="{{ route('education.index') }}" class="see-all">Lihat semua →</a>
+                    </div>
+                    <div class="related-grid">
+                        @foreach ($otherModules as $other)
+                            <a class="related-card" href="{{ route('education.show', $other) }}">
+                                <span class="related-type {{ $other->type }}">{{ $other->type === 'video' ? '▶' : '📄' }}</span>
+                                <div>
+                                    <h4>{{ $other->title }}</h4>
+                                    <p>{{ Str::limit($other->summary, 90) }}</p>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                </section>
+            @endif
         </main>
     </div>
 
     <style>
-        :root { --surface: #fff; --surface-muted: #f7faf5; --text: #0f172a; --muted: #64748b; --shadow: 0 12px 28px rgba(15,23,42,0.08); }
-        .education-page { background: #f4f6fb; font-family: 'Manrope', sans-serif; }
-        .education-layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
-        .education-sidebar { background: var(--surface); padding: 28px 20px; border-right: 1px solid #edf2f7; display: flex; flex-direction: column; gap: 24px; }
+        :root {
+            --surface: #ffffff;
+            --bg: #fafafa;
+            --text: #1a1a1a;
+            --text-secondary: #6b7280;
+            --accent: #2e7d32;
+            --accent-bg: #e8f5e9;
+            --border: #f0f0f0;
+            --shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        .reader-page {
+            background: var(--bg);
+            font-family: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+            color: var(--text);
+        }
+
+        .reader-layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+        }
+
+        .reader-sidebar {
+            background: var(--surface);
+            padding: 28px 20px;
+            border-right: 1px solid #edf2f7;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* ── Sidebar shared styles ── */
         .sidebar-brand { display: flex; gap: 12px; align-items: center; font-weight: 700; }
         .brand-icon { width: 42px; height: 42px; border-radius: 16px; background: #dff3df; display: grid; place-items: center; }
         .brand-icon span { width: 22px; height: 22px; border-radius: 999px; background: #63b96b; display: block; }
-        .sidebar-brand h1 { font-size: 0.95rem; color: var(--text); }
-        .sidebar-brand p { font-size: 0.8rem; color: var(--muted); }
+        .sidebar-brand h1 { font-size: 0.95rem; }
+        .sidebar-brand p { font-size: 0.8rem; color: var(--text-secondary); }
         .sidebar-nav { display: flex; flex-direction: column; gap: 10px; }
-        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; color: var(--muted); text-decoration: none; font-size: 0.9rem; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; }
         .nav-icon { width: 20px; height: 20px; display: grid; place-items: center; }
         .nav-icon svg { width: 18px; height: 18px; }
         .nav-item.is-active, .nav-item:hover { background: #e1f1e1; color: #256c32; }
         .sidebar-footer { margin-top: auto; }
-        .footer-card { background: #f8fafc; border-radius: 16px; padding: 16px; font-size: 0.75rem; color: var(--muted); }
+        .footer-card { background: #f8fafc; border-radius: 16px; padding: 16px; font-size: 0.75rem; color: var(--text-secondary); }
         .footer-title { font-weight: 700; color: var(--text); }
-        .education-main { padding: 26px 32px 48px; display: flex; flex-direction: column; gap: 8px; }
-        .education-topbar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
-        .education-topbar > div:not(.topbar-actions) { grid-column: 2; text-align: center; }
-        .education-topbar .ghost-button { grid-column: 1; justify-self: start; }
-        .education-topbar .topbar-actions { grid-column: 3; justify-self: end; }
-        .education-topbar h2 { font-size: 1.4rem; font-weight: 700; }
-        .education-topbar p { color: var(--muted); font-size: 0.85rem; }
+        .sidebar-divider { height: 1px; background: #edf2f7; margin: 12px 0 8px; }
+        .sidebar-section-label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: #94a3b8; padding: 0 12px; font-weight: 700; }
+
+        /* ── Topbar shared ── */
         .topbar-actions { display: flex; align-items: center; gap: 10px; }
         .icon-button { position: relative; border: none; background: #fff; box-shadow: var(--shadow); border-radius: 12px; width: 38px; height: 38px; cursor: pointer; display: grid; place-items: center; color: #475569; text-decoration: none; font-size: 1rem; font-weight: 600; }
+        .icon-button svg { width: 20px; height: 20px; }
+        .badge { position: absolute; top: -4px; right: -4px; background: #22c55e; color: #fff; font-size: 0.65rem; width: 18px; height: 18px; border-radius: 999px; display: grid; place-items: center; }
         .user-chip { display: flex; align-items: center; gap: 10px; background: #fff; border-radius: 16px; padding: 6px 12px; box-shadow: var(--shadow); border: none; cursor: pointer; font-family: inherit; }
         .avatar { width: 34px; height: 34px; border-radius: 999px; background: #e0f2fe; color: #1d4ed8; font-weight: 700; display: grid; place-items: center; font-size: 0.85rem; }
-        .user-name { font-size: 0.85rem; font-weight: 600; color: var(--text); }
-        .user-role { font-size: 0.75rem; color: var(--muted); }
-        .card { background: var(--surface); border-radius: 20px; padding: 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 16px; }
-        .section-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-        .section-header h4 { font-weight: 700; }
-        .section-header p { font-size: 0.78rem; color: var(--muted); }
-        .ghost-button { border: 1px solid #e2e8f0; background: #fff; color: #475569; border-radius: 12px; padding: 6px 12px; font-size: 0.78rem; cursor: pointer; text-decoration: none; }
+        .user-name { font-size: 0.85rem; font-weight: 600; }
+        .user-role { font-size: 0.75rem; color: var(--text-secondary); }
+        .chevron { color: var(--text-secondary); }
 
-        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--muted); }
-        .breadcrumb a { color: #2f855a; text-decoration: none; }
-        .module-detail { display: grid; gap: 8px; }
-        .detail-card { gap: 20px; }
-        .detail-header { display: grid; gap: 12px; }
-        .detail-header h2 { font-size: 1.4rem; font-weight: 700; }
-        .detail-summary { font-size: 0.9rem; color: var(--muted); line-height: 1.5; }
-        .type-badge { display: inline-flex; width: fit-content; padding: 4px 12px; border-radius: 999px; font-size: 0.72rem; font-weight: 600; }
-        .type-badge.video { background: #f3e8ff; color: #7c3aed; }
-        .type-badge.article { background: #dcfce7; color: #15803d; }
-        .video-wrapper { background: #f8fafc; border-radius: 16px; overflow: hidden; }
-        .video-wrapper:not(:has(.video-embed)) { padding: 40px 20px; text-align: center; }
-        .video-placeholder { display: grid; gap: 12px; justify-items: center; color: var(--muted); }
-        .video-embed { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
-        .video-embed iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        .video-placeholder a { color: #2f855a; }
-        .article-content { font-size: 0.92rem; line-height: 1.8; color: var(--text); white-space: pre-wrap; }
-        .article-image { border-radius: 16px; overflow: hidden; }
-        .article-image img { width: 100%; max-height: 400px; object-fit: cover; border-radius: 16px; }
-        .video-player { background: #000; border-radius: 12px; }
-        .detail-tags { display: flex; flex-wrap: wrap; gap: 6px; }
-        .tag { background: #f1f5f9; padding: 4px 10px; border-radius: 999px; font-size: 0.75rem; color: #475569; }
-        .empty-state { font-size: 0.85rem; color: var(--muted); text-align: center; padding: 16px; }
-        .other-modules { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; }
-        .other-module-card { border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px; text-decoration: none; color: inherit; display: grid; gap: 6px; transition: box-shadow 0.2s; }
-        .other-module-card:hover { box-shadow: 0 4px 12px rgba(15,23,42,0.08); }
-        .other-module-card h5 { font-size: 0.82rem; font-weight: 600; }
-        .other-module-card p { font-size: 0.72rem; color: var(--muted); }
-        .type-badge.mini { font-size: 0.65rem; padding: 2px 8px; width: fit-content; }
+        /* ── Reader main ── */
+        .reader-main {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
 
+        /* ── Reading topbar ── */
+        .reader-topbar {
+            position: sticky;
+            top: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 32px;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+        .back-link svg { width: 16px; height: 16px; }
+        .back-link:hover { color: var(--accent); }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .type-pill {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+        .type-pill.video { background: #f3e8ff; color: #7c3aed; }
+        .type-pill.article { background: #dcfce7; color: #15803d; }
+        .read-time { font-size: 0.75rem; color: #94a3b8; }
+
+        /* ── Article container (Medium-style) ── */
+        .article-container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 48px 24px 64px;
+            width: 100%;
+        }
+
+        /* ── Article header ── */
+        .article-header {
+            margin-bottom: 32px;
+        }
+
+        .article-tags-top {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .tag-link {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent);
+            text-decoration: none;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: var(--accent-bg);
+            transition: all 0.15s;
+        }
+        .tag-link:hover { background: #c8e6c9; }
+
+        .article-header h1 {
+            font-family: 'Merriweather', 'Georgia', serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            line-height: 1.25;
+            letter-spacing: -0.02em;
+            color: var(--text);
+            margin: 0 0 16px;
+        }
+
+        .article-subtitle {
+            font-size: 1.15rem;
+            line-height: 1.55;
+            color: var(--text-secondary);
+            margin: 0 0 24px;
+        }
+
+        .article-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .meta-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .author-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.8rem;
+            display: grid;
+            place-items: center;
+            flex-shrink: 0;
+        }
+
+        .author-name {
+            display: block;
+            font-weight: 600;
+            font-size: 0.88rem;
+            color: var(--text);
+        }
+
+        .meta-date {
+            display: block;
+            font-size: 0.78rem;
+            color: #94a3b8;
+        }
+
+        /* ── Hero image ── */
+        .article-hero-image {
+            margin: 0 -24px 36px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .article-hero-image img {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            background: #f1f5f9;
+            display: block;
+        }
+
+        /* ── Video section ── */
+        .video-section {
+            margin-bottom: 36px;
+        }
+
+        .video-embed {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 12px;
+            background: #000;
+        }
+
+        .video-embed iframe {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border: none;
+        }
+
+        .video-native {
+            width: 100%;
+            max-height: 480px;
+            border-radius: 12px;
+            background: #000;
+        }
+
+        .video-link-box {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 24px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+        }
+        .video-link-box a { color: var(--accent); word-break: break-all; }
+
+        /* ── Article body (Medium typography) ── */
+        .article-body {
+            font-family: 'Merriweather', 'Georgia', serif;
+            font-size: 1.05rem;
+            line-height: 1.85;
+            color: #292929;
+            letter-spacing: -0.003em;
+            word-break: break-word;
+        }
+
+        .article-body br + br {
+            content: '';
+            display: block;
+            margin-top: 0.5em;
+        }
+
+        /* ── Article footer ── */
+        .article-footer {
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .footer-tag {
+            font-size: 0.78rem;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        /* ── Related modules ── */
+        .related-section {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 24px 64px;
+            width: 100%;
+        }
+
+        .related-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+        }
+
+        .related-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .see-all {
+            font-size: 0.82rem;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .related-grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .related-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 16px;
+            background: var(--surface);
+            border-radius: 14px;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid var(--border);
+            transition: all 0.2s ease;
+        }
+
+        .related-card:hover {
+            border-color: #c8e6c9;
+            box-shadow: 0 4px 16px rgba(46,125,50,0.06);
+            transform: translateY(-1px);
+        }
+
+        .related-type {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .related-type.video { background: #f3e8ff; }
+        .related-type.article { background: #dcfce7; }
+
+        .related-card h4 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin: 0 0 4px;
+            line-height: 1.3;
+        }
+
+        .related-card p {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        /* ── Responsive ── */
         @media (max-width: 900px) {
-            .education-layout { grid-template-columns: 1fr; }
-            .education-sidebar { position: sticky; top: 0; z-index: 10; flex-direction: row; overflow-x: auto; gap: 12px; }
+            .reader-layout { grid-template-columns: 1fr; }
+            .reader-sidebar { position: sticky; top: 0; z-index: 30; flex-direction: row; overflow-x: auto; gap: 12px; padding: 12px 16px; }
             .sidebar-brand, .sidebar-footer { display: none; }
             .sidebar-nav { flex-direction: row; }
             .nav-item { white-space: nowrap; }
-            .education-topbar { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
-            .education-topbar > div:not(.topbar-actions) { text-align: left; }
-            .education-topbar .topbar-actions { justify-self: auto; align-self: flex-start; }
+            .reader-topbar { padding: 10px 16px; }
+            .article-container { padding: 28px 16px 48px; }
+            .article-header h1 { font-size: 1.6rem; }
+            .article-subtitle { font-size: 1rem; }
+            .article-body { font-size: 0.95rem; }
+            .article-hero-image { margin: 0 -16px 24px; }
+            .related-section { padding: 0 16px 48px; }
         }
     </style>
 </x-app-layout>

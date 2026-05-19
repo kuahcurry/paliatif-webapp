@@ -16,11 +16,16 @@
 
 <header {{ $attributes->merge(['class' => '', 'x-data' => '{ notifOpen: false, profileOpen: false }']) }}>
     @if ($showMenuButton)
-        <button class="ghost-button" type="button" aria-label="Menu">
+        <button class="ghost-button desktop-menu-btn" type="button" aria-label="Menu">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         </button>
     @endif
-    <div>
+    <!-- Mobile Hamburger Button -->
+    <button class="ghost-button mobile-menu-btn" type="button" aria-label="Menu" onclick="toggleMobileSidebar()" style="display: none;">
+        <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+    
+    <div class="topbar-title-wrapper">
         <h2>{{ $title }}</h2>
         @if ($subtitle)
             <p>{{ $subtitle }}</p>
@@ -254,5 +259,68 @@
         cursor: pointer;
         text-decoration: none;
         white-space: nowrap;
+    }
+
+    @media (max-width: 900px) {
+        .mobile-menu-btn {
+            display: inline-flex !important;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            border-radius: 12px;
+            width: 38px;
+            height: 38px;
+            cursor: pointer;
+            margin-right: 12px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+        }
+        .desktop-menu-btn {
+            display: none !important;
+        }
+        header {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            width: 100%;
+            gap: 12px;
+        }
+        header > .topbar-title-wrapper {
+            flex: 1;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .user-chip .user-name, .user-chip .user-role {
+            display: none; /* Only show avatar on small screens */
+        }
+        .user-chip {
+            padding: 4px;
+            border-radius: 999px;
+            gap: 0;
+        }
+        .user-chip .chevron {
+            display: none;
+        }
+        .topbar-title-wrapper h2 {
+            font-size: 1.1rem !important;
+        }
+        .topbar-title-wrapper p {
+            font-size: 0.75rem !important;
+            margin-top: 2px;
+        }
+        .topbar-actions {
+            gap: 6px;
+        }
+        .notif-dropdown {
+            position: fixed;
+            top: 70px;
+            left: 10px;
+            right: 10px;
+            width: auto;
+            min-width: unset;
+        }
     }
 </style>

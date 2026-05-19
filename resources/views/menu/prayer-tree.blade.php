@@ -892,29 +892,6 @@
                 grid-template-columns: 1fr;
             }
 
-            .prayer-sidebar {
-                position: sticky;
-                top: 0;
-                z-index: 10;
-                flex-direction: row;
-                overflow-x: auto;
-                gap: 12px;
-                padding: 12px 20px;
-            }
-
-            .sidebar-brand,
-            .sidebar-footer {
-                display: none;
-            }
-
-            .sidebar-nav {
-                flex-direction: row;
-            }
-
-            .nav-item {
-                white-space: nowrap;
-            }
-
             .prayer-main {
                 padding: 16px 16px 40px;
                 gap: 12px;

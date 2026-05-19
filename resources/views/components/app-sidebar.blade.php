@@ -81,7 +81,7 @@
 </button>
 
 <nav class="sidebar-nav">
-    @if (Auth::check() && request()->routeIs('admin.*'))
+    @if (Auth::user()?->is_admin && $adminItems)
         @foreach ($adminItems as $item)
             @php $isActive = $active ? $active === $item['key'] : request()->routeIs($item['routeIs']); @endphp
             <a class="nav-item {{ $isActive ? 'is-active' : '' }}" href="{{ route($item['route']) }}" title="{{ $item['label'] }}">
@@ -97,17 +97,6 @@
                 <span class="nav-label">{{ $item['label'] }}</span>
             </a>
         @endforeach
-        @if ($adminItems)
-            <div class="sidebar-divider"></div>
-            <div class="sidebar-section-label nav-label">Admin</div>
-            @foreach ($adminItems as $item)
-                @php $isActive = $active ? $active === $item['key'] : request()->routeIs($item['routeIs']); @endphp
-                <a class="nav-item {{ $isActive ? 'is-active' : '' }}" href="{{ route($item['route']) }}" title="{{ $item['label'] }}">
-                    <span class="nav-icon"><svg viewBox="0 0 24 24" aria-hidden="true">{!! $item['icon'] !!}</svg></span>
-                    <span class="nav-label">{{ $item['label'] }}</span>
-                </a>
-            @endforeach
-        @endif
     @endif
 </nav>
 
@@ -201,9 +190,113 @@
     .sidebar-collapsed .toggle-expand {
         display: block !important;
     }
+
+    /* ── Mobile Sliding Drawer Navigation ── */
+    @media (max-width: 900px) {
+        aside[class$="-sidebar"], aside[class*="-sidebar"] {
+            position: fixed !important;
+            top: 0 !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            width: 280px !important;
+            height: 100vh !important;
+            z-index: 100 !important;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex !important;
+            flex-direction: column !important;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.1);
+        }
+
+        /* When active, slide in */
+        aside[class$="-sidebar"].mobile-open, aside[class*="-sidebar"].mobile-open {
+            transform: translateX(0);
+        }
+
+        /* Show brand and footer in the drawer */
+        .sidebar-brand, .sidebar-footer, .sidebar-divider, .sidebar-section-label {
+            display: flex !important;
+        }
+        .sidebar-section-label { display: block !important; }
+
+        .sidebar-nav {
+            flex-direction: column !important;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .nav-item {
+            flex-direction: row !important;
+            padding: 12px 16px !important;
+            font-size: 0.95rem !important;
+            text-align: left !important;
+            white-space: normal !important;
+        }
+
+        .nav-icon {
+            margin: 0 !important;
+        }
+
+        .sidebar-toggle {
+            display: none !important; /* Hide desktop collapse toggle on mobile */
+        }
+
+        /* Fix layout grid */
+        div[class$="-layout"], div[class*="-layout"] {
+            grid-template-columns: 1fr !important;
+        }
+
+        main[class$="-main"], main[class*="-main"] {
+            padding: 16px !important;
+        }
+    }
+
+    /* Mobile backdrop */
+    .sidebar-backdrop {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.5);
+        z-index: 90;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .sidebar-backdrop.show {
+        display: block;
+        opacity: 1;
+    }
 </style>
 
 <script>
+    function toggleMobileSidebar() {
+        const sidebar = document.querySelector('[class*="-sidebar"]');
+        let backdrop = document.querySelector('.sidebar-backdrop');
+        
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.className = 'sidebar-backdrop';
+            document.body.appendChild(backdrop);
+            
+            backdrop.addEventListener('click', () => {
+                sidebar.classList.remove('mobile-open');
+                backdrop.classList.remove('show');
+                setTimeout(() => backdrop.style.display = 'none', 300);
+            });
+        }
+        
+        const isOpen = sidebar.classList.contains('mobile-open');
+        if (isOpen) {
+            sidebar.classList.remove('mobile-open');
+            backdrop.classList.remove('show');
+            setTimeout(() => backdrop.style.display = 'none', 300);
+        } else {
+            sidebar.classList.add('mobile-open');
+            backdrop.style.display = 'block';
+            // slight delay to allow display:block to apply before opacity transition
+            setTimeout(() => backdrop.classList.add('show'), 10);
+        }
+    }
+
     function toggleSidebar() {
         const sidebar = document.querySelector('[class*="-sidebar"]');
         const layout = sidebar?.parentElement;

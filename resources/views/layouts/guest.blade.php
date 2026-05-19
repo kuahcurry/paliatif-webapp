@@ -7,6 +7,19 @@
 
         <title>{{ config('app.name', 'Ruang Hening') }}</title>
         <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
+        
+        <!-- PWA Meta Tags -->
+        <link rel="manifest" href="/manifest.json">
+        <meta name="theme-color" content="#4f9b4f">
+        <link rel="apple-touch-icon" href="/images/logo.png">
+
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js');
+                });
+            }
+        </script>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -304,6 +317,8 @@
             .auth-mobile-logo img {
                 width: 72px;
                 height: 72px;
+                margin: 0 auto;
+                display: block;
             }
 
             .auth-mobile-logo h3 {
@@ -330,6 +345,10 @@
                 .auth-form-panel {
                     padding: 32px 20px;
                     background: linear-gradient(160deg, #f0fdf4 0%, #f5f7fb 50%, #fefce8 100%);
+                }
+
+                .auth-form-header {
+                    text-align: center;
                 }
 
                 .auth-card {
@@ -387,5 +406,59 @@
                 </div>
             </div>
         </div>
+
+        <style>
+            .password-wrapper {
+                position: relative;
+                display: flex;
+                align-items: center;
+            }
+
+            .password-wrapper input {
+                padding-right: 44px !important;
+            }
+
+            .password-toggle {
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                background: none;
+                border: none;
+                cursor: pointer;
+                color: #94a3b8;
+                padding: 4px;
+                display: grid;
+                place-items: center;
+                transition: color 0.2s ease;
+            }
+
+            .password-toggle:hover {
+                color: #4f9b4f;
+            }
+
+            .password-toggle svg {
+                width: 20px;
+                height: 20px;
+            }
+        </style>
+
+        <script>
+            function togglePassword(fieldId, btn) {
+                const input = document.getElementById(fieldId);
+                const eyeOpen = btn.querySelector('.eye-open');
+                const eyeClosed = btn.querySelector('.eye-closed');
+
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    eyeOpen.style.display = 'none';
+                    eyeClosed.style.display = 'block';
+                } else {
+                    input.type = 'password';
+                    eyeOpen.style.display = 'block';
+                    eyeClosed.style.display = 'none';
+                }
+            }
+        </script>
     </body>
 </html>

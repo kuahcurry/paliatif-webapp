@@ -7,8 +7,21 @@
 
         <title>{{ config('app.name', 'Ruang Hening') }}</title>
         <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/png">
+        
+        <!-- PWA Meta Tags -->
+        <link rel="manifest" href="/manifest.json">
+        <meta name="theme-color" content="#4f9b4f">
+        <link rel="apple-touch-icon" href="/images/logo.png">
 
         <style>[x-cloak] { display: none !important; }</style>
+
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js');
+                });
+            }
+        </script>
 
         @stack('head')
 

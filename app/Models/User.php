@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Notifications\VerifyEmailNotification;
 
 #[Fillable(['name', 'religion', 'email', 'password', 'patient_gender', 'patient_age', 'patient_birth_date', 'marital_status'])]
 #[Hidden(['password', 'remember_token'])]
@@ -32,6 +33,14 @@ class User extends Authenticatable implements MustVerifyEmail
             'patient_age' => 'integer',
             'patient_birth_date' => 'date',
         ];
+    }
+
+    /**
+     * Send the email verification notification using the custom Indonesian template.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        $this->notify(new VerifyEmailNotification);
     }
 
     public function getPatientAgeAttribute(): ?int
