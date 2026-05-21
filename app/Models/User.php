@@ -34,7 +34,6 @@ class User extends Authenticatable implements MustVerifyEmail
             'is_admin' => 'boolean',
             'patient_gender' => 'encrypted',
             'patient_age' => 'integer',
-            'patient_birth_date' => 'encrypted:date',
             'marital_status' => 'encrypted',
         ];
     }
@@ -45,6 +44,38 @@ class User extends Authenticatable implements MustVerifyEmail
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new VerifyEmailNotification);
+    }
+
+    /**
+     * Accessor and Mutator for patient_birth_date to encrypt it and cast to Carbon instance.
+     */
+    protected function patientBirthDate(): \Illuminate\Database\Eloquent\Casts\Attribute
+    {
+        return \Illuminate\Database\Eloquent\Casts\Attribute::make(
+            get: function ($value) {
+                if (!$value) {
+                    return null;
+                }
+                try {
+                    $decrypted = \Illuminate\Support\Facades\Crypt::decryptString($value);
+                    return \Illuminate\Support\Carbon::parse($decrypted);
+                } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+                    // Fallback to parsing as plain text if decryption fails (e.g. database transition state)
+                    try {
+                        return \Illuminate\Support\Carbon::parse($value);
+                    } catch (\Exception $ex) {
+                        return null;
+                    }
+                }
+            },
+            set: function ($value) {
+                if (!$value) {
+                    return null;
+                }
+                $dateStr = $value instanceof \DateTimeInterface ? $value->format('Y-m-d') : $value;
+                return \Illuminate\Support\Facades\Crypt::encryptString($dateStr);
+            }
+        );
     }
 
     public function getPatientAgeAttribute(): ?int
