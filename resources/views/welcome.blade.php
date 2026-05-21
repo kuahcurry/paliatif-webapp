@@ -1,9 +1,10 @@
 @push('head')
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Manrope', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 50%, #fef3c7 100%); position: relative; }
+        body { font-family: 'Outfit', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: linear-gradient(135deg, #f0fdf4 0%, #dbeafe 50%, #fef3c7 100%); position: relative; }
         body::before { content: ''; position: fixed; inset: 0; background: url('https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=1920&q=80') center/cover no-repeat; opacity: 0.15; z-index: 0; }
         .welcome-wrap { position: relative; z-index: 1; display: flex; align-items: center; gap: 48px; max-width: 900px; width: 100%; }
         .welcome-hero { flex: 1; display: none; }

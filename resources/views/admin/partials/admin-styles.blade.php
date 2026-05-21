@@ -13,7 +13,7 @@
     /* ── Base ── */
     .admin-page {
         background: #f4f6fb;
-        font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, sans-serif;
+        font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, sans-serif;
     }
 
     .admin-layout {
@@ -58,7 +58,7 @@
 
     /* ── Topbar ── */
     .admin-topbar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
-    .admin-topbar > div:not(.topbar-actions) { grid-column: 2; text-align: center; }
+    .admin-topbar .topbar-title-wrapper { grid-column: 2; text-align: center; }
     .admin-topbar .ghost-button { grid-column: 1; justify-self: start; }
     .admin-topbar .topbar-actions { grid-column: 3; justify-self: end; }
     .admin-topbar h2 { font-size: 1.4rem; font-weight: 700; }
@@ -360,7 +360,7 @@
         .admin-layout { grid-template-columns: 1fr; }
         .admin-main { padding: 16px; }
         .admin-topbar { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
-        .admin-topbar > div:not(.topbar-actions) { text-align: left; }
+        .admin-topbar .topbar-title-wrapper { text-align: left; }
         .admin-topbar .topbar-actions { justify-self: auto; align-self: flex-start; }
         .card-grid-2 { grid-template-columns: 1fr; }
         .stats-grid { grid-template-columns: repeat(2, 1fr); }

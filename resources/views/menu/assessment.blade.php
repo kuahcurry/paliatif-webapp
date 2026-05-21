@@ -1,6 +1,7 @@
 @push('head')
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
 @endpush
 
 @php
@@ -517,7 +518,8 @@
 
         .dashboard-page {
             background: #f5f7fb;
-            font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, sans-serif;
+            font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
         }
 
         .dashboard-layout {
@@ -654,6 +656,8 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            min-width: 0;
+            overflow-x: hidden;
         }
 
         .dashboard-topbar {
@@ -662,7 +666,7 @@
             align-items: center;
         }
 
-        .dashboard-topbar > div:first-child {
+        .dashboard-topbar .topbar-title-wrapper {
             grid-column: 2;
             text-align: center;
         }
@@ -765,6 +769,10 @@
             border-radius: 14px;
             font-size: 0.82rem;
             line-height: 1.5;
+            min-width: 0;
+            max-width: 100%;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
 
         .notice.info { background: #eff6ff; color: #1e40af; border-left: 4px solid #3b82f6; }
@@ -779,11 +787,15 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
+            min-width: 0;
+            max-width: 100%;
         }
 
         .card-body {
             display: grid;
             gap: 16px;
+            min-width: 0;
+            max-width: 100%;
         }
 
         .card-actions {
@@ -936,12 +948,14 @@
             display: grid;
             grid-template-columns: 2.1fr 1fr;
             gap: 20px;
+            min-width: 0;
         }
 
         .assessment-main,
         .assessment-side {
             display: grid;
             gap: 8px;
+            min-width: 0;
         }
 
         .card-header {
@@ -983,6 +997,7 @@
         .swbs-form {
             display: grid;
             gap: 14px;
+            min-width: 0;
         }
 
         .swbs-legend {
@@ -1010,6 +1025,7 @@
             font-size: 0.78rem;
             color: #1f2937;
             align-items: center;
+            min-width: 0;
         }
 
         .swbs-row:last-child {
@@ -1021,6 +1037,7 @@
             gap: 10px;
             align-items: flex-start;
             color: #1f2937;
+            min-width: 0;
         }
 
         .swbs-index {
@@ -1059,12 +1076,14 @@
         .ecog-form {
             display: grid;
             gap: 16px;
+            min-width: 0;
         }
 
         .ecog-meta {
             display: grid;
             grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: 12px;
+            min-width: 0;
         }
 
         .ecog-meta .field {
@@ -1155,6 +1174,7 @@
         .esas-form {
             display: grid;
             gap: 14px;
+            min-width: 0;
         }
 
         .esas-row {
@@ -1166,6 +1186,7 @@
             border-bottom: 1px solid #f1f5f9;
             font-size: 0.78rem;
             color: #1f2937;
+            min-width: 0;
         }
 
         .esas-row:last-child {
@@ -1269,6 +1290,7 @@
 
         .table-wrap {
             overflow-x: auto;
+            max-width: 100%;
         }
 
         .history-table {
@@ -1348,6 +1370,10 @@
             color: #166534;
             font-size: 0.8rem;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .quote-card span {
@@ -1456,47 +1482,84 @@
             .ecog-meta {
                 grid-template-columns: 1fr;
             }
-            .dashboard-topbar {
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-            }
-
-            .dashboard-topbar > div:first-child {
-                text-align: left;
-            }
-
-            .dashboard-topbar .topbar-actions {
-                justify-self: auto;
-                align-self: flex-start;
-            }
 
             .dashboard-layout {
                 grid-template-columns: 1fr;
             }
+        }
 
-            .dashboard-sidebar {
-                position: sticky;
-                top: 0;
-                z-index: 10;
-                flex-direction: row;
-                overflow-x: auto;
+        @media (max-width: 600px) {
+            .dashboard-main {
+                padding: 16px 12px 32px;
+            }
+
+            .card {
+                padding: 16px 12px;
+            }
+
+            .hero-metrics {
+                grid-template-columns: 1fr;
+            }
+
+            /* Fix hardcoded pixel columns that cause overflow on 412px screens */
+            .swbs-row {
+                grid-template-columns: 1fr;
+            }
+
+            .esas-row {
+                grid-template-columns: 1fr;
+                gap: 6px;
+            }
+
+            .esas-label.right {
+                text-align: left;
+            }
+
+            .ecog-meta {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            /* Scale inputs — keep them fitting within the card */
+            .esas-scale {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+            }
+
+            .esas-scale label {
+                flex: 1;
+                min-width: 0;
+                gap: 2px;
+                font-size: 0.65rem;
+            }
+
+            .esas-scale input {
+                width: 12px;
+                height: 12px;
+            }
+
+            .swbs-scale {
+                gap: 4px;
+            }
+
+            .swbs-scale label {
+                font-size: 0.65rem;
+            }
+
+            .card-header {
+                flex-direction: column;
+                align-items: stretch;
                 gap: 12px;
             }
 
-            .sidebar-brand,
-            .sidebar-footer {
-                display: none;
+            .card-actions {
+                justify-content: flex-start;
+                width: 100%;
             }
 
-            .sidebar-nav {
-                flex-direction: row;
-                flex-wrap: nowrap;
-            }
-
-            .nav-group {
-                min-width: 180px;
+            .swbs-legend, .score-legend {
+                justify-content: flex-start;
+                width: 100%;
             }
         }
     </style>

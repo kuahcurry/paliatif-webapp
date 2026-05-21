@@ -1,6 +1,7 @@
 @push('head')
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
 @endpush
 
 <x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen notif-page">
@@ -14,7 +15,6 @@
                 class="notif-topbar"
                 title="Notifikasi"
                 subtitle="Semua pemberitahuan untuk Anda"
-                :showMenuButton="true"
             />
 
             @if ($notifications->where('is_read', false)->count() > 0)
@@ -78,7 +78,7 @@
 
     <style>
         :root { --surface: #fff; --surface-muted: #f7faf5; --text: #0f172a; --muted: #64748b; --shadow: 0 12px 28px rgba(15,23,42,0.08); }
-        .notif-page { background: #f4f6fb; font-family: 'Manrope', sans-serif; }
+        .notif-page { background: #f4f6fb; font-family: 'Outfit', sans-serif; }
         .notif-layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
         .notif-sidebar { background: var(--surface); padding: 28px 20px; border-right: 1px solid #edf2f7; display: flex; flex-direction: column; gap: 24px; }
         .sidebar-brand { display: flex; gap: 12px; align-items: center; font-weight: 700; }
@@ -96,7 +96,7 @@
         .footer-title { font-weight: 700; color: var(--text); }
         .notif-main { padding: 26px 32px 48px; display: flex; flex-direction: column; gap: 8px; }
         .notif-topbar { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; }
-        .notif-topbar > div:not(.topbar-actions) { grid-column: 2; text-align: center; }
+        .notif-topbar .topbar-title-wrapper { grid-column: 2; text-align: center; }
         .notif-topbar .ghost-button { grid-column: 1; justify-self: start; }
         .notif-topbar .topbar-actions { grid-column: 3; justify-self: end; }
         .notif-topbar h2 { font-size: 1.4rem; font-weight: 700; }
@@ -131,7 +131,7 @@
             .sidebar-nav { flex-direction: row; }
             .nav-item { white-space: nowrap; }
             .notif-topbar { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
-            .notif-topbar > div:not(.topbar-actions) { text-align: left; }
+            .notif-topbar .topbar-title-wrapper { text-align: left; }
             .notif-topbar .topbar-actions { justify-self: auto; align-self: flex-start; }
             .notif-item { flex-direction: column; gap: 8px; }
         }

@@ -133,7 +133,8 @@
         background: #fff;
         border-radius: 16px;
         box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
-        min-width: 320px;
+        min-width: 280px;
+        max-width: calc(100vw - 20px);
         overflow: hidden;
     }
 

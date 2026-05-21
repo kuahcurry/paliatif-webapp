@@ -4,62 +4,83 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
 @endpush
 
-@php
-    $faqItems = [
-        ['q' => 'Apa itu Terapi Rohani Pasien Paliatif?', 'a' => 'Layanan pendampingan spiritual dan psikososial untuk pasien paliatif dan caregiver, membantu menemukan makna, ketenangan, dan dukungan emosional.'],
-        ['q' => 'Bagaimana cara menginstal aplikasi ini di HP?', 'a' => 'Anda dapat menginstal aplikasi ini di layar utama (home screen) HP Anda. Buka situs web ini di browser HP Anda (seperti Chrome atau Safari), lalu pilih opsi <strong>Tambahkan ke Layar Utama (Add to Home Screen)</strong> dari menu browser.'],
-        ['q' => 'Bagaimana cara menggunakan fitur Pengkajian?', 'a' => 'Anda dapat mengisi pengkajian awal seperti skala kesejahteraan spiritual dan gejala melalui menu <strong>Pengkajian</strong>. Ini membantu memantau kondisi awal Anda.'],
-        ['q' => 'Bagaimana cara menggunakan modul edukasi?', 'a' => 'Anda dapat mengakses modul edukasi melalui menu <strong>Modul Edukasi</strong>. Pilih modul yang sesuai dengan kebutuhan Anda, baik berupa artikel maupun video.'],
-        ['q' => 'Apa yang harus saya lakukan jika merasa cemas atau tertekan?', 'a' => 'Gunakan menu <strong>Evaluasi</strong> untuk melaporkan kondisi emosional Anda. Ini membantu memantau perasaan Anda dari waktu ke waktu.'],
-        ['q' => 'Bagaimana cara mengisi cek harian?', 'a' => 'Cek harian dapat diisi melalui halaman <strong>Beranda</strong>. Isi skala spiritual dan gejala Anda setiap hari untuk melihat perkembangan pada radar spiritual.'],
-        ['q' => 'Bagaimana cara menggunakan fitur Jurnal & Catatan?', 'a' => 'Gunakan menu <strong>Jurnal & Catatan</strong> untuk mencatat pikiran, perasaan, atau pengalaman harian Anda sebagai bentuk refleksi diri.'],
-        ['q' => 'Apa itu Pohon Doa?', 'a' => 'Pohon Doa adalah fitur berbagi doa dan dukungan spiritual antar pengguna. Anda dapat mengirimkan doa dan memberikan dukungan kepada doa pengguna lain melalui menu <strong>Pohon Doa</strong>.'],
-        ['q' => 'Bagaimana cara menghubungi tenaga profesional?', 'a' => 'Jika Anda membutuhkan bantuan lebih lanjut, silakan hubungi tim pendamping melalui informasi kontak yang tersedia di menu <strong>Pengaturan</strong>.'],
-    ];
-@endphp
-
-<x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen faq-page">
-    <div class="faq-layout">
-        <aside class="faq-sidebar">
+<x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen contact-page">
+    <div class="contact-layout">
+        <aside class="contact-sidebar">
             <x-app-sidebar />
         </aside>
 
-        <main class="faq-main">
+        <main class="contact-main">
             <x-app-topbar
-                class="faq-topbar"
-                title="Pusat Bantuan"
-                subtitle="Pertanyaan yang sering diajukan"
+                class="contact-topbar"
+                title="Hubungi Kami"
+                subtitle="Informasi Kontak Pengembang & Pendamping"
                 :badgeCount="0"
             />
 
-            <div class="faq-content">
-                <div class="card">
-                    <div class="section-header">
+            <div class="contact-content">
+                <!-- Developer Card -->
+                <div class="card contact-card">
+                    <div class="contact-header">
+                        <div class="contact-icon-wrap bg-primary-light">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        </div>
                         <div>
-                            <h4>Pertanyaan Umum</h4>
-                            <p>Temukan jawaban atas pertanyaan seputar penggunaan layanan Terapi Rohani.</p>
+                            <h4>Pengembang Aplikasi</h4>
+                            <p class="role-badge">Developer Sistem</p>
                         </div>
                     </div>
 
-                    <div class="faq-list">
-                        @foreach ($faqItems as $item)
-                            <details class="faq-item">
-                                <summary>
-                                    <span>{{ $item['q'] }}</span>
-                                    <svg class="faq-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-                                </summary>
-                                <p>{!! $item['a'] !!}</p>
-                            </details>
-                        @endforeach
+                    <div class="contact-info-list">
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                            </div>
+                            <div>
+                                <small>Nama Lengkap</small>
+                                <p>Aqief Hakimi</p>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            </div>
+                            <div>
+                                <small>E-mail Kontak</small>
+                                <p><a href="mailto:tbot691@gmail.com" class="link-styled">tbot691@gmail.com</a></p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card help-card">
-                    <div>
-                        <h4>Masih butuh bantuan?</h4>
-                        <p>Jika pertanyaan Anda belum terjawab, jangan ragu untuk menghubungi tim pendamping kami.</p>
+                <!-- Support Card -->
+                <div class="card contact-card">
+                    <div class="contact-header">
+                        <div class="contact-icon-wrap bg-success-light">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                        </div>
+                        <div>
+                            <h4>Dukungan Medis & Spiritual</h4>
+                            <p class="role-badge success">Tim Pendamping</p>
+                        </div>
                     </div>
-                    <a href="{{ route('contact') }}" class="ghost-button">Hubungi Kami</a>
+
+                    <p class="support-text">
+                        Untuk konsultasi mengenai terapi rohani pasien paliatif, bimbingan emosional, atau bantuan perawatan lainnya, Anda dapat menghubungi tim pendamping yang terdaftar di sistem.
+                    </p>
+
+                    <div class="contact-info-list">
+                        <div class="info-item">
+                            <div class="info-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s-8-4-8-10c0-4 3.5-6 8-6s8 2 8 6c0 6-8 10-8 10z"/><path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"/></svg>
+                            </div>
+                            <div>
+                                <small>Layanan Utama</small>
+                                <p>Konseling & Pendampingan Paliatif</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
@@ -76,18 +97,18 @@
             --shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
         }
 
-        .faq-page {
+        .contact-page {
             background: #f4f6fb;
             font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, sans-serif;
         }
 
-        .faq-layout {
+        .contact-layout {
             display: grid;
             grid-template-columns: 260px 1fr;
             min-height: 100vh;
         }
 
-        .faq-sidebar {
+        .contact-sidebar {
             background: var(--surface);
             padding: 28px 20px;
             border-right: 1px solid #edf2f7;
@@ -214,40 +235,40 @@
             margin-bottom: 6px;
         }
 
-        .faq-main {
+        .contact-main {
             padding: 26px 32px 48px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 24px;
         }
 
-        .faq-topbar {
+        .contact-topbar {
             display: grid;
             grid-template-columns: 1fr auto 1fr;
             align-items: center;
         }
 
-        .faq-topbar .topbar-title-wrapper {
+        .contact-topbar .topbar-title-wrapper {
             grid-column: 2;
             text-align: center;
         }
 
-        .faq-topbar .ghost-button {
+        .contact-topbar .ghost-button {
             grid-column: 1;
             justify-self: start;
         }
 
-        .faq-topbar .topbar-actions {
+        .contact-topbar .topbar-actions {
             grid-column: 3;
             justify-self: end;
         }
 
-        .faq-topbar h2 {
+        .contact-topbar h2 {
             font-size: 1.4rem;
             font-weight: 700;
         }
 
-        .faq-topbar p {
+        .contact-topbar p {
             color: var(--muted);
             font-size: 0.85rem;
         }
@@ -336,117 +357,142 @@
             color: var(--muted);
         }
 
-        .faq-content {
+        .contact-content {
             display: grid;
-            gap: 8px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
         }
 
         .card {
             background: var(--surface);
             border-radius: 20px;
-            padding: 20px;
+            padding: 28px;
             box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .contact-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 16px;
+        }
+
+        .contact-icon-wrap {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            color: #475569;
+        }
+
+        .bg-primary-light {
+            background: #e9f6e9;
+            color: #4f9b4f;
+        }
+
+        .bg-success-light {
+            background: #f0fdf4;
+            color: #16a34a;
+        }
+
+        .contact-icon-wrap svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .contact-header h4 {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text);
+            margin: 0;
+        }
+
+        .role-badge {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: #e9f6e9;
+            color: #2e622e;
+            margin: 4px 0 0 0;
+        }
+
+        .role-badge.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .contact-info-list {
             display: flex;
             flex-direction: column;
             gap: 16px;
         }
 
-        .section-header {
+        .info-item {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
         }
 
-        .section-header h4 {
-            font-weight: 700;
-        }
-
-        .section-header p {
-            font-size: 0.78rem;
-            color: var(--muted);
-        }
-
-        .faq-list {
-            display: grid;
-            gap: 8px;
-        }
-
-        .faq-item {
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            overflow: hidden;
+        .info-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
             background: #f8fafc;
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            border: 1px solid var(--border);
         }
 
-        .faq-item summary {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 16px;
-            font-size: 0.85rem;
+        .info-icon svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .info-item small {
+            font-size: 0.72rem;
+            color: var(--muted);
+            display: block;
+        }
+
+        .info-item p {
+            font-size: 0.9rem;
             font-weight: 600;
-            color: #1f2937;
-            cursor: pointer;
-            list-style: none;
+            color: var(--text);
+            margin: 0;
         }
 
-        .faq-item summary::-webkit-details-marker {
-            display: none;
+        .link-styled {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.15s ease;
         }
 
-        .faq-chevron {
-            flex-shrink: 0;
+        .link-styled:hover {
+            color: #2e622e;
+            text-decoration: underline;
+        }
+
+        .support-text {
+            font-size: 0.85rem;
             color: var(--muted);
-            transition: transform 0.2s ease;
-        }
-
-        .faq-item[open] .faq-chevron {
-            transform: rotate(180deg);
-        }
-
-        .faq-item p {
-            padding: 0 16px 14px;
-            font-size: 0.8rem;
-            color: var(--muted);
-            line-height: 1.5;
-        }
-
-        .help-card {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-        }
-
-        .help-card h4 {
-            font-weight: 700;
-        }
-
-        .help-card p {
-            font-size: 0.78rem;
-            color: var(--muted);
-        }
-
-        .ghost-button {
-            border: 1px solid #e2e8f0;
-            background: #fff;
-            color: #475569;
-            border-radius: 12px;
-            padding: 8px 14px;
-            font-size: 0.82rem;
-            cursor: pointer;
-            white-space: nowrap;
+            line-height: 1.6;
+            margin: 0;
         }
 
         @media (max-width: 900px) {
-            .faq-layout {
+            .contact-layout {
                 grid-template-columns: 1fr;
             }
 
-            .faq-sidebar {
+            .contact-sidebar {
                 position: sticky;
                 top: 0;
                 z-index: 10;
@@ -455,25 +501,19 @@
                 gap: 12px;
             }
 
-            .faq-topbar {
+            .contact-main {
+                padding: 16px;
+            }
+
+            .contact-topbar {
                 display: flex;
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 12px;
             }
 
-            .faq-topbar .topbar-title-wrapper {
+            .contact-topbar .topbar-title-wrapper {
                 text-align: left;
-            }
-
-            .faq-topbar .topbar-actions {
-                justify-self: auto;
-                align-self: flex-start;
-            }
-
-            .help-card {
-                flex-direction: column;
-                align-items: flex-start;
             }
         }
     </style>

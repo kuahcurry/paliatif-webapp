@@ -28,8 +28,8 @@ class ContentSecurityPolicy
         // Content Security Policy (CSP)
         $csp = "default-src 'self'; " .
                "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; " .
-               "style-src 'self' 'unsafe-inline' https://fonts.bunny.net; " .
-               "font-src 'self' https://fonts.bunny.net; " .
+               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net; " .
+               "font-src 'self' https://fonts.gstatic.com https://fonts.bunny.net; " .
                "img-src 'self' data:; " .
                "frame-src 'self' https://www.google.com/recaptcha/ https://recaptcha.google.com/; " .
                "connect-src 'self' https://www.google.com/recaptcha/; " .

@@ -127,7 +127,7 @@
         place-items: center;
         color: #64748b;
         transition: all 0.2s ease;
-        align-self: flex-end;
+        align-self: flex-start;
         margin-top: -8px;
         margin-bottom: -8px;
     }
@@ -248,6 +248,8 @@
 
         main[class$="-main"], main[class*="-main"] {
             padding: 16px !important;
+            overflow-x: hidden !important;
+            max-width: 100vw !important;
         }
     }
 

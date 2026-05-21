@@ -1,6 +1,7 @@
 @push('head')
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
 @endpush
 
 @php
@@ -27,7 +28,7 @@
 @endphp
 
 <x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen dashboard-page">
-    <div class="dashboard-layout">
+    <div class="dashboard-layout" x-data="dashboardState()">
         <aside class="dashboard-sidebar">
             <x-app-sidebar />
         </aside>
@@ -114,13 +115,19 @@
                                     <div class="checkin-field">
                                         <label>{{ $dim['label'] }}</label>
                                         <p class="field-desc">{{ $dim['desc'] }}</p>
-                                        <div class="scale-group">
-                                            @for ($i = 1; $i <= 5; $i++)
-                                                <label class="scale-option">
-                                                    <input type="radio" name="{{ $dim['id'] }}" value="{{ $i }}" required>
-                                                    <span class="scale-num">{{ $i }}</span>
-                                                </label>
-                                            @endfor
+                                        <div class="scale-wrapper">
+                                            <div class="scale-group spiritual-scale">
+                                                @for ($i = 1; $i <= 5; $i++)
+                                                    <label class="scale-option">
+                                                        <input type="radio" name="{{ $dim['id'] }}" value="{{ $i }}" required>
+                                                        <span class="scale-num">{{ $i }}</span>
+                                                    </label>
+                                                @endfor
+                                            </div>
+                                            <div class="scale-labels">
+                                                <span class="scale-label-start">Sangat Tidak Setuju</span>
+                                                <span class="scale-label-end">Sangat Setuju</span>
+                                            </div>
                                         </div>
                                         <x-input-error :messages="$errors->get($dim['id'])" class="mt-1" />
                                     </div>
@@ -144,13 +151,19 @@
                                 @foreach ($symptomDims as $dim)
                                     <div class="checkin-field">
                                         <label>{{ $dim['label'] }}</label>
-                                        <div class="scale-group">
-                                            @for ($i = 1; $i <= 5; $i++)
-                                                <label class="scale-option">
-                                                    <input type="radio" name="{{ $dim['id'] }}" value="{{ $i }}" required>
-                                                    <span class="scale-num">{{ $i }}</span>
-                                                </label>
-                                            @endfor
+                                        <div class="scale-wrapper">
+                                            <div class="scale-group symptom-scale">
+                                                @for ($i = 1; $i <= 5; $i++)
+                                                    <label class="scale-option">
+                                                        <input type="radio" name="{{ $dim['id'] }}" value="{{ $i }}" required>
+                                                        <span class="scale-num">{{ $i }}</span>
+                                                    </label>
+                                                @endfor
+                                            </div>
+                                            <div class="scale-labels">
+                                                <span class="scale-label-start">Tidak Ada</span>
+                                                <span class="scale-label-end">Sangat Berat</span>
+                                            </div>
                                         </div>
                                         <x-input-error :messages="$errors->get($dim['id'])" class="mt-1" />
                                     </div>
@@ -226,7 +239,7 @@
                             <h4>Skor Spiritual Harian</h4>
                             <p>Skor spiritual Anda dalam {{ $range }} hari terakhir</p>
                         </div>
-                        <a href="{{ route('dashboard') }}?range=30" class="ghost-button">Lihat Detail</a>
+                        <button type="button" class="ghost-button" @click="openSpiritualModal = true; $nextTick(() => updateSpiritualChart())">Lihat Detail</button>
                     </div>
                     <div class="chart-wrap">
                         <canvas id="spiritualScoreChart"></canvas>
@@ -260,7 +273,7 @@
                             <h4>Tren Emosi</h4>
                             <p>Bagaimana perasaan Anda dari hari ke hari</p>
                         </div>
-                        <a href="{{ route('menu.emotional-evaluation') }}" class="ghost-button">Lihat Detail</a>
+                        <button type="button" class="ghost-button" @click="openEmotionModal = true; $nextTick(() => updateEmotionChart())">Lihat Detail</button>
                     </div>
                     <div class="emotion-chart">
                         <div class="emotion-legend">
@@ -388,6 +401,86 @@
                 <span>Teruslah merawat ruh dengan kebaikan setiap hari.</span>
             </section>
 
+            <!-- Modal Detail Skor Spiritual -->
+            <div class="modal-overlay" :class="{ 'show': openSpiritualModal }" @click.self="openSpiritualModal = false" x-cloak>
+                <div class="modal-content modal-content-large">
+                    <div class="modal-header">
+                        <h3>Detail Skor Spiritual</h3>
+                        <p>Analisis tren perkembangan spiritualitas Anda</p>
+                        <button class="modal-close" @click="openSpiritualModal = false" type="button">&times;</button>
+                    </div>
+                    
+                    <div class="stock-dashboard">
+                        <div class="stock-metric-row">
+                            <span class="stock-value" x-text="getStats('spiritual', spiritualTimeframe).current"></span>
+                            <span class="stock-unit">/100</span>
+                            <div class="stock-change" :class="getStats('spiritual', spiritualTimeframe).changeClass">
+                                <span class="change-icon" x-text="getStats('spiritual', spiritualTimeframe).icon"></span>
+                                <span class="change-text" x-text="getStats('spiritual', spiritualTimeframe).changeText"></span>
+                                <span class="change-period">terhadap awal periode</span>
+                            </div>
+                        </div>
+                        
+                        <div class="timeframe-selector">
+                            <button type="button" class="timeframe-btn" :class="{ 'active': spiritualTimeframe === '1W' }" @click="spiritualTimeframe = '1W'; updateSpiritualChart()">1M (Minggu)</button>
+                            <button type="button" class="timeframe-btn" :class="{ 'active': spiritualTimeframe === '1M' }" @click="spiritualTimeframe = '1M'; updateSpiritualChart()">1B (Bulan)</button>
+                            <button type="button" class="timeframe-btn" :class="{ 'active': spiritualTimeframe === '3M' }" @click="spiritualTimeframe = '3M'; updateSpiritualChart()">3B</button>
+                            <button type="button" class="timeframe-btn" :class="{ 'active': spiritualTimeframe === '6M' }" @click="spiritualTimeframe = '6M'; updateSpiritualChart()">6B</button>
+                            <button type="button" class="timeframe-btn" :class="{ 'active': spiritualTimeframe === '1Y' }" @click="spiritualTimeframe = '1Y'; updateSpiritualChart()">1T (Tahun)</button>
+                            <button type="button" class="timeframe-btn" :class="{ 'active': spiritualTimeframe === 'ALL' }" @click="spiritualTimeframe = 'ALL'; updateSpiritualChart()">Semua</button>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-chart-wrap">
+                        <canvas id="modalSpiritualChart"></canvas>
+                    </div>
+                    
+                    <div class="modal-footer-info">
+                        <p>💡 <strong>Tips:</strong> Skor spiritual Anda dihitung secara komprehensif dari makna hidup, rasa damai, dan kedekatan spiritual Anda sehari-hari.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Detail Tren Emosi -->
+            <div class="modal-overlay" :class="{ 'show': openEmotionModal }" @click.self="openEmotionModal = false" x-cloak>
+                <div class="modal-content modal-content-large">
+                    <div class="modal-header">
+                        <h3>Detail Tren Emosi</h3>
+                        <p>Analisis kondisi emosi dan suasana hati Anda</p>
+                        <button class="modal-close" @click="openEmotionModal = false" type="button">&times;</button>
+                    </div>
+                    
+                    <div class="stock-dashboard">
+                        <div class="stock-metric-row">
+                            <span class="stock-value" x-text="typeof getStats('emotion', emotionTimeframe).current === 'number' ? getStats('emotion', emotionTimeframe).current.toFixed(1) : getStats('emotion', emotionTimeframe).current"></span>
+                            <span class="stock-unit">/5</span>
+                            <div class="stock-change" :class="getStats('emotion', emotionTimeframe).changeClass">
+                                <span class="change-icon" x-text="getStats('emotion', emotionTimeframe).icon"></span>
+                                <span class="change-text" x-text="getStats('emotion', emotionTimeframe).changeText"></span>
+                                <span class="change-period">terhadap awal periode</span>
+                            </div>
+                        </div>
+                        
+                        <div class="timeframe-selector">
+                            <button type="button" class="timeframe-btn" :class="{ 'active': emotionTimeframe === '1W' }" @click="emotionTimeframe = '1W'; updateEmotionChart()">1M (Minggu)</button>
+                            <button type="button" class="timeframe-btn" :class="{ 'active': emotionTimeframe === '1M' }" @click="emotionTimeframe = '1M'; updateEmotionChart()">1B (Bulan)</button>
+                            <button type="button" class="timeframe-btn" :class="{ 'active': emotionTimeframe === '3M' }" @click="emotionTimeframe = '3M'; updateEmotionChart()">3B</button>
+                            <button type="button" class="timeframe-btn" :class="{ 'active': emotionTimeframe === '6M' }" @click="emotionTimeframe = '6M'; updateEmotionChart()">6B</button>
+                            <button type="button" class="timeframe-btn" :class="{ 'active': emotionTimeframe === '1Y' }" @click="emotionTimeframe = '1Y'; updateEmotionChart()">1T (Tahun)</button>
+                            <button type="button" class="timeframe-btn" :class="{ 'active': emotionTimeframe === 'ALL' }" @click="emotionTimeframe = 'ALL'; updateEmotionChart()">Semua</button>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-chart-wrap">
+                        <canvas id="modalEmotionChart"></canvas>
+                    </div>
+                    
+                    <div class="modal-footer-info">
+                        <p>💡 <strong>Tips:</strong> Tren emosi Anda didasarkan pada skala 1-5 (Sedih, Cemas, Netral, Baik, Sangat Baik) yang Anda isi pada cek harian.</p>
+                    </div>
+                </div>
+            </div>
+
 
         </main>
     </div>
@@ -406,7 +499,7 @@
 
         .dashboard-page {
             background: #f5f7fb;
-            font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, sans-serif;
+            font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, sans-serif;
         }
 
         .dashboard-layout {
@@ -531,7 +624,7 @@
             position: relative;
         }
 
-        .dashboard-topbar > div:first-child {
+        .dashboard-topbar .topbar-title-wrapper {
             text-align: center;
         }
 
@@ -784,6 +877,7 @@
         .card-header {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             gap: 16px;
         }
 
@@ -804,6 +898,11 @@
             border-radius: 10px;
             font-size: 0.75rem;
             color: var(--muted);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: normal;
         }
 
         .chart-wrap {
@@ -1019,10 +1118,15 @@
 
         .tips-card-v2 {
             display: flex;
-            align-items: flex-start;
-            gap: 14px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 16px;
             background: #fffbeb;
             border: 1px solid #fde68a;
+            padding: 24px;
+            height: 100%;
         }
 
         .tips-icon-wrap {
@@ -1298,25 +1402,182 @@
         .scale-num {
             display: grid;
             place-items: center;
-            width: 40px;
-            height: 40px;
+            width: 46px;
+            height: 46px;
             border-radius: 12px;
             background: #f1f5f9;
             color: #475569;
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 1.1rem;
+            font-weight: 700;
             transition: all 0.15s;
             border: 2px solid transparent;
         }
 
-        .scale-option input:checked + .scale-num {
-            background: #d4edda;
-            color: #2f855a;
-            border-color: #4f9b4f;
-        }
-
         .scale-option:hover .scale-num {
             background: #e2e8f0;
+        }
+
+        .scale-wrapper {
+            margin-top: 6px;
+        }
+
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 262px;
+            margin-top: 6px;
+            padding: 0 4px;
+        }
+
+        .scale-labels span {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--muted);
+        }
+
+        .scale-label-start {
+            text-align: left;
+        }
+
+        .scale-label-end {
+            text-align: right;
+        }
+
+        /* Spiritual Scale checked colors */
+        .spiritual-scale .scale-option input[value="1"]:checked + .scale-num { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+        .spiritual-scale .scale-option input[value="2"]:checked + .scale-num { background: #ffedd5; border-color: #f97316; color: #9a3412; }
+        .spiritual-scale .scale-option input[value="3"]:checked + .scale-num { background: #fef9c3; border-color: #eab308; color: #854d0e; }
+        .spiritual-scale .scale-option input[value="4"]:checked + .scale-num { background: #e8f5e9; border-color: #4caf50; color: #1b5e20; }
+        .spiritual-scale .scale-option input[value="5"]:checked + .scale-num { background: #d4edda; border-color: #4f9b4f; color: #2f855a; }
+
+        /* Symptom Scale checked colors */
+        .symptom-scale .scale-option input[value="1"]:checked + .scale-num { background: #d4edda; border-color: #4f9b4f; color: #2f855a; }
+        .symptom-scale .scale-option input[value="2"]:checked + .scale-num { background: #e8f5e9; border-color: #8bc34a; color: #33691e; }
+        .symptom-scale .scale-option input[value="3"]:checked + .scale-num { background: #fef9c3; border-color: #eab308; color: #854d0e; }
+        .symptom-scale .scale-option input[value="4"]:checked + .scale-num { background: #ffedd5; border-color: #f97316; color: #9a3412; }
+        .symptom-scale .scale-option input[value="5"]:checked + .scale-num { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+
+        /* Stock-like Detail Modals styling */
+        .modal-content-large {
+            max-width: 800px;
+        }
+
+        .stock-dashboard {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            background: #f8fafc;
+            padding: 16px 20px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .stock-metric-row {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .stock-value {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        .stock-unit {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--muted);
+            margin-right: 12px;
+        }
+
+        .stock-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .stock-change.positive {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .stock-change.negative {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .stock-change.neutral {
+            background: #f1f5f9;
+            color: #475569;
+        }
+
+        .change-period {
+            font-weight: 400;
+            opacity: 0.85;
+            margin-left: 2px;
+            font-size: 0.72rem;
+        }
+
+        .timeframe-selector {
+            display: flex;
+            gap: 6px;
+            background: #e2e8f0;
+            padding: 4px;
+            border-radius: 12px;
+        }
+
+        .timeframe-btn {
+            border: none;
+            background: transparent;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .timeframe-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+            color: var(--text);
+        }
+
+        .timeframe-btn.active {
+            background: #ffffff;
+            color: var(--text);
+            box-shadow: 0 2px 4px rgba(15, 23, 42, 0.05);
+        }
+
+        .modal-chart-wrap {
+            height: 320px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .modal-footer-info {
+            background: #eff6ff;
+            border-radius: 12px;
+            padding: 12px 16px;
+            border: 1px solid #bfdbfe;
+        }
+
+        .modal-footer-info p {
+            font-size: 0.78rem;
+            color: #1e3a8a;
+            margin: 0;
+            line-height: 1.5;
         }
 
         .checkin-section textarea {
@@ -1324,7 +1585,7 @@
             border: 1px solid #d1d5db;
             border-radius: 12px;
             padding: 10px 14px;
-            font-family: 'Manrope', sans-serif;
+            font-family: 'Outfit', sans-serif;
             font-size: 0.85rem;
             resize: vertical;
         }
@@ -1365,7 +1626,7 @@
             font-weight: 600;
             font-size: 0.85rem;
             cursor: pointer;
-            font-family: 'Manrope', sans-serif;
+            font-family: 'Outfit', sans-serif;
             transition: background 0.15s;
         }
 
@@ -1380,7 +1641,7 @@
                 justify-content: space-between;
             }
 
-            .dashboard-topbar > div:first-child {
+            .dashboard-topbar .topbar-title-wrapper {
                 text-align: left;
             }
 
@@ -1509,5 +1770,228 @@
             }
         }
         document.addEventListener('DOMContentLoaded', initCharts);
+
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('dashboardState', () => ({
+                openSpiritualModal: false,
+                openEmotionModal: false,
+                spiritualTimeframe: '1M',
+                emotionTimeframe: '1M',
+                historicalData: @json($historicalData),
+                spiritualChartInstance: null,
+                emotionChartInstance: null,
+
+                getFilteredData(metric, timeframe) {
+                    const now = new Date();
+                    let limitDate = new Date();
+                    
+                    if (timeframe === '1W') {
+                        limitDate.setDate(now.getDate() - 7);
+                    } else if (timeframe === '1M') {
+                        limitDate.setMonth(now.getMonth() - 1);
+                    } else if (timeframe === '3M') {
+                        limitDate.setMonth(now.getMonth() - 3);
+                    } else if (timeframe === '6M') {
+                        limitDate.setMonth(now.getMonth() - 6);
+                    } else if (timeframe === '1Y') {
+                        limitDate.setFullYear(now.getFullYear() - 1);
+                    } else {
+                        limitDate = new Date(0); // ALL
+                    }
+                    
+                    return this.historicalData
+                        .filter(item => new Date(item.date) >= limitDate)
+                        .sort((a, b) => new Date(a.date) - new Date(b.date));
+                },
+
+                getStats(metric, timeframe) {
+                    const data = this.getFilteredData(metric, timeframe);
+                    if (data.length === 0) return { current: '--', changeText: 'Belum ada data', changeClass: 'neutral', icon: '' };
+                    
+                    const current = data[data.length - 1][metric];
+                    if (data.length < 2) {
+                        return { current: current, changeText: 'Stabil', changeClass: 'neutral', icon: '•' };
+                    }
+                    
+                    const first = data[0][metric];
+                    const diff = current - first;
+                    
+                    if (diff > 0) {
+                        return {
+                            current: current,
+                            changeText: `+${diff.toFixed(metric === 'emotion' ? 1 : 0)} poin`,
+                            changeClass: 'positive',
+                            icon: '↑'
+                        };
+                    } else if (diff < 0) {
+                        return {
+                            current: current,
+                            changeText: `${diff.toFixed(metric === 'emotion' ? 1 : 0)} poin`,
+                            changeClass: 'negative',
+                            icon: '↓'
+                        };
+                    } else {
+                        return {
+                            current: current,
+                            changeText: 'Stabil',
+                            changeClass: 'neutral',
+                            icon: '•'
+                        };
+                    }
+                },
+
+                updateSpiritualChart() {
+                    const filtered = this.getFilteredData('spiritual', this.spiritualTimeframe);
+                    const labels = filtered.map(item => item.label);
+                    const data = filtered.map(item => item.spiritual);
+                    
+                    if (this.spiritualChartInstance) {
+                        this.spiritualChartInstance.data.labels = labels;
+                        this.spiritualChartInstance.data.datasets[0].data = data;
+                        this.spiritualChartInstance.update();
+                    } else {
+                        const ctx = document.getElementById('modalSpiritualChart');
+                        if (!ctx) return;
+                        const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 300);
+                        gradient.addColorStop(0, 'rgba(79, 155, 79, 0.3)');
+                        gradient.addColorStop(1, 'rgba(79, 155, 79, 0.0)');
+                        
+                        this.spiritualChartInstance = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Skor Spiritual',
+                                    data: data,
+                                    borderColor: '#4f9b4f',
+                                    backgroundColor: gradient,
+                                    tension: 0.4,
+                                    fill: true,
+                                    pointRadius: 5,
+                                    pointHoverRadius: 7,
+                                    pointBackgroundColor: '#4f9b4f',
+                                    pointBorderColor: '#ffffff',
+                                    pointBorderWidth: 2,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                interaction: {
+                                    intersect: false,
+                                    mode: 'index',
+                                },
+                                scales: {
+                                    y: {
+                                        min: 0,
+                                        max: 100,
+                                        ticks: {
+                                            stepSize: 20,
+                                            font: { family: 'Outfit', size: 11 }
+                                        },
+                                        grid: { color: '#e2e8f0' }
+                                    },
+                                    x: {
+                                        ticks: { font: { family: 'Outfit', size: 11 } },
+                                        grid: { display: false }
+                                    }
+                                },
+                                plugins: {
+                                    legend: { display: false },
+                                    tooltip: {
+                                        bodyFont: { family: 'Outfit', size: 12 },
+                                        titleFont: { family: 'Outfit', size: 12, weight: 'bold' },
+                                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                        padding: 12,
+                                        cornerRadius: 8
+                                    }
+                                }
+                            }
+                        });
+                    }
+                },
+
+                updateEmotionChart() {
+                    const filtered = this.getFilteredData('emotion', this.emotionTimeframe);
+                    const labels = filtered.map(item => item.label);
+                    const data = filtered.map(item => item.emotion);
+                    
+                    if (this.emotionChartInstance) {
+                        this.emotionChartInstance.data.labels = labels;
+                        this.emotionChartInstance.data.datasets[0].data = data;
+                        this.emotionChartInstance.update();
+                    } else {
+                        const ctx = document.getElementById('modalEmotionChart');
+                        if (!ctx) return;
+                        const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 300);
+                        gradient.addColorStop(0, 'rgba(96, 165, 250, 0.3)');
+                        gradient.addColorStop(1, 'rgba(96, 165, 250, 0.0)');
+                        
+                        this.emotionChartInstance = new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: labels,
+                                datasets: [{
+                                    label: 'Tren Emosi',
+                                    data: data,
+                                    borderColor: '#3b82f6',
+                                    backgroundColor: gradient,
+                                    tension: 0.4,
+                                    fill: true,
+                                    pointRadius: 5,
+                                    pointHoverRadius: 7,
+                                    pointBackgroundColor: '#3b82f6',
+                                    pointBorderColor: '#ffffff',
+                                    pointBorderWidth: 2,
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                interaction: {
+                                    intersect: false,
+                                    mode: 'index',
+                                },
+                                scales: {
+                                    y: {
+                                        min: 1,
+                                        max: 5,
+                                        ticks: {
+                                            stepSize: 1,
+                                            callback: function(value) {
+                                                const labels = { 1: 'Sedih', 2: 'Cemas', 3: 'Netral', 4: 'Baik', 5: 'Sgt Baik' };
+                                                return labels[value] || value;
+                                            },
+                                            font: { family: 'Outfit', size: 10 }
+                                        },
+                                        grid: { color: '#e2e8f0' }
+                                    },
+                                    x: {
+                                        ticks: { font: { family: 'Outfit', size: 11 } },
+                                        grid: { display: false }
+                                    }
+                                },
+                                plugins: {
+                                    legend: { display: false },
+                                    tooltip: {
+                                        bodyFont: { family: 'Outfit', size: 12 },
+                                        titleFont: { family: 'Outfit', size: 12, weight: 'bold' },
+                                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                        padding: 12,
+                                        cornerRadius: 8,
+                                        callbacks: {
+                                            label: function(context) {
+                                                const labels = { 1: 'Sedih', 2: 'Cemas', 3: 'Netral', 4: 'Baik', 5: 'Sangat Baik' };
+                                                return 'Kondisi: ' + (labels[context.raw] || context.raw);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+            }));
+        });
     </script>
 </x-app-layout>

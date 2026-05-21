@@ -1,6 +1,7 @@
 @push('head')
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
 @endpush
 
 @php
@@ -237,7 +238,7 @@
 
         .journal-page {
             background: #f4f6fb;
-            font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, sans-serif;
+            font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, sans-serif;
         }
 
         .journal-layout {
@@ -392,7 +393,7 @@
             align-items: center;
         }
 
-        .journal-topbar > div:not(.topbar-actions) {
+        .journal-topbar .topbar-title-wrapper {
             grid-column: 2;
             text-align: center;
         }
@@ -1068,7 +1069,7 @@
                 gap: 12px;
             }
 
-            .journal-topbar > div:not(.topbar-actions) {
+            .journal-topbar .topbar-title-wrapper {
                 text-align: left;
             }
 

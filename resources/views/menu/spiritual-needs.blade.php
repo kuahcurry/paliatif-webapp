@@ -1,6 +1,7 @@
 @push('head')
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
 @endpush
 
 @php
@@ -142,7 +143,7 @@
 
         .intervention-page {
             background: #f4f6fb;
-            font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, sans-serif;
+            font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, sans-serif;
         }
 
         .intervention-layout {
@@ -277,7 +278,7 @@
             gap: 16px;
         }
 
-        .intervention-topbar > div:first-of-type {
+        .intervention-topbar .topbar-title-wrapper {
             text-align: center;
         }
 
@@ -688,7 +689,7 @@
                 justify-content: space-between;
             }
 
-            .intervention-topbar > div:first-of-type {
+            .intervention-topbar .topbar-title-wrapper {
                 text-align: left;
             }
 

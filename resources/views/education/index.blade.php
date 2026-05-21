@@ -1,6 +1,7 @@
 @push('head')
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
 @endpush
 
 @php
@@ -166,7 +167,7 @@
                         <div class="help-content">
                             <h4>Butuh Bantuan?</h4>
                             <p>Jika Anda merasa perlu dukungan lebih lanjut dari tenaga profesional, kami siap membantu.</p>
-                            <a href="{{ route('faq') }}" class="help-button">
+                            <a href="{{ route('contact') }}" class="help-button">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                                 Hubungi Kami
                             </a>
@@ -181,8 +182,7 @@
                             </div>
                             <h4>Tips Hari Ini</h4>
                             @if ($dailyTip)
-                                <p>{{ $dailyTip->summary ?? Str::limit($dailyTip->content, 150) }}</p>
-                                <a href="{{ route('education.show', $dailyTip) }}" class="tips-link">Baca selengkapnya</a>
+                                <p>{{ $dailyTip }}</p>
                             @else
                                 <p>Luangkan waktu sejenak untuk diri sendiri setiap hari, meski hanya 10 menit. Anda juga berhak untuk merasa lelah.</p>
                             @endif
@@ -206,7 +206,7 @@
 
         .education-page {
             background: #f4f6fb;
-            font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, sans-serif;
+            font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, sans-serif;
         }
 
         .education-layout {
@@ -361,7 +361,7 @@
             align-items: center;
         }
 
-        .education-topbar > div:not(.topbar-actions) {
+        .education-topbar .topbar-title-wrapper {
             grid-column: 2;
             text-align: center;
         }
@@ -966,47 +966,23 @@
                 grid-template-columns: 1fr;
             }
 
-            .education-sidebar {
-                position: sticky;
-                top: 0;
-                z-index: 10;
-                flex-direction: row;
-                overflow-x: auto;
-                gap: 12px;
-            }
-
-            .sidebar-brand,
-            .sidebar-footer {
-                display: none;
-            }
-
-            .sidebar-nav {
-                flex-direction: row;
-                flex-wrap: nowrap;
-            }
-
-            .nav-group {
-                min-width: 180px;
-            }
-
             .filter-bar {
                 grid-template-columns: 1fr;
             }
 
-            .education-topbar {
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
+            .module-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             }
 
-            .education-topbar > div:not(.topbar-actions) {
-                text-align: left;
+            .module-grid.compact {
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
             }
+        }
 
-            .education-topbar .topbar-actions {
-                justify-self: auto;
-                align-self: flex-start;
+        @media (max-width: 600px) {
+            .module-grid,
+            .module-grid.compact {
+                grid-template-columns: 1fr !important;
             }
         }
     </style>

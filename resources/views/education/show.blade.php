@@ -1,6 +1,7 @@
 @push('head')
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700,800|merriweather:300,400,700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
 @endpush
 
 <x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen reader-page">
@@ -146,7 +147,7 @@
 
         .reader-page {
             background: var(--bg);
-            font-family: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+            font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
             color: var(--text);
         }
 

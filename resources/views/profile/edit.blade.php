@@ -1,6 +1,7 @@
 @push('head')
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
 @endpush
 
 @php
@@ -99,7 +100,7 @@
 
         .dashboard-page {
             background: #f5f7fb;
-            font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, sans-serif;
+            font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, sans-serif;
         }
 
         .dashboard-layout {
@@ -258,7 +259,7 @@
             position: relative;
         }
 
-        .dashboard-topbar > div:first-child {
+        .dashboard-topbar .topbar-title-wrapper {
             text-align: center;
         }
 
@@ -430,7 +431,7 @@
             border: 1px solid #d1dbe6;
             border-radius: 12px;
             padding: 10px 14px;
-            font-family: 'Manrope', sans-serif;
+            font-family: 'Outfit', sans-serif;
             font-size: 0.85rem;
             width: 100%;
             color: #1e293b;
@@ -474,7 +475,7 @@
             font-weight: 600;
             font-size: 0.85rem;
             cursor: pointer;
-            font-family: 'Manrope', sans-serif;
+            font-family: 'Outfit', sans-serif;
             transition: background 0.15s;
             align-self: flex-start;
         }
@@ -531,7 +532,7 @@
             border: none;
             color: #4f9b4f;
             cursor: pointer;
-            font-family: 'Manrope', sans-serif;
+            font-family: 'Outfit', sans-serif;
             font-size: 0.8rem;
             padding: 0;
         }
@@ -645,7 +646,7 @@
             font-weight: 600;
             font-size: 0.85rem;
             cursor: pointer;
-            font-family: 'Manrope', sans-serif;
+            font-family: 'Outfit', sans-serif;
             transition: background 0.15s;
             margin-top: 12px;
         }
@@ -666,7 +667,7 @@
             gap: 6px;
             cursor: pointer;
             text-decoration: none;
-            font-family: 'Manrope', sans-serif;
+            font-family: 'Outfit', sans-serif;
         }
 
         .danger-btn {
@@ -678,7 +679,7 @@
             font-weight: 600;
             font-size: 0.85rem;
             cursor: pointer;
-            font-family: 'Manrope', sans-serif;
+            font-family: 'Outfit', sans-serif;
             transition: background 0.15s;
             display: inline-flex;
             align-items: center;
@@ -747,7 +748,7 @@
             border: 1px solid #d1dbe6;
             border-radius: 12px;
             padding: 10px 14px;
-            font-family: 'Manrope', sans-serif;
+            font-family: 'Outfit', sans-serif;
             font-size: 0.85rem;
             width: 75%;
         }
@@ -788,7 +789,7 @@
                 justify-content: space-between;
             }
 
-            .dashboard-topbar > div:first-child {
+            .dashboard-topbar .topbar-title-wrapper {
                 text-align: left;
             }
 
@@ -801,27 +802,15 @@
             .dashboard-layout {
                 grid-template-columns: 1fr;
             }
+        }
 
-            .dashboard-sidebar {
-                position: sticky;
-                top: 0;
-                z-index: 10;
-                flex-direction: row;
-                overflow-x: auto;
-                gap: 12px;
+        @media (max-width: 600px) {
+            .dashboard-main {
+                padding: 16px 12px 32px;
             }
 
-            .sidebar-brand {
-                display: none;
-            }
-
-            .sidebar-nav {
-                flex-direction: row;
-                flex-wrap: nowrap;
-            }
-
-            .nav-item {
-                white-space: nowrap;
+            .card {
+                padding: 16px 12px;
             }
         }
     </style>

@@ -1,6 +1,7 @@
 @push('head')
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
 @endpush
 
 @php
@@ -182,7 +183,7 @@
 
         .dashboard-page {
             background: #f5f7fb;
-            font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, sans-serif;
+            font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, sans-serif;
         }
 
         .dashboard-layout {
@@ -327,7 +328,7 @@
             align-items: center;
         }
 
-        .dashboard-topbar > div:first-child {
+        .dashboard-topbar .topbar-title-wrapper {
             grid-column: 2;
             text-align: center;
         }
@@ -810,21 +811,10 @@
         }
 
         @media (max-width: 1200px) {
-            .dashboard-topbar {
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
+            .evaluation-hero {
+                grid-template-columns: 1fr;
             }
 
-            .dashboard-topbar > div:first-child {
-                text-align: left;
-            }
-
-            .dashboard-topbar .topbar-actions {
-                justify-self: auto;
-                align-self: flex-start;
-            }
             .hero-metrics {
                 grid-template-columns: 1fr 1fr;
             }
@@ -842,28 +832,19 @@
             .dashboard-layout {
                 grid-template-columns: 1fr;
             }
+        }
 
-            .dashboard-sidebar {
-                position: sticky;
-                top: 0;
-                z-index: 10;
-                flex-direction: row;
-                overflow-x: auto;
-                gap: 12px;
+        @media (max-width: 600px) {
+            .dashboard-main {
+                padding: 16px 12px 32px;
             }
 
-            .sidebar-brand,
-            .sidebar-footer {
-                display: none;
+            .card {
+                padding: 16px 12px;
             }
 
-            .sidebar-nav {
-                flex-direction: row;
-                flex-wrap: nowrap;
-            }
-
-            .nav-group {
-                min-width: 180px;
+            .hero-metrics {
+                grid-template-columns: 1fr;
             }
         }
     </style>

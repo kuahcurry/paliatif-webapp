@@ -1,6 +1,7 @@
 @push('head')
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700&display=swap" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
 @endpush
 
 <x-app-layout :hideNavigation="true" :hideHeader="true" bodyClass="antialiased" pageClass="min-h-screen prayer-tree-page">
@@ -157,7 +158,7 @@
 
         .prayer-tree-page {
             background: #f0f5f0;
-            font-family: 'Manrope', ui-sans-serif, system-ui, -apple-system, sans-serif;
+            font-family: 'Outfit', ui-sans-serif, system-ui, -apple-system, sans-serif;
             color: var(--text);
         }
 
@@ -271,11 +272,11 @@
             gap: 16px;
         }
 
-        .prayer-topbar > div:first-of-type {
+        .prayer-topbar .topbar-title-wrapper {
             text-align: center;
         }
 
-        .prayer-topbar .ghost-button {
+        .prayer-topbar .desktop-menu-btn {
             position: absolute;
             left: 0;
         }
@@ -300,7 +301,7 @@
 
         /* ── Topbar Profile ── */
 
-        .prayer-topbar .icon-button {
+        .icon-button {
             position: relative;
             border: none;
             background: #ffffff;
@@ -315,18 +316,18 @@
             transition: all 0.2s ease;
         }
 
-        .prayer-topbar .icon-button:hover {
+        .icon-button:hover {
             background: #f8fafc;
             box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
-            color: var(--accent);
+            color: #3b82f6;
         }
 
-        .prayer-topbar .icon-button svg {
+        .icon-button svg {
             width: 20px;
             height: 20px;
         }
 
-        .prayer-topbar .badge {
+        .badge {
             position: absolute;
             top: -3px;
             right: -3px;
@@ -342,55 +343,48 @@
             border: 2px solid #fff;
         }
 
-        .prayer-topbar .user-chip {
+        .user-chip {
             display: flex;
             align-items: center;
             gap: 10px;
             background: #ffffff;
-            border-radius: 14px;
-            padding: 6px 14px 6px 6px;
-            box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
-            border: 1px solid transparent;
+            border-radius: 16px;
+            padding: 6px 12px;
+            box-shadow: var(--shadow);
+            border: none;
             cursor: pointer;
-            transition: all 0.2s ease;
+            font-family: inherit;
         }
 
-        .prayer-topbar .user-chip:hover {
-            border-color: var(--accent);
-            box-shadow: 0 4px 14px rgba(79, 155, 79, 0.15);
-        }
-
-        .prayer-topbar .avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--accent-light), #c8e6c9);
-            color: var(--accent-dark);
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            background: #dbeafe;
+            color: #1d4ed8;
             font-weight: 700;
-            font-size: 0.9rem;
             display: grid;
             place-items: center;
-            flex-shrink: 0;
         }
 
-        .prayer-topbar .user-name {
+        .user-name {
             font-size: 0.85rem;
             font-weight: 700;
             line-height: 1.2;
         }
 
-        .prayer-topbar .user-role {
+        .user-role {
             font-size: 0.7rem;
             color: var(--muted);
         }
 
-        .prayer-topbar .chevron {
+        .chevron {
             color: var(--muted);
             margin-left: 2px;
             transition: transform 0.2s ease;
         }
 
-        .prayer-topbar .user-chip:hover .chevron {
+        .user-chip:hover .chevron {
             transform: rotate(180deg);
         }
 
@@ -888,6 +882,10 @@
         }
 
         @media (max-width: 900px) {
+            .prayer-topbar .topbar-actions {
+                position: static !important;
+            }
+
             .prayer-layout {
                 grid-template-columns: 1fr;
             }
@@ -895,21 +893,6 @@
             .prayer-main {
                 padding: 16px 16px 40px;
                 gap: 12px;
-            }
-
-            .prayer-topbar {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 8px;
-            }
-
-            .prayer-topbar > div:first-of-type {
-                text-align: left;
-            }
-
-            .prayer-topbar .topbar-actions {
-                position: static;
-                align-self: flex-end;
             }
 
             .patient-strip {
