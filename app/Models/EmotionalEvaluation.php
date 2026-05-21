@@ -21,6 +21,7 @@ class EmotionalEvaluation extends Model
     {
         return [
             'session_number' => 'integer',
+            'note' => 'encrypted',
         ];
     }
 

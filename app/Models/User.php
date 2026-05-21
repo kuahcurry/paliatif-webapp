@@ -27,11 +27,15 @@ class User extends Authenticatable implements MustVerifyEmail
     protected function casts(): array
     {
         return [
+            'name' => 'encrypted',
+            'religion' => 'encrypted',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_admin' => 'boolean',
+            'patient_gender' => 'encrypted',
             'patient_age' => 'integer',
-            'patient_birth_date' => 'date',
+            'patient_birth_date' => 'encrypted:date',
+            'marital_status' => 'encrypted',
         ];
     }
 

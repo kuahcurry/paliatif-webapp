@@ -6,11 +6,14 @@
 @php
     $faqItems = [
         ['q' => 'Apa itu Terapi Rohani Pasien Paliatif?', 'a' => 'Layanan pendampingan spiritual dan psikososial untuk pasien paliatif dan caregiver, membantu menemukan makna, ketenangan, dan dukungan emosional.'],
-        ['q' => 'Bagaimana cara menggunakan modul edukasi?', 'a' => 'Anda dapat mengakses modul edukasi melalui menu <strong>Modul Edukasi</strong> di sidebar. Pilih modul yang sesuai dengan kebutuhan Anda, baik berupa artikel maupun video.'],
-        ['q' => 'Apa yang harus saya lakukan jika merasa cemas atau tertekan?', 'a' => 'Gunakan fitur <strong>Evaluasi Perasaan</strong> untuk melaporkan kondisi emosional Anda. Tim pendamping akan memantau dan memberikan dukungan yang diperlukan.'],
-        ['q' => 'Bagaimana cara mengisi cek harian?', 'a' => 'Cek harian dapat diisi melalui halaman <strong>Dashboard Spiritual</strong>. Isi skala spiritual dan gejala Anda setiap hari untuk memantau perkembangan.'],
-        ['q' => 'Apa itu Pohon Doa?', 'a' => 'Pohon Doa adalah fitur berbagi doa dan dukungan spiritual antar pengguna. Anda dapat mengirimkan doa dan memberikan dukungan kepada doa pengguna lain.'],
-        ['q' => 'Bagaimana cara menghubungi tenaga profesional?', 'a' => 'Jika Anda membutuhkan bantuan lebih lanjut, silakan hubungi tim pendamping melalui informasi kontak yang tersedia di halaman <strong>Profil</strong> atau melalui menu Bantuan.'],
+        ['q' => 'Bagaimana cara menginstal aplikasi ini di HP?', 'a' => 'Anda dapat menginstal aplikasi ini di layar utama (home screen) HP Anda. Buka situs web ini di browser HP Anda (seperti Chrome atau Safari), lalu pilih opsi <strong>Tambahkan ke Layar Utama (Add to Home Screen)</strong> dari menu browser.'],
+        ['q' => 'Bagaimana cara menggunakan fitur Pengkajian?', 'a' => 'Anda dapat mengisi pengkajian awal seperti skala kesejahteraan spiritual dan gejala melalui menu <strong>Pengkajian</strong>. Ini membantu memantau kondisi awal Anda.'],
+        ['q' => 'Bagaimana cara menggunakan modul edukasi?', 'a' => 'Anda dapat mengakses modul edukasi melalui menu <strong>Modul Edukasi</strong>. Pilih modul yang sesuai dengan kebutuhan Anda, baik berupa artikel maupun video.'],
+        ['q' => 'Apa yang harus saya lakukan jika merasa cemas atau tertekan?', 'a' => 'Gunakan menu <strong>Evaluasi</strong> untuk melaporkan kondisi emosional Anda. Ini membantu memantau perasaan Anda dari waktu ke waktu.'],
+        ['q' => 'Bagaimana cara mengisi cek harian?', 'a' => 'Cek harian dapat diisi melalui halaman <strong>Beranda</strong>. Isi skala spiritual dan gejala Anda setiap hari untuk melihat perkembangan pada radar spiritual.'],
+        ['q' => 'Bagaimana cara menggunakan fitur Jurnal & Catatan?', 'a' => 'Gunakan menu <strong>Jurnal & Catatan</strong> untuk mencatat pikiran, perasaan, atau pengalaman harian Anda sebagai bentuk refleksi diri.'],
+        ['q' => 'Apa itu Pohon Doa?', 'a' => 'Pohon Doa adalah fitur berbagi doa dan dukungan spiritual antar pengguna. Anda dapat mengirimkan doa dan memberikan dukungan kepada doa pengguna lain melalui menu <strong>Pohon Doa</strong>.'],
+        ['q' => 'Bagaimana cara menghubungi tenaga profesional?', 'a' => 'Jika Anda membutuhkan bantuan lebih lanjut, silakan hubungi tim pendamping melalui informasi kontak yang tersedia di menu <strong>Pengaturan</strong>.'],
     ];
 @endphp
 

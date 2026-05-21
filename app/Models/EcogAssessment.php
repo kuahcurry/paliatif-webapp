@@ -21,8 +21,13 @@ class EcogAssessment extends Model
     ];
 
     protected $casts = [
+        'respondent_initials' => 'encrypted',
         'age' => 'integer',
+        'gender' => 'encrypted',
+        'marital_status' => 'encrypted',
+        'cancer_stage' => 'encrypted',
         'score' => 'integer',
+        'score_label' => 'encrypted',
     ];
 
     public function user(): BelongsTo

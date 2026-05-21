@@ -25,6 +25,8 @@ class JournalEntry extends Model
         return [
             'entry_date' => 'date',
             'is_shareable' => 'boolean',
+            'content' => 'encrypted',
+            'provider_response' => 'encrypted',
         ];
     }
 

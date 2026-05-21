@@ -31,7 +31,7 @@ class VerifyEmailNotification extends BaseVerifyEmail
     /**
      * Intercept toMail to capture the notifiable before building the message.
      */
-    public function toMail(object $notifiable): MailMessage
+    public function toMail($notifiable)
     {
         $this->notifiable = $notifiable;
 
